@@ -5,19 +5,19 @@ settingsPort.onMessage.addListener(function(response) {
 });
 
 var init = function (settings) {
-    console.log('settings', settings);
+    //console.log('settings', settings);
 
     $.each(settings.sites,
         function (i, site) {
-            console.log('window.location.href', window.location.href);
-            console.log('site.domain', site.domain);
+            //console.log('window.location.href', window.location.href);
+            //console.log('site.domain', site.domain);
 
-            console.log('site', site);
+            //console.log('site', site);
 
             if (window.location.href.includes(site.domain)) {
                 var search = window.location.href.replace(/(.+\/)/g, '');
 
-                console.log('search', search);
+                //console.log('search', search);
 
                 if (search.trim() !== '') {
                     // use jquery selector and then retrieve the DOM element
