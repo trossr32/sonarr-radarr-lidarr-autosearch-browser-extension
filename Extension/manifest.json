@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Sonarr/Radarr/Lidarr autosearch",
-  "description": "Exposes a context menu when text is highlighted and right-clicked that enables direct searching for tv shows, movies or artists in Sonarr, Radarr and Lidarr.",
+  "description": "Exposes a context menu that enables direct searching for tv shows, movies or artists in Sonarr, Radarr and Lidarr.",
   "version": "1.0.0.0",
   "browser_action": {
     "default_icon": "content/assets/images/SonarrRadarrLidarr128.png",
