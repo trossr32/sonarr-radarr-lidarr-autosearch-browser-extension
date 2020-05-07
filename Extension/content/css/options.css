@@ -24,28 +24,6 @@ a, a:focus, a:hover {
     margin-bottom: 40px;
 }
 
-.wellLabel {
-    width: 110px;
-    float: left;
-}
-
-.wellData {
-    font-weight: bold;
-    float: left;
-}
-
-.wellButtons {
-    float: right;
-}
-
-.wellButton {
-    margin-left: 5px;
-}
-
-.wd-header {
-    margin-bottom: 5px;
-}
-
 .clear {
     clear: both;
 }
