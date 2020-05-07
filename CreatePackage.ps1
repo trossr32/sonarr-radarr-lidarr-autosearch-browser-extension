@@ -1,5 +1,5 @@
 $extension = Resolve-Path -LiteralPath "Extension\"
-$zip = Resolve-Path -LiteralPath "sonarr-radarr-lidarr-autosearch-chrome-extension.zip"
+$zip = Join-Path (Get-Location).Path "sonarr-radarr-lidarr-autosearch-chromium-extension.zip"
 
 print
 
