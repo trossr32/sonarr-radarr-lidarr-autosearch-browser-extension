@@ -10,6 +10,10 @@ The extension an be disabled from the extension's popup and each context menu it
 
 # Getting started
 
+Chrome web store: https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc
+
+Microsoft Edge add-ons: https://microsoftedge.microsoft.com/addons/detail/aclgfcjonnhgdkinhmmafdbkpegfcnal
+
 Once the extension is installed on Chrome or Edge go to the options page and configure the extension.
 
 ## Settings
