@@ -11,17 +11,24 @@
     
     <style type="text/css">
         .popupRow { width: 100%; margin-bottom: 10px; }
-        .popupBtn { width: 100%; }
-        .popupContainer { width: 15em; text-align: center; padding-top: 10px; }
+        .popupBtn { width: 70%; }
+        .popupContainer { width: 35em; text-align: center; padding-top: 10px; }
     </style>
 </head>
 <body>
 <div class="container popupContainer">
     <div class="popupRow">
+        <p>Please note that by default the advanced settings are configured to the defaults that work with v2.0 of Sonarr.</p>
+        <p>If you are using v3.0, then please head to the options page, advanced tab and setup the v3.0 defaults.</p>
+    </div>
+
+    <hr />
+
+    <div class="popupRow text-center">
         <button type="button" class="btn btn-success popupBtn" id="toggleActive"><span class="glyphicon glyphicon-off"></span> Disable</button>
     </div>
 
-    <div class="popupRow">
+    <div class="popupRow text-center">
         <button type="button" class="btn btn-primary popupBtn" id="btnSettings"><span class="glyphicon glyphicon-cog"></span> Settings</button>
     </div>
 </div>

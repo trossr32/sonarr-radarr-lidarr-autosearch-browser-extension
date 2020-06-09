@@ -84,20 +84,29 @@ var initialiseAdvancedForm = function (settings) {
                 .val(site.searchInputSelector),
             selectorHelp = $('<div class="col-sm-offset-3"><small id="' + site.id + 'SearchInputSelectorHelp" class="form-text" style="margin-left: 20px;">This is the jquery selector used to find the search input form field for this instance.</small></div>');
 
-        wrapper
-            .append(section
-                .append(header.append(headerImg).append(headerText))
-                .append(searchPathGroup
-                    .append(searchPathLabel.append(searchPathLabelContent))
-                    .append(searchPathInputDiv.append(searchPathInput))
-                    .append(searchPathHelp)
-                )
-                .append(selectorGroup
-                    .append(selectorLabel.append(selectorLabelContent))
-                    .append(selectorInputDiv.append(selectorInput))
-                    .append(selectorHelp)
-                )
-        );
+        section.append(header.append(headerImg).append(headerText));
+
+        if (site.id === 'sonarr') {
+            section.append($('<div class="alert alert-info" style="margin-top: -10px; margin-bottom: 40px;"></div>')
+                .append($('<h4 class="alert-heading">Version info</h4>'))
+                .append($('<p>The below settings are defaulted to v2.0. For v3.0 use:</p>'))
+                .append($('<p>Search path url: <strong>/add/new/</strong></p>'))
+                .append($('<p>Search field selector: <strong>input[class*="AddNewSeries/searchInput"]</strong></p>'))
+            )
+        }
+        
+        section.append(searchPathGroup
+            .append(searchPathLabel.append(searchPathLabelContent))
+            .append(searchPathInputDiv.append(searchPathInput))
+            .append(searchPathHelp)
+        )
+        .append(selectorGroup
+            .append(selectorLabel.append(selectorLabelContent))
+            .append(selectorInputDiv.append(selectorInput))
+            .append(selectorHelp)
+        );        
+
+        wrapper.append(section);
     });
 
     $('#advancedOptionsForm').prepend(wrapper);

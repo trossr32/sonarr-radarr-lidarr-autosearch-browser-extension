@@ -12,6 +12,8 @@ The extension an be disabled from the extension's popup and each context menu it
 
 Once the extension is installed on Chrome or Edge go to the options page and configure the extension.
 
+Note: by default this extension defaults to settings applicable top v2.0 of Sonarr. If you're using v3.0 (currently in beta) then go to the advanced settings tab on the options page for guidance.
+
 ## Settings
 
 Fill out the URL fields for each of your Sonarr, Radarr or Lidarr instances in the format http://my.sonarr.domain:7357. 
