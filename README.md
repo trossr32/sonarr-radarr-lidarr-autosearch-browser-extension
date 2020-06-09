@@ -10,6 +10,10 @@ The extension an be disabled from the extension's popup and each context menu it
 
 # Getting started
 
+[Extension on the Chrome web store](https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc)
+
+[Extension on the Microsoft Edge add-ons store](https://microsoftedge.microsoft.com/addons/detail/aclgfcjonnhgdkinhmmafdbkpegfcnal)
+
 Once the extension is installed on Chrome or Edge go to the options page and configure the extension.
 
 Note: by default this extension defaults to settings applicable top v2.0 of Sonarr. If you're using v3.0 (currently in beta) then go to the advanced settings tab on the options page for guidance.
