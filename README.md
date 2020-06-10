@@ -16,7 +16,7 @@ The extension an be disabled from the extension's popup and each context menu it
 
 Once the extension is installed on Chrome or Edge go to the options page and configure the extension.
 
-Note: by default this extension defaults to settings applicable top v2.0 of Sonarr. If you're using v3.0 (currently in beta) then go to the advanced settings tab on the options page for guidance.
+Note: by default this extension defaults to settings applicable to v2.0 of Sonarr. If you're using v3.0 then go to the advanced settings tab on the options page for guidance.
 
 ## Settings
 
@@ -32,4 +32,4 @@ Fill out the URL fields for each of your Sonarr, Radarr or Lidarr instances in t
 Powershell scripts and batch files that execute those PS scripts are included but these simply zip the Extension directory, as that's all that's required to publish this to the Chrome Web Store and Microsoft Edge Addons sites.
 
 # Contribute
-If you can make this extension better I'm happy for the help! Create a pull request and get in touch.
+If you can make this extension better I'm happy for the help! Create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug.
