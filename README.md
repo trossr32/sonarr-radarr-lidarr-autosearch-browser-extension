@@ -14,7 +14,7 @@ The extension an be disabled from the extension's popup and each context menu it
 
 [Extension on the Microsoft Edge add-ons store](https://microsoftedge.microsoft.com/addons/detail/aclgfcjonnhgdkinhmmafdbkpegfcnal)
 
-[Add-on on the Firefox add-ons store](https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-autosearch/)
+[Add-on on the Firefox add-ons store](https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/)
 
 Once installed in your browser go to the options page and configure the extension.
 
