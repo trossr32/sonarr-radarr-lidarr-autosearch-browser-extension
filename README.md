@@ -1,6 +1,6 @@
 # Sonarr, Radarr and Lidarr Auto Search
 
-This is an extension for Chrome and the new chromium Microsoft Edge that:
+This is an extension for Chrome, the new chromium Microsoft Edge and Firefox that:
 
 1. Populates the search field on Sonarr, Radarr or Lidarr with any text added to the end of the search URL and then triggers the input event on the search field to fire off a search request. For instance, the standard search page url for Sonarr would be http://my.sonarr.domain:7357/addseries. This extension takes a URL like http://my.sonarr.domain:7357/addseries/fringe and automatically triggers the page to show results for fringe.
 
@@ -14,7 +14,9 @@ The extension an be disabled from the extension's popup and each context menu it
 
 [Extension on the Microsoft Edge add-ons store](https://microsoftedge.microsoft.com/addons/detail/aclgfcjonnhgdkinhmmafdbkpegfcnal)
 
-Once the extension is installed on Chrome or Edge go to the options page and configure the extension.
+[Add-on on the Firefox add-ons store](https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-autosearch/)
+
+Once installed in your browser go to the options page and configure the extension.
 
 Note: by default this extension defaults to settings applicable to v2.0 of Sonarr. If you're using v3.0 then go to the advanced settings tab on the options page for guidance.
 
@@ -29,7 +31,7 @@ Fill out the URL fields for each of your Sonarr, Radarr or Lidarr instances in t
 **Search input selector** - This text is used as a jQuery selector when the extension is trying to find the input search element. Again, this should only require changing to react to changes made by the Sonarr/Radarr/Lidarr developers.
 
 # Create package
-Powershell scripts and batch files that execute those PS scripts are included but these simply zip the Extension directory, as that's all that's required to publish this to the Chrome Web Store and Microsoft Edge Addons sites.
+Powershell scripts and batch files that execute those PS scripts are included but these simply zip the ChromiumExtension or FirefoxAddOn directories, as that's all that's required to publish this to the Chrome Web Store, Microsoft Edge Addons and Firefox Addons sites.
 
 # Contribute
 If you can make this extension better I'm happy for the help! Create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug.

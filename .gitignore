@@ -170,7 +170,7 @@ DocProject/Help/Html2
 DocProject/Help/html
 
 # Click-Once directory
-publish/
+[Pp]ublish/
 
 # Publish Web Output
 *.[Pp]ublish.xml
@@ -353,5 +353,3 @@ MigrationBackup/
 .ionide/
 Extension.crx
 Extension.pem
-sonarr-radarr-lidarr-autosearch-chrome-extension.zip
-sonarr-radarr-lidarr-autosearch-chromium-extension.zip

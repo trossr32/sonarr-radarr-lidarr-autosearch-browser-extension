@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sonarr/Radarr/Lidarr autosearch options</title>
+    <link rel="stylesheet" href="content/css/bootstrap.min.css">
+    <link rel="stylesheet" href="content/css/bootstrap-toggle.min.css">
+    <link rel="stylesheet" href="content/css/options.css" />
+    <script src="content/js/jquery-3.2.1.min.js"></script>
+    <script src="content/js/bootstrap.min.js"></script>
+    <script src="content/js/bootstrap-toggle.min.js"></script>
+    <script src="content/js/font-awesome_all.min.js"></script>
+    <script src="content/js/options.js"></script>
+</head>
+<body>
+<div class="container">
+    <h2 style="margin-bottom: 30px;">
+        <img src="content/assets/images/SonarrRadarrLidarr48.png" style="margin-right: 10px;" />
+        Sonarr/Radarr/Lidarr autosearch options
+    </h2>
+
+    <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#basic" role="tab" aria-controls="basic"><i class="fas fa-cog"></i>&nbsp;&nbsp;&nbsp;Settings</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#advanced" role="tab" aria-controls="advanced"><i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;&nbsp;Advanced</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#github" role="tab" aria-controls="github"><i class="fab fa-github"></i>&nbsp;&nbsp;&nbsp;Github</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#donate" role="tab" aria-controls="donate">Show some&nbsp;&nbsp;<i class="fas fa-heart" style="color:red;"></i></a>
+        </li>
+    </ul>
+        
+    <div class="tab-content">
+        <div class="tab-pane fade active" id="basic" role="tabpanel">
+            <form id="generalOptionsForm">
+                <button id="saveOptions" type="button" class="btn btn-primary" style="margin-top: 20px;">Save</button>
+            </form>
+        </div>
+        <div class="tab-pane fade active" id="advanced" role="tabpanel">
+            <form id="advancedOptionsForm" style="margin-bottom: 80px;">
+                <button id="saveAdvancedOptions" type="button" class="btn btn-primary" style="margin-top: 20px;">Save</button>
+            </form>
+        </div>
+        <div class="tab-pane fade" id="github" role="tabpanel">
+            <div class="col-md-1"></div>
+            <div class="col-md-10" style="text-align: center">
+                <h2 style="margin-bottom: 45px;">Contribute on Github</h2>
+                <h4 style="margin-bottom: 45px;">
+                    This project is open source on Github: <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch">github.com/trossr32/sonarr-radarr-lidarr-autosearch</a>
+                </h4>
+                <h4 style="margin-bottom: 35px;">
+                    If you found this extension useful and would like to fix a bug or add an improvement, please create a pull request.
+                </h4>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+        <div class="tab-pane fade" id="donate" role="tabpanel">
+            <div class="col-md-1"></div>
+            <div class="col-md-10" style="text-align: center">
+                <h2 style="margin-bottom: 45px;">Buy me a coffee</h2>
+                <h4 style="margin-bottom: 15px;">
+                    If you found this extension useful and would like to buy me a coffee please click the link below
+                </h4>
+                <p>&nbsp;</p>
+                <p>
+                    <a href="https://paypal.me/RobGreenDev/10"><img src="content/assets/images/paypal.png" alt="PayPal" width="180" /></a>
+                </p>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
