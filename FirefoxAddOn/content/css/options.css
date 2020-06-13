@@ -1,0 +1,29 @@
+body {
+    background-color: #1d1e22;
+    color: #fff
+}
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover {
+    color: #fff;
+    background-color: #1d1e22;
+}
+
+.nav > li > a:focus, .nav > li > a:hover {
+    background-color: #1d1e22;
+}
+
+a, a:focus, a:hover {
+    color: deepskyblue;
+}
+
+.col-form-label {
+    margin-top: 6px;
+}
+
+#settingsTabs {
+    margin-bottom: 40px;
+}
+
+.clear {
+    clear: both;
+}

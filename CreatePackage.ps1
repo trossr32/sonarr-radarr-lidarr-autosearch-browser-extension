@@ -1,12 +1,31 @@
-$extension = Resolve-Path -LiteralPath "Extension\"
-$zip = Join-Path (Get-Location).Path "sonarr-radarr-lidarr-autosearch-chromium-extension.zip"
+param([string]$BrowserType)
 
-print
-
- If (Test-path $zip) {
-     Remove-item $zip
+$publish = Join-Path (Get-Location).Path "Publish/"
+		
+If (!(Test-path $publish)) {
+	mkdir $publish
 }
 
-Add-Type -assembly "system.io.compression.filesystem"
+switch ($BrowserType) {
+	"Chromium" {
+		$extension = Resolve-Path -LiteralPath "ChromiumExtension/"
+		$zip = Join-Path $publish "sonarr-radarr-lidarr-autosearch-chromium.zip"
 
-[io.compression.zipfile]::CreateFromDirectory($extension, $zip) 
+		print
+		
+		If (Test-path $zip) {
+			Remove-item $zip
+		}
+		
+		Add-Type -assembly "system.io.compression.filesystem"
+		
+		[io.compression.zipfile]::CreateFromDirectory($extension, $zip) 
+	}
+	"Firefox" {
+		$addon = Resolve-Path -LiteralPath "FirefoxAddOn/"
+		
+		npm i -g web-ext
+
+		web-ext build -s $addon -a $publish -o
+	}
+}
