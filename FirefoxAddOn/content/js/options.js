@@ -27,10 +27,10 @@ var initialiseBasicForm = function (settings) {
     $.each(settings.sites, function (i, site) {
         var formLabelImg = $('<img src="content/assets/images/' + site.id + '/' + title(site.id) + '48.png" style="width: 24px; margin-right: 10px;" />'),
             formLabelText = $('<label style="padding-top: 6px;">' + title(site.id) + ' protocol, domain and port</label>'),
-            formLabel = $('<label for="' + site.id + 'Domain" class="col-sm-4 col-form-label"></label>'),
+            formLabel = $('<label for="' + site.id + 'Domain" class="col-sm-3 col-form-label"></label>'),
             input = $('<input type="text" class="form-control" id="' + site.id + 'Domain" placeholder="http://192.168.0.1:7357">')
                 .val(site.domain),
-            inputDiv = $('<div class="col-sm-6"></div>'),
+            inputDiv = $('<div class="col-sm-7"></div>'),
             toggle = $('<input type="checkbox" id="toggle-' + site.id + '">')
                 .prop('checked', site.enabled),
             toggleDiv = $('<div class="col-sm-2"></div>'),
@@ -67,7 +67,7 @@ var initialiseAdvancedForm = function (settings) {
     $.each(settings.sites, function (i, site) {
         var section = $('<div style="margin-bottom: 80px;">'),
             header = $('<h3 style="margin-bottom: 40px;"></h3>'),
-            headerImg = $('<img src="content/assets/images/' + site.id + '/' + title(site.id) + '48.png" style="margin-right: 10px; width: 30px;" />'),
+            headerImg = $('<img src="content/assets/images/' + site.id + '/' + title(site.id) + '48.png" style="margin: -5px 10px 0 0; width: 30px;" />'),
             headerText = title(site.id) + ' advanced settings',
             searchPathGroup = $('<div class="form-group row"></div>'),
             searchPathLabel = $('<label for="' + site.id + 'SearchPath" class="col-sm-3 col-form-label"></label>'),
@@ -112,6 +112,43 @@ var initialiseAdvancedForm = function (settings) {
     $('#advancedOptionsForm').prepend(wrapper);
 };
 
+var initialiseIntegrationsForm = function (settings) {
+    var wrapper = $('<div></div>');
+
+    $.each(settings.integrations, function (i, integration) {
+        //var formLabelImg = $('<div style="float: left; width: 32px;"><i class="' + integration.fa + ' fa-2x" style="color: deepskyblue;" /></div>'),
+        var formLabelImg = $('<div style="float: left; width: 32px;"><img src="content/assets/images/integrations/' + integration.image + '" height="24px" style="height: 24px;" /></div>'),
+            formLabelText = $('<div style="float: left; margin: 4px 0 0 40px;">' + integration.name + '</div>'),
+            formLabel = $('<div class="col-sm-2"></label>'),
+            toggle = $('<input type="checkbox" id="toggle-' + integration.name + '">')
+                .prop('checked', integration.enabled),
+            toggleDiv = $('<div class="col-sm-2"></div>'),
+            container = $('<div class="form-group row"></div>');
+
+        wrapper
+            .append(container
+                .append(formLabel.append(formLabelImg).append(formLabelText))
+                .append(toggleDiv.append(toggle))
+            );
+    });
+
+    $('#integrationsOptionsForm').prepend(wrapper);
+
+    // enable toggles
+    $('[id^="toggle-"]').each(function (i, e) {
+        var el = $(e);
+
+        el.bootstrapToggle({
+            on: 'Enabled',
+            off: 'Disabled',
+            onstyle: 'success',
+            offstyle: 'danger',
+            width: '100%',
+            size: 'small'
+        });
+    });
+};
+
 var setSettingsPropertiesFromForm = function (settings) {
     for (var i = 0; i < settings.sites.length; i++) {
         settings.sites[i].domain = $('#' + settings.sites[i].id + 'Domain').val();
@@ -126,6 +163,12 @@ var setSettingsPropertiesFromAdvancedForm = function (settings) {
     }
 };
 
+var setSettingsPropertiesFromIntegrationsForm = function (settings) {
+    for (var i = 0; i < settings.integrations.length; i++) {
+        settings.integrations[i].enabled = $('#toggle-' + settings.integrations[i].name).prop('checked');
+    }
+};
+
 settingsPort.onMessage.addListener(function (response) {
     var settings = response.settings;
 
@@ -133,6 +176,7 @@ settingsPort.onMessage.addListener(function (response) {
         case 'initPage':
             initialiseBasicForm(settings);
             initialiseAdvancedForm(settings);
+            initialiseIntegrationsForm(settings);
             break;
 
         case 'setFields':
@@ -146,6 +190,12 @@ settingsPort.onMessage.addListener(function (response) {
 
             settingsPort.postMessage({ method: 'set', caller: '', settings: settings });
             break;
+
+        case 'setIntegrationsFields':
+            setSettingsPropertiesFromIntegrationsForm(settings);
+
+            settingsPort.postMessage({ method: 'set', caller: '', settings: settings });
+            break;
     }
 });
 
@@ -156,8 +206,8 @@ $(function () {
     // initialise page on load
     settingsPort.postMessage({ method: 'get', caller: 'initPage' });
 
-    // save settings/advanced button click events
-    $.each(['', 'Advanced'], function(i, v) {
+    // save settings/advanced/integrations button click events
+    $.each(['', 'Advanced', 'Integrations'], function(i, v) {
         $('#save' + v + 'Options').click(function (e) {
             settingsPort.postMessage({ method: 'get', caller: 'set' + v + 'Fields' });
         });

@@ -89,25 +89,51 @@ var sessionId,
         sites: [
             {
                 id: 'sonarr',
-                domain: 'http:/my.sonarrurl.domain',
+                domain: 'http://my.sonarrurl.domain',
                 enabled: true,
                 searchPath: '/addseries/',
                 searchInputSelector: '.add-series-search .x-series-search',
                 menuText: 'Search Sonarr for tv'
             }, {
                 id: 'radarr',
-                domain: 'http:/my.radarrurl.domain',
+                domain: 'http://my.radarrurl.domain',
                 enabled: true,
                 searchPath: '/addmovies/',
                 searchInputSelector: '.add-movies-search .x-movies-search',
                 menuText: 'Search Radarr for movie'
             }, {
                 id: 'lidarr',
-                domain: 'http:/my.lidarrurl.domain',
+                domain: 'http://my.lidarrurl.domain',
                 enabled: false,
                 searchPath: '/add/new/',
                 searchInputSelector: 'input[class*="AddNewArtist-searchInput-"]',
                 menuText: 'Search Lidarr for artist'
+            }
+        ],
+        integrations: [
+            {
+                id: 'imdb',
+                name: 'IMDb',
+                image: 'imdb.png',
+                enabled: true
+            },
+            {
+                id: 'tmdb',
+                name: 'TMDb',
+                image: 'tmdb.svg',
+                enabled: true
+            },
+            {
+                id: 'tvdb',
+                name: 'tvdb',
+                image: 'tvdb.png',
+                enabled: true
+            },
+            {
+                id: 'trakt',
+                name: 'Trakt',
+                image: 'trakt.png',
+                enabled: true
             }
         ],
         enabled: true
@@ -127,6 +153,11 @@ var getSettings = function(callback) {
             if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('enabled')) {
                 data.sonarrRadarrLidarrAutosearchSettings.enabled = true;
             }
+
+            if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('integrations')) {
+                data.sonarrRadarrLidarrAutosearchSettings.integrations = defaultSettings.integrations;
+            }
+            
             callback(data.sonarrRadarrLidarrAutosearchSettings);
         }
     });
@@ -135,6 +166,10 @@ var getSettings = function(callback) {
 var setSettings = function (data, callback) {
     if (!data.hasOwnProperty('enabled')) {
         data.enabled = true;
+    }
+
+    if (!data.hasOwnProperty('integrations')) {
+        data.integrations = defaultSettings.integrations;
     }
 
     var obj = {};
