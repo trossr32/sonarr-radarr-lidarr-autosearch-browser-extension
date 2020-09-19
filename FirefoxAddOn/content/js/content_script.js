@@ -160,6 +160,9 @@ var init = function (settings) {
             if (window.location.href.includes(site.domain)) {
                 var search = window.location.href.replace(/(.+\/)/g, '');
 
+                var sdef = site.searchPath.replace(/(\/)/g, '');
+                search = search.replace(sdef, '');
+
                 if (search.trim() !== '') {
                     // use jquery selector and then retrieve the DOM element
                     var searchInput = $(site.searchInputSelector)[0];
@@ -213,15 +216,11 @@ var init = function (settings) {
                     return;
                 }
                 
-                var domain = site.domain.endsWith("/")
-                    ? site.domain.substring(0, site.domain.length - 1)
-                    : site.domain;
-
                 var searchTerm = integration.search.remove == null
                     ? $(integration.search.containerSelector).text().trim()
                     : $(integration.search.containerSelector).text().toLowerCase().replace(integration.search.remove, '').trim();
 
-                var searchUrl = domain + site.searchPath + searchTerm;
+                var searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ');
                 var icon = base64Icons.find(i => i.id == site.id)
 
                 var el = $('<a href="' + searchUrl + '" target="_blank" tooltip="' + site.menuText + '" title="' + site.menuText + '"></a>')

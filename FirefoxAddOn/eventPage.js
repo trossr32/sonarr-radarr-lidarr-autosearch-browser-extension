@@ -69,7 +69,7 @@ function onClickHandler(info, tab) {
         for (var i = 0; i < settings.sites.length; i++) {
             if (info.menuItemId == (settings.sites[i].id + 'Menu')) {
                 browser.tabs.create({
-                    'url': settings.sites[i].domain.replace(/\/$/, '') + settings.sites[i].searchPath + info.selectionText
+                    'url': settings.sites[i].domain.replace(/\/$/, '') + settings.sites[i].searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
                 });
             }
         }
