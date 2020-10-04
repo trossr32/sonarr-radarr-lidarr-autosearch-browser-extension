@@ -26,6 +26,6 @@ switch ($BrowserType) {
 		
 		npm i -g web-ext
 
-		web-ext build -s $addon -a $publish -o --filename "sonarr_radarr_lidarr_autosearch-{version}.zip"
+		web-ext build -s $addon -a $publish -o --filename "sonarr_radarr_lidarr_autosearch-firefox-{version}.zip"
 	}
 }

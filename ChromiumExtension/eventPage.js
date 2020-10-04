@@ -134,6 +134,12 @@ var sessionId,
                 name: 'Trakt',
                 image: 'trakt.png',
                 enabled: true
+            },
+            {
+                id: 'tvmaze',
+                name: 'TVmaze',
+                image: 'tvmaze.png',
+                enabled: true
             }
         ],
         enabled: true
@@ -156,6 +162,21 @@ var getSettings = function(callback) {
 
             if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('integrations')) {
                 data.sonarrRadarrLidarrAutosearchSettings.integrations = defaultSettings.integrations;
+            }
+
+            // check integrations array
+            for (let i = 0; i < defaultSettings.integrations.length; i++) {
+                var integrationFound = false;
+
+                for (let j = 0; j < data.sonarrRadarrLidarrAutosearchSettings.integrations.length; j++) {
+                    if (data.sonarrRadarrLidarrAutosearchSettings.integrations[j].id == defaultSettings.integrations[i].id) {
+                        integrationFound = true;
+                    }  
+                }
+
+                if (!integrationFound) {
+                    data.sonarrRadarrLidarrAutosearchSettings.integrations.push(defaultSettings.integrations[i]);
+                }
             }
             
             callback(data.sonarrRadarrLidarrAutosearchSettings);

@@ -23,6 +23,13 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                     }
                 },
                 {
+                    siteId: 'sonarr',
+                    match: {
+                        term: 'tv mini-series',
+                        operator: 'eq'
+                    }
+                },
+                {
                     siteId: 'radarr',
                     match: {
                         term: 'tv series',
@@ -143,6 +150,38 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;"'
             }
+        },
+        {
+            id: 'tvmaze',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'h1.show-for-medium',
+                remove: null
+            },
+            match: {
+                term: 'tvmaze.com/shows/'
+            },
+            icon: {
+                containerSelector: 'h1.show-for-medium',
+                locator: 'prepend',
+                imgStyles: 'width: 32px; margin: -8px 10px 0 0;"'
+            }
+        },
+        {
+            id: 'tvmaze',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'div.show-name',
+                remove: null
+            },
+            match: {
+                term: 'tvmaze.com/countdown'
+            },
+            icon: {
+                containerSelector: 'div.show-name',
+                locator: 'prepend',
+                imgStyles: 'width: 24px; margin: -8px 10px 0 0;"'
+            }
         }
     ];
 
@@ -180,58 +219,72 @@ var init = function (settings) {
             }
         });
 
+    /* iterate all integrations that are enabled in the settings */
     $.each(settings.integrations.filter(integration => { return integration.enabled }), 
         function (i, settingsIntegration) {
-            var integration = integrations.find(_i => _i.id == settingsIntegration.id);
+            /* iterate all integrations that match the current setting integration */
+            $.each(integrations.filter(_i => { return _i.id == settingsIntegration.id }),
+                function (ii, integration) {
+                    /* test the integration should be used by matching against the url */
+                    if (window.location.href.includes(integration.match.term)) {
+                        var matchContainer = $(integration.match.containerSelector),
+                            site = null;
 
-            if (window.location.href.includes(integration.match.term)) {
-                var matchContainer = $(integration.match.containerSelector),
-                    site = null;
+                        if (integration.hasOwnProperty('defaultSite')) {
+                            site = settings.sites
+                                .filter(s => { return s.enabled })
+                                .find(s => s.id == integration.defaultSite);
+                        } else {
+                            $.each(integration.rules, 
+                                function (ir, r) {
+                                    var hasMatch;
+                                    
+                                    switch (integration.match.attribute) {
+                                        case 'text':
+                                            hasMatch = matchContainer.text().toLowerCase().includes(r.match.term);
+                                            break;
+                                            
+                                        default:
+                                            hasMatch = matchContainer.attr(integration.match.attribute).toLowerCase().includes(r.match.term)
+                                            break;                                
+                                    }
 
-                $.each(integration.rules, 
-                    function (ir, r) {
-                        var hasMatch;
-                        
-                        switch (integration.match.attribute) {
-                            case 'text':
-                                hasMatch = matchContainer.text().toLowerCase().includes(r.match.term);
-                                break;
-                                
-                            default:
-                                hasMatch = matchContainer.attr(integration.match.attribute).toLowerCase().includes(r.match.term)
-                                break;                                
+                                    if (((r.match.operator == 'eq') && hasMatch) ||
+                                        ((r.match.operator == 'ne') && !hasMatch)) {
+                                            site = settings.sites
+                                                .filter(s => { return s.enabled })
+                                                .find(s => s.id == r.siteId);
+
+                                            return false;
+                                        }
+                                });
                         }
 
-                        if (((r.match.operator == 'eq') && hasMatch) ||
-                            ((r.match.operator == 'ne') && !hasMatch)) {
-                                site = settings.sites
-                                    .filter(s => { return s.enabled })
-                                    .find(s => s.id == r.siteId);
+                        if (site == null) {
+                            return;
+                        }
 
-                                return false;
+                        /* iterate all the containers */
+                        $.each($(integration.search.containerSelector), function(i_el, container) {
+                            console.log($(integration.icon.containerSelector).length);
+                            var searchTerm = integration.search.remove == null
+                                ? $(container).text().trim()
+                                : $(container).text().toLowerCase().replace(integration.search.remove, '').trim();
+
+                            var searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ');
+                            var icon = base64Icons.find(i => i.id == site.id)
+
+                            var el = $('<a href="' + searchUrl + '" target="_blank" tooltip="' + site.menuText + '" title="' + site.menuText + '"></a>')
+                                .append($('<img src="' + icon.base64 + '" style="' + integration.icon.imgStyles + '">'));
+
+                            if (integration.icon.locator == "append") {
+                                $(integration.icon.containerSelector).eq(i_el).append(el);
+                            } else {
+                                $(integration.icon.containerSelector).eq(i_el).prepend(el);
                             }
-                    });
-
-                if (site == null) {
-                    return;
-                }
-                
-                var searchTerm = integration.search.remove == null
-                    ? $(integration.search.containerSelector).text().trim()
-                    : $(integration.search.containerSelector).text().toLowerCase().replace(integration.search.remove, '').trim();
-
-                var searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ');
-                var icon = base64Icons.find(i => i.id == site.id)
-
-                var el = $('<a href="' + searchUrl + '" target="_blank" tooltip="' + site.menuText + '" title="' + site.menuText + '"></a>')
-                    .append($('<img src="' + icon.base64 + '" style="' + integration.icon.imgStyles + '">'));
-    
-                if (integration.icon.locator == "append") {
-                    $(integration.icon.containerSelector).append(el);
-                } else {
-                    $(integration.icon.containerSelector).prepend(el);
-                }
-            }
+                        });
+                    }
+                });            
         });
 };
 
