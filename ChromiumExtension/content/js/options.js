@@ -116,7 +116,7 @@ var initialiseIntegrationsForm = function (settings) {
     var wrapper = $('<div></div>');
 
     $.each(settings.integrations, function (i, integration) {
-        var formLabelImg = $('<div style="float: left; width: 32px;"><img src="content/assets/images/integrations/' + integration.image + '" height="24px" style="height: 24px;" /></div>'),
+        var formLabelImg = $('<div style="float: left; width: 50px;"><img src="content/assets/images/integrations/' + integration.image + '" height="24px" style="height: 24px;" /></div>'),
             formLabelText = $('<div style="float: left; margin: 4px 0 0 40px;">' + integration.name + '</div>'),
             formLabel = $('<div class="col-sm-2"></label>'),
             toggle = $('<input type="checkbox" id="toggle-' + integration.name + '">')
