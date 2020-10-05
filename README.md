@@ -17,7 +17,7 @@ The extension an be disabled from the extension's popup and each context menu it
 # Contribute
 If you can make this extension better I'm happy for the help! Please create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug or want to suggest a new feature.
 
-[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K22CEIT)
+<a href='https://ko-fi.com/K3K22CEIT' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi4.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 # Getting started
 
