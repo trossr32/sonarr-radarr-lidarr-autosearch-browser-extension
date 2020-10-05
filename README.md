@@ -14,6 +14,11 @@ This is an extension for Chrome, the new chromium Microsoft Edge and Firefox tha
 
 The extension an be disabled from the extension's popup and each context menu item can be disabled from the settings page.
 
+# Contribute
+If you can make this extension better I'm happy for the help! Please create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug or want to suggest a new feature.
+
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K22CEIT)
+
 # Getting started
 
 [Extension on the Chrome web store](https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc)
@@ -46,6 +51,3 @@ If any of the sites on this tab are set as enabled then this extension will atte
 
 # Create package
 A Powershell script and batch files that execute that PS script are included but these simply zip the ChromiumExtension directory or run web-ext build against the FirefoxAddOn directory, as that's all that's required to publish this to the Chrome Web Store, Microsoft Edge Addons and Firefox Addons sites.
-
-# Contribute
-If you can make this extension better I'm happy for the help! Please create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug or want to suggest a new feature.
