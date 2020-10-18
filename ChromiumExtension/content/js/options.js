@@ -73,7 +73,7 @@ var initialiseAdvancedForm = function (settings) {
             searchPathLabel = $('<label for="' + site.id + 'SearchPath" class="col-sm-3 col-form-label"></label>'),
             searchPathLabelContent = $('<label style="padding-top: 6px;">Search path url</label>'),
             searchPathInputDiv = $('<div class="col-sm-9"></div>'),
-            searchPathInput = $('<input type="text" class="form-control" id="' + site.id + 'SearchPath" placeholder="http://192.168.0.1:7357" aria-describedby="' + site.id + 'SearchPathHelp">')
+            searchPathInput = $('<input type="text" class="form-control" id="' + site.id + 'SearchPath" placeholder="http' + '://192' + '.168.0.1:7357" aria-describedby="' + site.id + 'SearchPathHelp">')
                 .val(site.searchPath),
             searchPathHelp = $('<div class="col-sm-offset-3"><small id="' + site.id + 'SearchPathHelp" class="form-text" style="margin-left: 20px;">This is the search path used to search for add new content in this instance, following your instance url/ip.</small></div>'),
             selectorGroup = $('<div class="form-group row"></div>'),
@@ -86,13 +86,33 @@ var initialiseAdvancedForm = function (settings) {
 
         section.append(header.append(headerImg).append(headerText));
 
-        if (site.id === 'sonarr') {
-            section.append($('<div class="alert alert-info" style="margin-top: -10px; margin-bottom: 40px;"></div>')
-                .append($('<h4 class="alert-heading">Version info</h4>'))
-                .append($('<p>The below settings are defaulted to v2.0. For v3.0 use:</p>'))
-                .append($('<p>Search path url: <strong>/add/new/</strong></p>'))
-                .append($('<p>Search field selector: <strong>input[class*="AddNewSeries/searchInput"]</strong></p>'))
-            )
+        switch (site.id) {
+            case 'sonarr':
+                section.append($('<div class="alert alert-info" style="margin-top: -10px; margin-bottom: 40px;"></div>')
+                    .append($('<h4 class="alert-heading">Version info</h4>'))
+                    .append($('<p>The below settings are defaulted to v2.<i>n</i>. For v3.<i>n</i> (tested against 3.0.4.982) use:</p>'))
+                    .append($('<p>Search path url: <strong>/add/new/</strong></p>'))
+                    .append($('<p>Search field selector: <strong>input[name="seriesLookup"]</strong></p>'))
+                )
+                break;
+                
+            case 'radarr':
+                section.append($('<div class="alert alert-info" style="margin-top: -10px; margin-bottom: 40px;"></div>')
+                    .append($('<h4 class="alert-heading">Version info</h4>'))
+                    .append($('<p>The below settings are defaulted to v0.<i>n</i>. For v3.<i>n</i> (tested against 3.0.0.3954) use:</p>'))
+                    .append($('<p>Search path url: <strong>/add/new/</strong></p>'))
+                    .append($('<p>Search field selector: <strong>input[name="movieLookup"]</strong></p>'))
+                )
+                break;
+        
+            case 'lidarr':
+                section.append($('<div class="alert alert-info" style="margin-top: -10px; margin-bottom: 40px;"></div>')
+                    .append($('<h4 class="alert-heading">Version info</h4>'))
+                    .append($('<p>As of v0.8.0.1881 the below settings should be used. If this is a new install this should be the default, otherwise you may need to amend:</p>'))
+                    .append($('<p>Search path url: <strong>/add/search/</strong></p>'))
+                    .append($('<p>Search field selector: <strong>input[name="searchBox"]</strong></p>'))
+                )
+                break;
         }
         
         section.append(searchPathGroup
