@@ -106,8 +106,8 @@ var sessionId,
                 id: 'lidarr',
                 domain: 'http://my.lidarrurl.domain',
                 enabled: false,
-                searchPath: '/add/new/',
-                searchInputSelector: 'input[class*="AddNewArtist-searchInput-"]',
+                searchPath: '/add/search/',
+                searchInputSelector: 'input[name="searchBox"]',
                 menuText: 'Search Lidarr for artist'
             }
         ],

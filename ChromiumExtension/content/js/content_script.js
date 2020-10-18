@@ -49,7 +49,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             icon: {
                 containerSelector: '.title_wrapper h1',
                 locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;"'
+                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
             }
         },
         {
@@ -82,7 +82,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             icon: {
                 containerSelector: '.header .title h2',
                 locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;"'
+                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
             }
         },
         {
@@ -115,7 +115,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             icon: {
                 containerSelector: '#series_title',
                 locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;"'
+                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
             }
         },
         {
@@ -148,7 +148,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             icon: {
                 containerSelector: 'h1',
                 locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;"'
+                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
             }
         },
         {
@@ -164,7 +164,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             icon: {
                 containerSelector: 'h1.show-for-medium',
                 locator: 'prepend',
-                imgStyles: 'width: 32px; margin: -8px 10px 0 0;"'
+                imgStyles: 'width: 32px; margin: -8px 10px 0 0;'
             }
         },
         {
@@ -180,7 +180,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             icon: {
                 containerSelector: 'div.show-name',
                 locator: 'prepend',
-                imgStyles: 'width: 24px; margin: -8px 10px 0 0;"'
+                imgStyles: 'width: 24px; margin: -8px 10px 0 0;'
             }
         }
     ];
