@@ -189,6 +189,36 @@ settingsPort.onMessage.addListener(function(response) {
     init(response.settings);
 });
 
+/**
+ * Attempts to fins a jQuery element using the supplied selector every 100 milliseconds until found 
+ * or max number of attempts reached (defaulted to 10 attempts, one second)
+ * @param {jQuery selector} selector 
+ * @param {Callback function*} callback 
+ * @param {max attempts} maxAttempts
+ * @param {attept iterator} count 
+ */
+var waitForEl = function(selector, callback, maxAttempts = 10, count) {
+    if ($(selector).length) {
+        callback();
+    } else {
+        setTimeout(function() {
+            if (!count) {
+                count = 0;
+            }
+
+            console.log(count);
+
+            count++;
+            
+            if (count < maxAttempts) {
+                waitForEl(selector, callback, maxAttempts, count);
+            } else {
+                return;
+            }
+        }, 100);
+    }
+};
+
 var init = function (settings) {
     if (!settings.enabled) {
         return;
@@ -198,23 +228,25 @@ var init = function (settings) {
         function (i, site) {
             if (window.location.href.includes(site.domain)) {
                 var search = window.location.href.replace(/(.+\/)/g, '');
-
                 var sdef = site.searchPath.replace(/(\/)/g, '');
+
                 search = search.replace(sdef, '');
 
                 if (search.trim() !== '') {
-                    // use jquery selector and then retrieve the DOM element
-                    var searchInput = $(site.searchInputSelector)[0];
-
-                    if (searchInput) {
-                        // jquery can't be used to trigger the input event here so rely on vanilla js for event triggering
-                        searchInput.value = decodeURIComponent(search.trim());
-
-                        var event = document.createEvent('Event');
-                        event.initEvent('input', true, true);
-
-                        searchInput.dispatchEvent(event);
-                    }
+                    waitForEl(site.searchInputSelector, function() {
+                        // use jquery selector and then retrieve the DOM element
+                        var searchInput = $(site.searchInputSelector)[0];
+                    
+                        if (searchInput) {
+                            // jquery can't be used to trigger the input event here so rely on vanilla js for event triggering
+                            searchInput.value = decodeURIComponent(search.trim());
+    
+                            var event = document.createEvent('Event');
+                            event.initEvent('input', true, true);
+    
+                            searchInput.dispatchEvent(event);
+                        }
+                    });
                 }
             }
         });
