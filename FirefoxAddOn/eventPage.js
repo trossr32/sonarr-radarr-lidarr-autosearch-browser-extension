@@ -59,7 +59,7 @@ function buildMenus(settings) {
 
         // create child menus from enabled sites array
         for (var i = 0; i < enabledSites.length; i++) {
-            browser.contextMenus.create({ "title": settings.sites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": settings.sites[i].id + "Menu", "contexts": ["selection"] });
+            browser.contextMenus.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": enabledSites[i].id + "Menu", "contexts": ["selection"] });
         }
     });
 }
