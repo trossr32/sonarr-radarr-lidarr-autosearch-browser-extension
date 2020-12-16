@@ -182,6 +182,22 @@ var settingsPort = browser.runtime.connect({ name: 'settings' }),
                 locator: 'prepend',
                 imgStyles: 'width: 24px; margin: -8px 10px 0 0;'
             }
+        },
+        {
+            id: 'musicbrainz',
+            defaultSite: 'lidarr',
+            search: {
+                containerSelector: '.artistheader > h1 > a > bdi',
+                remove: null
+            },
+            match: {
+                term: 'musicbrainz.org/artist'
+            },
+            icon: {
+                containerSelector: '.artistheader > h1',
+                locator: 'prepend',
+                imgStyles: 'width: 26px; margin: 0 5px -4px 0;'
+            }
         }
     ];
 
@@ -190,7 +206,7 @@ settingsPort.onMessage.addListener(function(response) {
 });
 
 /**
- * Attempts to fins a jQuery element using the supplied selector every 100 milliseconds until found 
+ * Attempts to find a jQuery element using the supplied selector every 100 milliseconds until found 
  * or max number of attempts reached (defaulted to 10 attempts, one second)
  * @param {jQuery selector} selector 
  * @param {Callback function*} callback 
