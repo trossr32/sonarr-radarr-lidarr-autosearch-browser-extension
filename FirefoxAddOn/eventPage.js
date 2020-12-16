@@ -141,6 +141,12 @@ var sessionId,
                 name: 'TVmaze',
                 image: 'tvmaze.png',
                 enabled: true
+            },
+            {
+                id: 'musicbrainz',
+                name: 'MusicBrainz',
+                image: 'musicbrainz.svg',
+                enabled: true
             }
         ],
         enabled: true

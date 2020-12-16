@@ -10,7 +10,7 @@ This is an extension for Chrome, the new chromium Microsoft Edge and Firefox tha
 
 2. When right-clicking selected text on any page this extension exposes a context menu with entries for Sonarr, Radarr and Lidarr that allow a direct search for the selected text in a new tab.
 
-3. **New feature** - Adds Sonarr or Radarr icons as direct search links on IMDb, TVDb, TMDb, Trakt and TVmaze websites.
+3. **New feature** - Adds Sonarr or Radarr icons as direct search links on IMDb, TVDb, TMDb, Trakt, TVmaze and MusicBrainz websites.
 
 The extension an be disabled from the extension's popup and each context menu item can be disabled from the settings page.
 
