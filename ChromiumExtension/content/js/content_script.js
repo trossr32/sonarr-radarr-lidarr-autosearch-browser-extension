@@ -39,7 +39,8 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             ],
             search: {
                 containerSelector: '.title_wrapper h1',
-                remove: null
+                selectorType: 'text',
+                modifier: null
             },
             match: {
                 term: 'imdb.com',
@@ -72,7 +73,8 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             ],
             search: {
                 containerSelector: '.header .title h2 a',
-                remove: null
+                selectorType: 'text',
+                modifier: null
             },
             match: {
                 term: 'themoviedb.org',
@@ -105,7 +107,8 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             ],
             search: {
                 containerSelector: '#series_title',
-                remove: null
+                selectorType: 'text',
+                modifier: null
             },
             match: {
                 term: 'thetvdb.com',
@@ -138,7 +141,12 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             ],
             search: {
                 containerSelector: 'title',
-                remove: ' - trakt.tv'
+                selectorType: 'text',
+                modifier: {
+                    type: 'replace',
+                    from: ' - trakt.tv',
+                    to: ''
+                }
             },
             match: {
                 term: 'trakt.tv',
@@ -156,7 +164,8 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             defaultSite: 'sonarr',
             search: {
                 containerSelector: 'h1.show-for-medium',
-                remove: null
+                selectorType: 'text',
+                modifier: null
             },
             match: {
                 term: 'tvmaze.com/shows/'
@@ -172,7 +181,8 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             defaultSite: 'sonarr',
             search: {
                 containerSelector: 'div.show-name',
-                remove: null
+                selectorType: 'text',
+                modifier: null
             },
             match: {
                 term: 'tvmaze.com/countdown'
@@ -187,8 +197,13 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             id: 'musicbrainz',
             defaultSite: 'lidarr',
             search: {
-                containerSelector: '.artistheader > h1 > a > bdi',
-                remove: null
+                containerSelector: '.artistheader > h1 > a',
+                selectorType: 'href',
+                modifier: {
+                    type: 'replace',
+                    from: '/artist/',
+                    to: 'lidarr:'
+                }
             },
             match: {
                 term: 'musicbrainz.org/artist'
@@ -221,8 +236,6 @@ var waitForEl = function(selector, callback, maxAttempts = 10, count) {
             if (!count) {
                 count = 0;
             }
-
-            console.log(count);
 
             count++;
             
@@ -314,10 +327,27 @@ var init = function (settings) {
 
                         /* iterate all the containers */
                         $.each($(integration.search.containerSelector), function(i_el, container) {
-                            //console.log($(integration.icon.containerSelector).length);
-                            var searchTerm = integration.search.remove == null
-                                ? $(container).text().trim()
-                                : $(container).text().toLowerCase().replace(integration.search.remove, '').trim();
+                            var searchTerm = '';
+
+                            switch (integration.search.selectorType) {
+                                case 'href':
+                                    searchTerm = $(container).attr('href');
+                                    break;
+
+                                default: // text
+                                    searchTerm = $(container).text();
+                                    break;
+                            }
+                            
+                            if (integration.search.modifier == null){
+                                searchTerm = searchTerm.trim()
+                            } else {
+                                switch (integration.search.modifier.type) {
+                                    case 'replace':
+                                        searchTerm = searchTerm.toLowerCase().replace(integration.search.modifier.from, integration.search.modifier.to).trim()
+                                        break;
+                                }
+                            }
 
                             var searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ');
                             var icon = base64Icons.find(i => i.id == site.id)
