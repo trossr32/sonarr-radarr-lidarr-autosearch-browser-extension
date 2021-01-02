@@ -348,6 +348,7 @@ var init = function (settings) {
                                         break;
                                 }
                             }
+                            searchTerm = searchTerm.replace(/\s\s+/g, ' ')
 
                             var searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ');
                             var icon = base64Icons.find(i => i.id == site.id)
