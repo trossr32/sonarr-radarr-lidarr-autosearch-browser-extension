@@ -213,6 +213,23 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                 locator: 'prepend',
                 imgStyles: 'width: 26px; margin: 0 5px -4px 0;'
             }
+        },
+        {
+            id: 'letterboxd',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifier: null
+            },
+            match: {
+                term: 'letterboxd.com/film/'
+            },
+            icon: {
+                containerSelector: '#featured-film-header > h1',
+                locator: 'prepend',
+                imgStyles: 'width: 25px; margin: 8px 10px 0 0; float: left;'
+            }
         }
     ];
 
