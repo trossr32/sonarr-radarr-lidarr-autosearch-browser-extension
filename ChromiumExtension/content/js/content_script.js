@@ -213,6 +213,23 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                 locator: 'prepend',
                 imgStyles: 'width: 26px; margin: 0 5px -4px 0;'
             }
+        },
+        {
+            id: 'letterboxd',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifier: null
+            },
+            match: {
+                term: 'letterboxd.com/film/'
+            },
+            icon: {
+                containerSelector: '#featured-film-header > h1',
+                locator: 'prepend',
+                imgStyles: 'width: 25px; margin: 8px 10px 0 0; float: left;'
+            }
         }
     ];
 
@@ -334,6 +351,10 @@ var init = function (settings) {
                                     searchTerm = $(container).attr('href');
                                     break;
 
+                                case 'content':
+                                    searchTerm = $(container).attr('content');
+                                    break;
+
                                 default: // text
                                     searchTerm = $(container).text();
                                     break;
@@ -348,6 +369,7 @@ var init = function (settings) {
                                         break;
                                 }
                             }
+                            searchTerm = searchTerm.replace(/\s\s+/g, ' ')
 
                             var searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ');
                             var icon = base64Icons.find(i => i.id == site.id)

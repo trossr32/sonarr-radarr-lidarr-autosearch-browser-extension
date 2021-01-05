@@ -353,3 +353,8 @@ MigrationBackup/
 .ionide/
 Extension.crx
 Extension.pem
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride

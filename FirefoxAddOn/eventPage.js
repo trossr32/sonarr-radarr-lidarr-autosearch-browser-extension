@@ -147,6 +147,12 @@ var sessionId,
                 name: 'MusicBrainz',
                 image: 'musicbrainz.svg',
                 enabled: true
+            },
+            {
+                id: 'letterboxd',
+                name: 'Letterboxd',
+                image: 'letterboxd.svg',
+                enabled: true
             }
         ],
         enabled: true

@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
   "name": "Sonarr/Radarr/Lidarr autosearch",
-  "description": "Exposes a context menu that enables direct searching for tv shows, movies or artists in Sonarr, Radarr and Lidarr. Adds Sonarr or Radarr icons as direct search links on IMDb, TVDb, TMDb, Trakt, TVmaze and MusicBrainz websites.",
-  "version": "1.4.1.0",
+  "description": "Exposes a context menu that enables direct searching for tv shows, movies or artists in Sonarr, Radarr and Lidarr. Adds Sonarr or Radarr icons as direct search links on IMDb, TVDb, TMDb, Trakt, TVmaze, MusicBrainz and Letterboxd websites.",
+  "version": "1.5.0.0",
   "browser_action": {
     "default_icon": "content/assets/images/SonarrRadarrLidarr128.png",
     "default_popup": "popup.html"
