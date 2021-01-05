@@ -334,6 +334,10 @@ var init = function (settings) {
                                     searchTerm = $(container).attr('href');
                                     break;
 
+                                case 'content':
+                                    searchTerm = $(container).attr('content');
+                                    break;
+
                                 default: // text
                                     searchTerm = $(container).text();
                                     break;
