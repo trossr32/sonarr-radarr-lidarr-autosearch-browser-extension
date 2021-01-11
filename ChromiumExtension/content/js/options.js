@@ -168,6 +168,34 @@ var initialiseIntegrationsForm = function (settings) {
     });
 };
 
+var initialiseDebugForm = function (settings) {
+    var wrapper = $('<div></div>');
+
+    var formLabel = $('<label for="toggle-debug" class="col-sm-3 col-form-label">Turn on console logging</label>'),
+        toggle = $('<input type="checkbox" id="toggle-debug">')
+            .prop('checked', settings.debug),
+        toggleDiv = $('<div class="col-sm-2"></div>'),
+        container = $('<div class="form-group row"></div>');
+
+    wrapper
+        .append(container
+            .append(formLabel)
+            .append(toggleDiv.append(toggle))
+        );
+
+    $('#debugOptionsForm').prepend(wrapper);
+
+    // enable toggle
+    $('#toggle-debug').bootstrapToggle({
+        on: 'Enabled',
+        off: 'Disabled',
+        onstyle: 'success',
+        offstyle: 'danger',
+        width: '100%',
+        size: 'small'
+    });
+};
+
 var setSettingsPropertiesFromForm = function (settings) {
     for (var i = 0; i < settings.sites.length; i++) {
         settings.sites[i].domain = $('#' + settings.sites[i].id + 'Domain').val();
@@ -188,6 +216,10 @@ var setSettingsPropertiesFromIntegrationsForm = function (settings) {
     }
 };
 
+var setSettingsPropertiesFromDebugForm = function (settings) {
+    settings.debug = $('#toggle-debug').prop('checked');
+};
+
 settingsPort.onMessage.addListener(function (response) {
     var settings = response.settings;
 
@@ -196,6 +228,7 @@ settingsPort.onMessage.addListener(function (response) {
             initialiseBasicForm(settings);
             initialiseAdvancedForm(settings);
             initialiseIntegrationsForm(settings);
+            initialiseDebugForm(settings);
             break;
 
         case 'setFields':
@@ -215,6 +248,12 @@ settingsPort.onMessage.addListener(function (response) {
 
             settingsPort.postMessage({ method: 'set', caller: '', settings: settings });
             break;
+
+        case 'setDebugFields':
+            setSettingsPropertiesFromDebugForm(settings);
+
+            settingsPort.postMessage({ method: 'set', caller: '', settings: settings });
+            break;
     }
 });
 
@@ -226,7 +265,7 @@ $(function () {
     settingsPort.postMessage({ method: 'get', caller: 'initPage' });
 
     // save settings/advanced/integrations button click events
-    $.each(['', 'Advanced', 'Integrations'], function(i, v) {
+    $.each(['', 'Advanced', 'Integrations', 'Debug'], function(i, v) {
         $('#save' + v + 'Options').click(function (e) {
             settingsPort.postMessage({ method: 'get', caller: 'set' + v + 'Fields' });
         });

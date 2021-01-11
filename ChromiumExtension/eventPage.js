@@ -154,7 +154,8 @@ var sessionId,
                 enabled: true
             }
         ],
-        enabled: true
+        enabled: true,
+        debug: false
     };
 
 var setIcon = function(settings) {
@@ -170,6 +171,10 @@ var getSettings = function(callback) {
         if (typeof callback === "function") {
             if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('enabled')) {
                 data.sonarrRadarrLidarrAutosearchSettings.enabled = true;
+            }
+
+            if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('debug')) {
+                data.sonarrRadarrLidarrAutosearchSettings.debug = false;
             }
 
             if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('integrations')) {
@@ -199,6 +204,10 @@ var getSettings = function(callback) {
 var setSettings = function (data, callback) {
     if (!data.hasOwnProperty('enabled')) {
         data.enabled = true;
+    }
+
+    if (!data.hasOwnProperty('debug')) {
+        data.enabled = false;
     }
 
     if (!data.hasOwnProperty('integrations')) {
