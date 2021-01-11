@@ -1,4 +1,5 @@
 var settingsPort = chrome.runtime.connect({ name: 'settings' }),
+    debug = false,
     base64Icons = [
         {
             id: 'sonarr',
@@ -12,6 +13,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
         }
     ],
     integrations = [
+        /* old imdb layout (current as of 11.01.2021) */
         {
             id: 'imdb',
             rules: [
@@ -51,6 +53,48 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                 containerSelector: '.title_wrapper h1',
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        /* new imdb layout (beta as of 11.01.2021) */
+        {
+            id: 'imdb',
+            rules: [
+                {
+                    siteId: 'sonarr',
+                    match: {
+                        term: 'tv series',
+                        operator: 'eq'
+                    }
+                },
+                {
+                    siteId: 'sonarr',
+                    match: {
+                        term: 'tv mini series',
+                        operator: 'eq'
+                    }
+                },
+                {
+                    siteId: 'radarr',
+                    match: {
+                        term: 'tv series',
+                        operator: 'ne'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: '[class^="TitleHeader__TitleText"]',
+                selectorType: 'text',
+                modifier: null
+            },
+            match: {
+                term: 'imdb.com',
+                containerSelector: 'meta[property="og:title"]',
+                attribute: 'content',
+            },
+            icon: {
+                containerSelector: '[class^="TitleHeader__TitleText"]',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
             }
         },
         {
@@ -241,7 +285,7 @@ settingsPort.onMessage.addListener(function(response) {
  * Attempts to find a jQuery element using the supplied selector every 100 milliseconds until found 
  * or max number of attempts reached (defaulted to 10 attempts, one second)
  * @param {jQuery selector} selector 
- * @param {Callback function*} callback 
+ * @param {Callback function} callback 
  * @param {max attempts} maxAttempts
  * @param {attept iterator} count 
  */
@@ -265,14 +309,32 @@ var waitForEl = function(selector, callback, maxAttempts = 10, count) {
     }
 };
 
+/**
+ * logs to console if the debug flag is set
+ * @param {any[]} content 
+ */
+var log = function(content) {
+    if (!debug) {
+        return;
+    }
+
+    console.log(content);
+}
+
 var init = function (settings) {
     if (!settings.enabled) {
         return;
     }
 
+    debug = settings.debug;
+
+    log(['settings.sites: ', settings.sites]);
+
     $.each(settings.sites,
         function (i, site) {
             if (window.location.href.includes(site.domain)) {
+                log(['sonarr/radarr/lidarr site match found: ', site]);
+
                 var search = window.location.href.replace(/(.+\/)/g, '');
                 var sdef = site.searchPath.replace(/(\/)/g, '');
 
@@ -296,6 +358,8 @@ var init = function (settings) {
                 }
             }
         });
+        
+    log(['integrations: ', integrations]);
 
     /* iterate all integrations that are enabled in the settings */
     $.each(settings.integrations.filter(integration => { return integration.enabled }), 
@@ -305,6 +369,8 @@ var init = function (settings) {
                 function (ii, integration) {
                     /* test the integration should be used by matching against the url */
                     if (window.location.href.includes(integration.match.term)) {
+                        log(['integration matched to domain: ', integration]);
+
                         var matchContainer = $(integration.match.containerSelector),
                             site = null;
 
@@ -320,6 +386,10 @@ var init = function (settings) {
                                     switch (integration.match.attribute) {
                                         case 'text':
                                             hasMatch = matchContainer.text().toLowerCase().includes(r.match.term);
+                                            break;
+
+                                        case 'content':
+                                            hasMatch = matchContainer.attr('content').toLowerCase().includes(r.match.term);
                                             break;
                                             
                                         default:
@@ -341,6 +411,8 @@ var init = function (settings) {
                         if (site == null) {
                             return;
                         }
+
+                        log(['integration matched to site: ', integration, site]);
 
                         /* iterate all the containers */
                         $.each($(integration.search.containerSelector), function(i_el, container) {
@@ -369,9 +441,15 @@ var init = function (settings) {
                                         break;
                                 }
                             }
+
                             searchTerm = searchTerm.replace(/\s\s+/g, ' ')
 
+                            log(['search term: ', searchTerm]);
+
                             var searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ');
+
+                            log(['search url: ', searchUrl]);
+
                             var icon = base64Icons.find(i => i.id == site.id)
 
                             var el = $('<a href="' + searchUrl + '" target="_blank" tooltip="' + site.menuText + '" title="' + site.menuText + '"></a>')
