@@ -268,6 +268,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
             }
         },
+        // trakt for sonarr, uses tvdb id
         {
             id: 'trakt',
             rules: [
@@ -277,7 +278,36 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                         pattern: /tv/i,
                         operator: 'eq'
                     }
-                },
+                }
+            ],
+            search: {
+                containerSelector: 'a[href*="tvdb.com"]',
+                selectorType: 'href',
+                modifiers: [
+                    {
+                        type: 'regex-match',
+                        pattern: /\/(?<search>\d{4,10})/i
+                    }, {
+                        type: 'prepend',
+                        var: 'tvdb:'
+                    }
+                ]
+            },
+            match: {
+                term: 'trakt.tv',
+                containerSelector: '#main-nav ul li a.selected',
+                attribute: 'text'
+            },
+            icon: {
+                containerSelector: 'h1',
+                locator: 'prepend',
+                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        // trakt for radarr, uses tmdb id
+        {
+            id: 'trakt',
+            rules: [
                 {
                     siteId: 'radarr',
                     match: {
@@ -287,13 +317,15 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                 }
             ],
             search: {
-                containerSelector: 'title',
-                selectorType: 'text',
+                containerSelector: 'a[href*="moviedb.org"]',
+                selectorType: 'href',
                 modifiers: [
                     {
-                        type: 'replace',
-                        from: ' - trakt.tv',
-                        to: ''
+                        type: 'regex-match',
+                        pattern: /\/(?<search>\d{4,10})/i
+                    }, {
+                        type: 'prepend',
+                        var: 'tmdb:'
                     }
                 ]
             },
@@ -369,9 +401,14 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             id: 'letterboxd',
             defaultSite: 'radarr',
             search: {
-                containerSelector: 'meta[property="og:title"]',
-                selectorType: 'content',
-                modifiers: []
+                containerSelector: 'body',
+                selectorType: 'data-tmdb-id',
+                modifiers: [
+                    {
+                        type: 'prepend',
+                        var: 'tmdb:'
+                    }
+                ]
             },
             match: {
                 term: 'letterboxd.com/film/'

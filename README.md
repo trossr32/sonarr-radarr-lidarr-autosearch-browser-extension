@@ -12,7 +12,10 @@ This is an extension for Chrome, the new chromium Microsoft Edge and Firefox tha
 
 3. Adds Sonarr or Radarr icons as direct search links on IMDb, TVDb, TMDb, Trakt, TVmaze, MusicBrainz and Letterboxd websites.
 
-**New feature** - Integration ids are now used where the platform supports them, i.e. IMDb & TMDb for Radarr and TVDb for Sonarr (this was already implemented for MusicBrainz and Lidarr).
+**New feature** - Integration ids are now used where the platform supports them. 
+- Radarr: IMDb (native id), TMDb (native id), Trakt (TMDb id) & letterboxd (TMDb id).
+- Sonarr: TVDb (native id) & Trakt (TVDb id).
+- Lidarr: MusicBrainz (native id) was already implemented.
 
 The extension can be disabled from the extension's popup and each context menu item can be disabled from the settings page.
 
