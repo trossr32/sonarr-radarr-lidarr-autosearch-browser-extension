@@ -14,35 +14,58 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
     ],
     integrations = [
         /* old imdb layout (current as of 11.01.2021) */
+        /* sonarr version which doesn't work with id search */
         {
             id: 'imdb',
             rules: [
                 {
                     siteId: 'sonarr',
                     match: {
-                        term: 'tv series',
+                        pattern: /tv\s(|mini(\s|-))series/i,
                         operator: 'eq'
-                    }
-                },
-                {
-                    siteId: 'sonarr',
-                    match: {
-                        term: 'tv mini-series',
-                        operator: 'eq'
-                    }
-                },
-                {
-                    siteId: 'radarr',
-                    match: {
-                        term: 'tv series',
-                        operator: 'ne'
                     }
                 }
             ],
             search: {
                 containerSelector: '.title_wrapper h1',
                 selectorType: 'text',
-                modifier: null
+                modifiers: []
+            },
+            match: {
+                term: 'imdb.com',
+                containerSelector: '.title_wrapper',
+                attribute: 'text',
+            },
+            icon: {
+                containerSelector: '.title_wrapper h1',
+                locator: 'prepend',
+                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        /* radarr version which works with id search */
+        {
+            id: 'imdb',
+            rules: [
+                {
+                    siteId: 'radarr',
+                    match: {
+                        pattern: /tv\s(|mini(\s|-))series/i,
+                        operator: 'ne'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: 'link[rel="canonical"]',
+                selectorType: 'href',
+                modifiers: [
+                    {
+                        type: 'regex-match',
+                        pattern: /(?<search>tt\d{5,10})/i
+                    }, {
+                        type: 'prepend',
+                        var: 'imdb:'
+                    }
+                ]
             },
             match: {
                 term: 'imdb.com',
@@ -56,35 +79,22 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             }
         },
         /* new imdb layout (beta as of 11.01.2021) */
+        /* sonarr version which doesn't work with id search */
         {
             id: 'imdb',
             rules: [
                 {
                     siteId: 'sonarr',
                     match: {
-                        term: 'tv series',
+                        pattern: /tv\s(|mini(\s|-))series/i,
                         operator: 'eq'
-                    }
-                },
-                {
-                    siteId: 'sonarr',
-                    match: {
-                        term: 'tv mini series',
-                        operator: 'eq'
-                    }
-                },
-                {
-                    siteId: 'radarr',
-                    match: {
-                        term: 'tv series',
-                        operator: 'ne'
                     }
                 }
             ],
             search: {
                 containerSelector: '[class^="TitleHeader__TitleText"]',
                 selectorType: 'text',
-                modifier: null
+                modifiers: []
             },
             match: {
                 term: 'imdb.com',
@@ -97,20 +107,50 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                 imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
             }
         },
+        /* radarr version which works with id search */
+        {
+            id: 'imdb',
+            rules: [
+                {
+                    siteId: 'radarr',
+                    match: {
+                        pattern: /tv\s(|mini(\s|-))series/i,
+                        operator: 'ne'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: 'link[rel="canonical"]',
+                selectorType: 'href',
+                modifiers: [
+                    {
+                        type: 'regex-match',
+                        pattern: /(?<search>tt\d{5,10})/i
+                    }, {
+                        type: 'prepend',
+                        var: 'imdb:'
+                    }
+                ]
+            },
+            match: {
+                term: 'imdb.com',
+                containerSelector: 'meta[property="og:title"]',
+                attribute: 'content',
+            },
+            icon: {
+                containerSelector: '[class^="TitleHeader__TitleText"]',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
+            }
+        },
+        // tmdb id doesn't work with sonarr
         {
             id: 'tmdb',
             rules: [
                 {
                     siteId: 'sonarr',
                     match: {
-                        term: 'themoviedb.org/tv/',
-                        operator: 'eq'
-                    }
-                },
-                {
-                    siteId: 'radarr',
-                    match: {
-                        term: 'themoviedb.org/movie/',
+                        pattern: /themoviedb\.org\/tv\//i,
                         operator: 'eq'
                     }
                 }
@@ -118,7 +158,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             search: {
                 containerSelector: '.header .title h2 a',
                 selectorType: 'text',
-                modifier: null
+                modifiers: []
             },
             match: {
                 term: 'themoviedb.org',
@@ -131,28 +171,63 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
             }
         },
+        // radarr works with tmdb id
+        {
+            id: 'tmdb',
+            rules: [
+                {
+                    siteId: 'radarr',
+                    match: {
+                        pattern: /themoviedb\.org\/movie\//i,
+                        operator: 'eq'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: 'link[rel="canonical"]',
+                selectorType: 'href',
+                modifiers: [
+                    {
+                        type: 'regex-match',
+                        pattern: /\/(?<search>\d{4,10})-/i
+                    }, {
+                        type: 'prepend',
+                        var: 'tmdb:'
+                    }
+                ]
+            },
+            match: {
+                term: 'themoviedb.org',
+                containerSelector: 'link[rel="canonical"]',
+                attribute: 'href'
+            },
+            icon: {
+                containerSelector: '.header .title h2',
+                locator: 'prepend',
+                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        // tvdb for sonarr, uses tvdb:xxxxx type search
         {
             id: 'tvdb',
             rules: [
                 {
                     siteId: 'sonarr',
                     match: {
-                        term: 'thetvdb.com series',
-                        operator: 'eq'
-                    }
-                },
-                {
-                    siteId: 'radarr',
-                    match: {
-                        term: 'thetvdb.com movie',
+                        pattern: /thetvdb\.com\sseries/i,
                         operator: 'eq'
                     }
                 }
             ],
             search: {
-                containerSelector: '#series_title',
+                containerSelector: '#series_basic_info > ul > li:first-of-type > span',
                 selectorType: 'text',
-                modifier: null
+                modifiers: [
+                    {
+                        type: 'prepend',
+                        var: 'tvdb:'
+                    }
+                ]
             },
             match: {
                 term: 'thetvdb.com',
@@ -165,32 +240,94 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
             }
         },
+        // tvdb for radarr, uses text search as id search not working as tested (v0.9)
+        {
+            id: 'tvdb',
+            rules: [
+                {
+                    siteId: 'radarr',
+                    match: {
+                        pattern: /thetvdb\.com\smovie/i,
+                        operator: 'eq'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: '#series_title',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'thetvdb.com',
+                containerSelector: '#series_basic_info',
+                attribute: 'text'
+            },
+            icon: {
+                containerSelector: '#series_title',
+                locator: 'prepend',
+                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        // trakt for sonarr, uses tvdb id
         {
             id: 'trakt',
             rules: [
                 {
                     siteId: 'sonarr',
                     match: {
-                        term: 'tv',
-                        operator: 'eq'
-                    }
-                },
-                {
-                    siteId: 'radarr',
-                    match: {
-                        term: 'movies',
+                        pattern: /tv/i,
                         operator: 'eq'
                     }
                 }
             ],
             search: {
-                containerSelector: 'title',
-                selectorType: 'text',
-                modifier: {
-                    type: 'replace',
-                    from: ' - trakt.tv',
-                    to: ''
+                containerSelector: 'a[href*="tvdb.com"]',
+                selectorType: 'href',
+                modifiers: [
+                    {
+                        type: 'regex-match',
+                        pattern: /\/(?<search>\d{4,10})/i
+                    }, {
+                        type: 'prepend',
+                        var: 'tvdb:'
+                    }
+                ]
+            },
+            match: {
+                term: 'trakt.tv',
+                containerSelector: '#main-nav ul li a.selected',
+                attribute: 'text'
+            },
+            icon: {
+                containerSelector: 'h1',
+                locator: 'prepend',
+                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        // trakt for radarr, uses tmdb id
+        {
+            id: 'trakt',
+            rules: [
+                {
+                    siteId: 'radarr',
+                    match: {
+                        pattern: /movies/i,
+                        operator: 'eq'
+                    }
                 }
+            ],
+            search: {
+                containerSelector: 'a[href*="moviedb.org"]',
+                selectorType: 'href',
+                modifiers: [
+                    {
+                        type: 'regex-match',
+                        pattern: /\/(?<search>\d{4,10})/i
+                    }, {
+                        type: 'prepend',
+                        var: 'tmdb:'
+                    }
+                ]
             },
             match: {
                 term: 'trakt.tv',
@@ -209,7 +346,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             search: {
                 containerSelector: 'h1.show-for-medium',
                 selectorType: 'text',
-                modifier: null
+                modifiers: []
             },
             match: {
                 term: 'tvmaze.com/shows/'
@@ -226,7 +363,7 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             search: {
                 containerSelector: 'div.show-name',
                 selectorType: 'text',
-                modifier: null
+                modifiers: []
             },
             match: {
                 term: 'tvmaze.com/countdown'
@@ -243,11 +380,13 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             search: {
                 containerSelector: '.artistheader > h1 > a',
                 selectorType: 'href',
-                modifier: {
-                    type: 'replace',
-                    from: '/artist/',
-                    to: 'lidarr:'
-                }
+                modifiers: [
+                    {
+                        type: 'replace',
+                        from: '/artist/',
+                        to: 'lidarr:'
+                    }
+                ]
             },
             match: {
                 term: 'musicbrainz.org/artist'
@@ -262,9 +401,14 @@ var settingsPort = chrome.runtime.connect({ name: 'settings' }),
             id: 'letterboxd',
             defaultSite: 'radarr',
             search: {
-                containerSelector: 'meta[property="og:title"]',
-                selectorType: 'content',
-                modifier: null
+                containerSelector: 'body',
+                selectorType: 'data-tmdb-id',
+                modifiers: [
+                    {
+                        type: 'prepend',
+                        var: 'tmdb:'
+                    }
+                ]
             },
             match: {
                 term: 'letterboxd.com/film/'
@@ -319,6 +463,21 @@ var log = function(content) {
     }
 
     console.log(content);
+}
+
+/**
+ * gets a value from an element based on the supplied selector
+ * @param {jQuery element} el 
+ * @param {selector type} selector 
+ */
+var getElementValue = function(el, selector) {
+    switch (selector) {
+        case 'text':
+            return el.text();
+            
+        default: // attribute
+            return el.attr(selector);
+    }
 }
 
 var init = function (settings) {
@@ -381,30 +540,19 @@ var init = function (settings) {
                         } else {
                             $.each(integration.rules, 
                                 function (ir, r) {
-                                    var hasMatch;
-                                    
-                                    switch (integration.match.attribute) {
-                                        case 'text':
-                                            hasMatch = matchContainer.text().toLowerCase().includes(r.match.term);
-                                            break;
+                                    var matchValue = getElementValue(matchContainer, integration.match.attribute);
 
-                                        case 'content':
-                                            hasMatch = matchContainer.attr('content').toLowerCase().includes(r.match.term);
-                                            break;
-                                            
-                                        default:
-                                            hasMatch = matchContainer.attr(integration.match.attribute).toLowerCase().includes(r.match.term)
-                                            break;                                
+                                    var hasMatch = r.match.operator === 'eq'
+                                        ? r.match.pattern.test(matchValue)
+                                        : !(r.match.pattern.test(matchValue)); // 'ne', convert to switch if other values are required
+
+                                    if (hasMatch) {
+                                        site = settings.sites
+                                            .filter(s => { return s.enabled })
+                                            .find(s => s.id == r.siteId);
+
+                                        return false;
                                     }
-
-                                    if (((r.match.operator == 'eq') && hasMatch) ||
-                                        ((r.match.operator == 'ne') && !hasMatch)) {
-                                            site = settings.sites
-                                                .filter(s => { return s.enabled })
-                                                .find(s => s.id == r.siteId);
-
-                                            return false;
-                                        }
                                 });
                         }
 
@@ -416,33 +564,29 @@ var init = function (settings) {
 
                         /* iterate all the containers */
                         $.each($(integration.search.containerSelector), function(i_el, container) {
-                            var searchTerm = '';
-
-                            switch (integration.search.selectorType) {
-                                case 'href':
-                                    searchTerm = $(container).attr('href');
-                                    break;
-
-                                case 'content':
-                                    searchTerm = $(container).attr('content');
-                                    break;
-
-                                default: // text
-                                    searchTerm = $(container).text();
-                                    break;
-                            }
+                            var searchTerm = getElementValue($(container), integration.search.selectorType);
                             
-                            if (integration.search.modifier == null){
+                            if (integration.search.modifiers.length == 0){
                                 searchTerm = searchTerm.trim()
                             } else {
-                                switch (integration.search.modifier.type) {
-                                    case 'replace':
-                                        searchTerm = searchTerm.toLowerCase().replace(integration.search.modifier.from, integration.search.modifier.to).trim()
-                                        break;
-                                }
+                                $.each(integration.search.modifiers, function(i, modifier) {
+                                    switch (modifier.type) {
+                                        case 'replace':
+                                            searchTerm = searchTerm.toLowerCase().replace(modifier.from, modifier.to).trim()
+                                            break;
+
+                                        case 'regex-match':
+                                            searchTerm = searchTerm.match(modifier.pattern).groups.search;                                            
+                                            break;
+
+                                        case 'prepend':
+                                            searchTerm = modifier.var + searchTerm;
+                                            break;
+                                    }
+                                });
                             }
 
-                            searchTerm = searchTerm.replace(/\s\s+/g, ' ')
+                            searchTerm = searchTerm.replace(/\s\s+/g, ' ');
 
                             log(['search term: ', searchTerm]);
 
