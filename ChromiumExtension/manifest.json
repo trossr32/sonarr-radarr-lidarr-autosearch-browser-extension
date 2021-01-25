@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Sonarr/Radarr/Lidarr autosearch",
   "description": "Exposes a context menu that enables direct searching for tv shows, movies or artists in Sonarr, Radarr and Lidarr.",
-  "version": "1.7.0.0",
+  "version": "2.0.0.0",
   "browser_action": {
     "default_icon": "content/assets/images/SonarrRadarrLidarr128.png",
     "default_popup": "popup.html"
@@ -13,7 +13,11 @@
   },
   "options_page": "options.html",
   "background": {
-    "scripts": ["eventPage.js"],
+    "scripts": [
+      "content/js/jquery-3.5.1.min.js",
+      "content/js/core.js",
+      "eventPage.js"
+    ],
     "persistent": false
   },
   "content_scripts": [
@@ -23,7 +27,8 @@
         "file://*/*"
       ],
       "js": [
-        "content/js/jquery-3.2.1.min.js",
+        "content/js/jquery-3.5.1.min.js",
+        "content/js/core.js",
         "content/js/sonarr_radarr_lidarr_autosearch.js"
       ]
     }

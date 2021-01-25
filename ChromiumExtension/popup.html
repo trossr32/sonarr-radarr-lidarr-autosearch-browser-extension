@@ -5,9 +5,11 @@
     <title>Sonarr/Radarr/Lidarr autosearch options</title>
     <link rel="stylesheet" href="content/css/bootstrap.min.css">
     <link rel="stylesheet" href="content/css/popup.css" />
-    <script src="content/js/jquery-3.2.1.min.js"></script>
-    <script src="content/js/bootstrap.min.js"></script>
+    <script src="content/js/jquery-3.5.1.min.js"></script>
+    <script src="content/js/bootstrap.bundle.min.js"></script>
+    <script src="content/js/core.js"></script>
     <script src="content/js/popup.js"></script>
+    <script src="content/js/font-awesome_all.min.js"></script>
     
     <style type="text/css">
         .popupRow { width: 100%; margin-bottom: 10px; }
@@ -19,21 +21,17 @@
 <div class="container popupContainer">
     <div class="popupRow">
         <p>Please note that by default the advanced settings are configured to the defaults that work with v2 of Sonarr and v0 of Radarr.</p>
-        <p>If you are using the pre-release v3.0 of either, then please head to the options page, advanced tab and setup the v3.0 defaults.</p>
-        <p>
-            If you have issues getting these settings working then the pre-release code may have changed, please raise an issue on the project 
-            <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/new" target="_blank">GitHub repo</a>.
-        </p>
+        <p>Add your API key in the settings page and the correct settings will be set based on the version you are running.</p>
     </div>
 
     <hr />
 
     <div class="popupRow text-center">
-        <button type="button" class="btn btn-success popupBtn" id="toggleActive"><span class="glyphicon glyphicon-off"></span> Disable</button>
+        <button type="button" class="btn btn-success popupBtn" id="toggleActive"><i class="fas fa-power-off"></i>&nbsp;&nbsp;&nbsp;&nbsp;Disable</button>
     </div>
 
     <div class="popupRow text-center">
-        <button type="button" class="btn btn-primary popupBtn" id="btnSettings"><span class="glyphicon glyphicon-cog"></span> Settings</button>
+        <button type="button" class="btn btn-primary popupBtn" id="btnSettings"><i class="fas fa-cogs"></i>&nbsp;&nbsp;&nbsp;Settings</button>
     </div>
 </div>
 </body>

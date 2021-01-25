@@ -1,46 +1,27 @@
-var settingsPort = chrome.runtime.connect({ name: 'settings' }),
-    iconPort = chrome.runtime.connect({ name: 'icon' });
+var iconPort = chrome.runtime.connect({ name: 'icon' });
 
 var setEnabledDisabledButtonState = function(settings) {
-    if (settings.enabled) {
-        $('#toggleActive').removeClass('btn-success btn-danger').addClass('btn-danger');
-        $('#toggleActive').html('<span class="glyphicon glyphicon-off"></span> Disable');
-    } else {
-        $('#toggleActive').removeClass('btn-success btn-danger').addClass('btn-success');
-        $('#toggleActive').html('<span class="glyphicon glyphicon-off"></span> Enable');
-    }
+    $('#toggleActive').removeClass('btn-success btn-danger').addClass('btn-' + (settings.enabled ? 'danger' : 'success'));
+    $('#toggleActive').html('<i class="fas fa-power-off"></i>&nbsp;&nbsp;&nbsp;&nbsp;' + (settings.enabled ? 'Disable' : '&nbsp;Enable'));
 };
-
-settingsPort.onMessage.addListener(function (response) {
-    var settings = response.settings;
-
-    switch (response.request.caller) {
-        case 'initPopup':
-            setEnabledDisabledButtonState(settings);
-            break;
-        case 'enableDisable':
-            // update enabled setting
-            settings.enabled = !settings.enabled;
-
-            settingsPort.postMessage({ method: 'set', caller: 'setFields', settings: settings });
-
-            // update popup ui
-            setEnabledDisabledButtonState(settings);
-
-            // update icon
-            iconPort.postMessage({ x: "y" });
-
-            // remove context menus
-            break;
-    }
-});
 
 $(function () {
     // initialise page on load
-    settingsPort.postMessage({ method: 'get', caller: 'initPopup' });
+    getSettings(setEnabledDisabledButtonState);
     
     $('#toggleActive').click(function(e) {
-        settingsPort.postMessage({ method: 'get', caller: 'enableDisable' });
+        getSettings(function(settings) {
+            // update enabled setting
+            settings.enabled = !settings.enabled;
+
+            setSettings(settings, function() {
+                // update popup ui
+                setEnabledDisabledButtonState(settings);
+
+                // update icon
+                iconPort.postMessage({ x: "y" });
+            });            
+        });
     });
 
     $('#btnSettings').click(function() {

@@ -1,1 +1,0 @@
-Powershell -NoProfile -ExecutionPolicy Bypass -File "CreatePackage.ps1" -BrowserType "Firefox"

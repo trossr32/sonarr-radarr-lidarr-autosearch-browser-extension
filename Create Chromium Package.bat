@@ -1,1 +1,0 @@
-Powershell.exe -File CreatePackage.ps1 -BrowserType "Chromium"
