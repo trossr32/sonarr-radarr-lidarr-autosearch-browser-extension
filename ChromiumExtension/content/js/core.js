@@ -47,7 +47,7 @@
 /**
  * Version configuration for a site version
  * @typedef {Object} VersionConfigItem
- * @property {string} match - regex pattern to match against the site version
+ * @property {string} versionMatch - regex pattern to match against the site version
  * @property {string} searchPath - URL path to the site search / add new page
  * @property {string} searchInputSelector - jQuery selector for the search input on the search page
  */
@@ -198,12 +198,12 @@ var sessionId,
             id: 'sonarr',
             configs: [
                 {
-                    match: /^2/,
+                    versionMatch: /^2/,
                     searchPath: '/addseries/',
                     searchInputSelector: '.add-series-search .x-series-search'
                 },
                 {
-                    match: /^3/,
+                    versionMatch: /^3/,
                     searchPath: '/add/new/',
                     searchInputSelector: 'input[name="seriesLookup"]'
                 }
@@ -213,12 +213,12 @@ var sessionId,
             id: 'radarr',
             configs: [
                 {
-                    match: /^0/,
+                    versionMatch: /^0/,
                     searchPath: '/addmovies/',
                     searchInputSelector: '.add-movies-search .x-movies-search'
                 },
                 {
-                    match: /^3/,
+                    versionMatch: /^3/,
                     searchPath: '/add/new/',
                     searchInputSelector: 'input[name="movieLookup"]'
                 }
@@ -228,7 +228,7 @@ var sessionId,
             id: 'lidarr',
             configs: [
                 {
-                    match: /^0/,
+                    versionMatch: /^0/,
                     searchPath: '/add/search/',
                     searchInputSelector: 'input[name="searchBox"]'
                 }
@@ -267,6 +267,8 @@ chrome.storage.onChanged.addListener(logStorageChange);
 
 /**
  * Retrieves settings from local storage
+ * Checks for potentially missing properties in the settings object (caused by new properties being added on new versions of the code) 
+ * and create those properties as defaults or from the defaultSettings object.
  * @param {function} callback - function to call on completion
  */
 var getSettings = function(callback) {
@@ -286,17 +288,13 @@ var getSettings = function(callback) {
 
             // check integrations array
             for (let i = 0; i < defaultSettings.integrations.length; i++) {
-                var integrationFound = false;
-
-                for (let j = 0; j < data.sonarrRadarrLidarrAutosearchSettings.integrations.length; j++) {
-                    if (data.sonarrRadarrLidarrAutosearchSettings.integrations[j].id == defaultSettings.integrations[i].id) {
-                        integrationFound = true;
-                    }  
+                // try to find the integration
+                if (data.sonarrRadarrLidarrAutosearchSettings.integrations.some(integration => integration.id === defaultSettings.integrations[i].id)) {
+                    continue;
                 }
 
-                if (!integrationFound) {
-                    data.sonarrRadarrLidarrAutosearchSettings.integrations.push(defaultSettings.integrations[i]);
-                }
+                // integration not found
+                data.sonarrRadarrLidarrAutosearchSettings.integrations.push(defaultSettings.integrations[i]);
             }
 
             // check sites array
@@ -317,6 +315,8 @@ var getSettings = function(callback) {
 
 /**
  * Saves settings to local storage
+ * Checks for potentially missing properties in the settings object (caused by new properties being added on new versions of the code) 
+ * and create those properties as defaults or from the defaultSettings object.
  * @param {Settings} data - settings to save
  * @param {function} callback - function to call on completion
  */
@@ -353,13 +353,13 @@ var getVersionConfig = (siteId, version) =>
     versionConfig
         .find(v => v.id === siteId)
         .configs
-            .find(c => c.match.test(version));
+            .find(c => c.versionMatch.test(version));
 
 /**
  * Build a URL to call an API
  * @param {string} siteId 
  * @param {string} endpoint 
- * @returns {string} - the url
+ * @returns {URL} - the url
  */
 var getApiUrl = (site, endpoint) => {
     var _endpoint = apiConfig
