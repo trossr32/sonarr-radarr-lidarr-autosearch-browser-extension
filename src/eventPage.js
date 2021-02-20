@@ -2,20 +2,18 @@ browser.runtime.onConnect.addListener(function(port) {
     switch (port.name) {
         case 'init':
             port.onMessage.addListener(function (request) {
-                getSettings(function (settings) {
-                    setIcon(settings);
-
-                    // TODO: do we need to await the polyill before executing the content script?
-                    browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
-                    browser.tabs.executeScript({ file: 'content/js/content_script.js' });
+                getSettings(async function (settings) {
+                    await setIcon(settings);
+                    await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
+                    await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
                 });
             });
             break;
 
         case 'icon':
             port.onMessage.addListener(function (request) {
-                getSettings(function (settings) {
-                    setIcon(settings);
+                getSettings(async function (settings) {
+                    await setIcon(settings);
                 });
             });
             break;
@@ -26,28 +24,28 @@ browser.runtime.onConnect.addListener(function(port) {
  * Build the browser context menus
  * @param {Settings} settings 
  */
-function buildMenus(settings) {
-    browser.contextMenus.removeAll(function () {
-        // if extension is disabled gtfo
-        if (!settings.enabled) {
-            return;
-        }
+async function buildMenus(settings) {
+    await browser.contextMenus.removeAll();
 
-        var enabledSites = settings.sites.filter(site => { return site.enabled; });
+    // if extension is disabled gtfo
+    if (!settings.enabled) {
+        return;
+    }
 
-        // if no sites are enabled gtfo
-        if (enabledSites.length === 0) {
-            return;
-        }
+    var enabledSites = settings.sites.filter(site => { return site.enabled; });
 
-        // create parent menu
-        browser.contextMenus.create({ "title": "Search Sonarr/Radarr/Lidarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
+    // if no sites are enabled gtfo
+    if (enabledSites.length === 0) {
+        return;
+    }
 
-        // create child menus from enabled sites array
-        for (var i = 0; i < enabledSites.length; i++) {
-            browser.contextMenus.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": enabledSites[i].id + "Menu", "contexts": ["selection"] });
-        }
-    });
+    // create parent menu
+    browser.contextMenus.create({ "title": "Search Sonarr/Radarr/Lidarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
+
+    // create child menus from enabled sites array
+    for (var i = 0; i < enabledSites.length; i++) {
+        browser.contextMenus.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": enabledSites[i].id + "Menu", "contexts": ["selection"] });
+    }
 }
 
 /**
@@ -56,10 +54,10 @@ function buildMenus(settings) {
  * @param {*} tab 
  */
 function onClickHandler(info, tab) {
-    getSettings(function (settings) {
+    getSettings(async function (settings) {
         for (var i = 0; i < settings.sites.length; i++) {
             if (info.menuItemId == (settings.sites[i].id + 'Menu')) {
-                browser.tabs.create({
+                await browser.tabs.create({
                     'url': settings.sites[i].domain.replace(/\/$/, '') + settings.sites[i].searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
                 });
             }
@@ -82,10 +80,8 @@ browser.runtime.onInstalled.addListener(function () {
  * Set the extension icon
  * @param {Settings} settings 
  */
-var setIcon = function(settings) {
-    browser.tabs.getCurrent(function(tab) {
-        var img = 'content/assets/images/SonarrRadarrLidarr' + (settings.enabled ? '' : '-faded') + '16.png';
-
-        browser.browserAction.setIcon({ path: img });
-    });
+async function setIcon(settings) {
+    var tab = await browser.tabs.getCurrent();
+    var img = 'content/assets/images/SonarrRadarrLidarr' + (settings.enabled ? '' : '-faded') + '16.png';
+    await browser.browserAction.setIcon({ path: img });
 };
