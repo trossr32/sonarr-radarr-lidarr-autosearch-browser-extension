@@ -24,7 +24,7 @@ $(function () {
         });
     });
 
-    $('#btnSettings').click(function() {
-        browser.runtime.openOptionsPage(); // add open flag in settings?
+    $('#btnSettings').click(async function() {
+        await browser.runtime.openOptionsPage(); // add open flag in settings?
     });
 });
