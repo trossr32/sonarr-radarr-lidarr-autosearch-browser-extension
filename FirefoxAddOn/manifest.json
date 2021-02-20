@@ -24,6 +24,7 @@
   "background": {
     "scripts": [
       "content/js/jquery-3.5.1.min.js",
+      "content/js/browser-polyfill.min.js",
       "content/js/core.js",
       "eventPage.js"
     ],
@@ -37,6 +38,7 @@
       ],
       "js": [
         "content/js/jquery-3.5.1.min.js",
+        "content/js/browser-polyfill.min.js",
         "content/js/core.js",
         "content/js/sonarr_radarr_lidarr_autosearch.js"
       ]

@@ -5,6 +5,8 @@ browser.runtime.onConnect.addListener(function(port) {
                 getSettings(function (settings) {
                     setIcon(settings);
 
+                    // TODO: do we need to await the polyill before executing the content script?
+                    browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
                     browser.tabs.executeScript({ file: 'content/js/content_script.js' });
                 });
             });
