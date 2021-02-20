@@ -46,9 +46,9 @@ populated based on your instance version.
 
 If any of the sites on this tab are set as enabled then this extension will attempt to ascertain whether it should include a direct link to search within a Sonarr, Radarr or Lidarr instance, for example:
 
-![IMDb Sonarr example](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/ChromiumExtension/content/assets/images/integrations/imdb_example_screenshot.png)
+![IMDb Sonarr example](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/src/content/assets/images/integrations/imdb_example_screenshot.png)
 
-![TVDb Sonarr example](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/ChromiumExtension/content/assets/images/integrations/tvdb_example_screenshot.png)
+![TVDb Sonarr example](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/src/content/assets/images/integrations/tvdb_example_screenshot.png)
 
 # Create package
 A Powershell script and batch files that execute that PS script are included but these simply zip the ChromiumExtension directory or run web-ext build against the FirefoxAddOn directory, as that's all that's required to publish this to the Chrome Web Store, Microsoft Edge Addons and Firefox Addons sites.
