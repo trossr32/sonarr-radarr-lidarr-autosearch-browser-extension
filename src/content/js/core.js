@@ -368,59 +368,47 @@ var getApiUrl = (site, endpoint) => {
 /**
  * Call an instance API
  * @param {ApiRequest} request
- * @param {function} callback - function to call on completion
- * @returns {ApiResponse}
+ * @returns {Promise<ApiResponse>}
  */
-async function callApi(request, callback) {
+async function callApi(request) {
     const settings = await getSettings();
     let site = settings.sites
         .filter(s => s.enabled)
         .find(s => s.id == request.siteId);
 
     if (site == null) {
-        if (typeof callback === "function") {
-            callback({
-                data: null,
-                request: request,
-                success: false,
-                error: 'site config not found (likely it\'s not enabled)'
-            });
-        }
-
-        return;
+        return {
+            data: null,
+            request: request,
+            success: false,
+            error: 'site config not found (likely it\'s not enabled)'
+        };
     }
 
     if (site.apiKey == null || site.apiKey === '') {
-        if (typeof callback === "function") {
-            callback({
-                data: null,
-                request: request,
-                success: false,
-                error: 'no api key set for site'
-            });
-        }
-
-        return;
+        return {
+            data: null,
+            request: request,
+            success: false,
+            error: 'no api key set for site'
+        };
     }
 
     var url = getApiUrl(site, request.endpoint);
 
-    $.getJSON(url, async function(data) {
+    try {
+        const data = await $.getJSON(url);
         switch (request.endpoint) {
             // if this is a 'Version' call try to update settings if with version specific data
             case 'Version':
-                // if auto population is turned off the just return response via callback
+                // if auto population is turned off the just return response
                 if (!site.autoPopAdvancedFromApi && request.source != 'ApiAutoPopEnabled') {
-                    if (typeof callback === "function") {
-                        callback({
-                            data: data,
-                            request: request,
-                            success: true,
-                            error: null
-                        });
-                    }
-
-                    return;
+                    return {
+                        data: data,
+                        request: request,
+                        success: true,
+                        error: null
+                    };
                 }
 
                 // auto population is enabled, so get the config for this version and update settings
@@ -434,36 +422,27 @@ async function callApi(request, callback) {
                 }
 
                 await setSettings(settings);
-                if (typeof callback === "function") {
-                    callback({
-                        data: data,
-                        request: request,
-                        success: true,
-                        error: null
-                    });
-                }
-                break;
+                return {
+                    data: data,
+                    request: request,
+                    success: true,
+                    error: null
+                };
 
             default:
-                if (typeof callback === "function") {
-                    callback({
-                        data: data,
-                        request: request,
-                        success: true,
-                        error: null
-                    });
-                }
-                break;
+                return {
+                    data: data,
+                    request: request,
+                    success: true,
+                    error: null
+                };
         }
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-        if (typeof callback === "function") {
-            callback({
-                data: null,
-                request: request,
-                success: false,
-                error: textStatus
-            });
-        }
-    });
+    } catch (error) {
+        return {
+            data: null,
+            request: request,
+            success: false,
+            error: error
+        };
+    };
 }

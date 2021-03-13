@@ -134,34 +134,33 @@ var initialiseBasicForm = function (settings) {
         });
     
         // api key test buttons
-        $('#' + site.id + 'ApiKeyTest').on('click', function () {
+        $('#' + site.id + 'ApiKeyTest').on('click', async function () {
             var siteId = $(this).attr('data-site-id');
     
             setTestButtonIcon(siteId, 'Progress');
 
             $('#' + siteId + 'ApiTestMessage').hide();
-            callApi({ siteId: siteId, endpoint: 'Version' }, async function(response) {
-                if (response.success) {
-                    setTestButtonIcon(siteId, "Worked");
+            const response = await callApi({ siteId: siteId, endpoint: 'Version' });
+            if (response.success) {
+                setTestButtonIcon(siteId, "Worked");
 
-                    $('#' + siteId + 'ApiTestMessage')
-                        .removeClass('bg-danger')
-                        .addClass('bg-success')
-                        .html(`Success! Detected version ${response.data.version}`)
-                        .show();
-                    const settings = await getSettings();
-                    updateAdvancedForm(settings);
-                } else {
-                    setTestButtonIcon(siteId, "Failed");
-                    $('#' + siteId + 'ApiTestMessage')
-                        .removeClass('bg-success')
-                        .addClass('bg-danger')
-                        .html('Failed, please double check the domain and API key')
-                        .show();
-                }
+                $('#' + siteId + 'ApiTestMessage')
+                    .removeClass('bg-danger')
+                    .addClass('bg-success')
+                    .html(`Success! Detected version ${response.data.version}`)
+                    .show();
+                const settings = await getSettings();
+                updateAdvancedForm(settings);
+            } else {
+                setTestButtonIcon(siteId, "Failed");
+                $('#' + siteId + 'ApiTestMessage')
+                    .removeClass('bg-success')
+                    .addClass('bg-danger')
+                    .html('Failed, please double check the domain and API key')
+                    .show();
+            }
 
-                // alert?
-            });
+            // alert?
         });
     }); 
 };
@@ -406,7 +405,7 @@ async function setSettingsPropertiesFromDebugForm() {
 /**
  * Listen for storage changes
  */
-browser.storage.onChanged.addListener(function(changes, area) {
+browser.storage.onChanged.addListener(async function(changes, area) {
     let changedItems = Object.keys(changes);
 
     for (let item of changedItems) {
@@ -431,18 +430,17 @@ browser.storage.onChanged.addListener(function(changes, area) {
                 oldSite.autoPopAdvancedFromApi != newSite.autoPopAdvancedFromApi)) {
                     log('Advanced settings update check required, calling version API');
 
-                    callApi({ siteId: newSite.id, endpoint: 'Version' }, async function(response) {
-                        if (response.success) {
-                            log([`API call succeeded, updating advanced settings for ${newSite.id}`, response]);
+                    const response = await callApi({ siteId: newSite.id, endpoint: 'Version' });
+                    if (response.success) {
+                        log([`API call succeeded, updating advanced settings for ${newSite.id}`, response]);
 
-                            const settings = await getSettings();
-                            updateAdvancedForm(settings);
-                        } else {
-                            log(['API call failed', response]);
-                        }
+                        const settings = await getSettings();
+                        updateAdvancedForm(settings);
+                    } else {
+                        log(['API call failed', response]);
+                    }
 
-                        // notify?
-                    });
+                    // notify?
                 }
         }
     }
