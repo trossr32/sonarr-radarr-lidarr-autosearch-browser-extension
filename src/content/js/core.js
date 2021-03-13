@@ -313,9 +313,8 @@ async function getSettings() {
  * Checks for potentially missing properties in the settings object (caused by new properties being added on new versions of the code) 
  * and create those properties as defaults or from the defaultSettings object.
  * @param {Settings} data - settings to save
- * @param {function} callback - function to call on completion
  */
-async function setSettings(data, callback) {
+async function setSettings(data) {
     if (!data.hasOwnProperty('enabled')) {
         data.enabled = true;
     }
@@ -332,9 +331,7 @@ async function setSettings(data, callback) {
     obj['sonarrRadarrLidarrAutosearchSettings'] = data;
 
     await browser.storage.sync.set(obj);
-    if (typeof callback === "function") {
-        callback(data);
-    }
+    return data;
 };
 
 /**
@@ -408,7 +405,7 @@ async function callApi(request, callback) {
 
     var url = getApiUrl(site, request.endpoint);
 
-    $.getJSON(url, function(data) {
+    $.getJSON(url, async function(data) {
         switch (request.endpoint) {
             // if this is a 'Version' call try to update settings if with version specific data
             case 'Version':
@@ -436,16 +433,15 @@ async function callApi(request, callback) {
                     }
                 }
 
-                setSettings(settings, function (settings) {
-                    if (typeof callback === "function") {
-                        callback({
-                            data: data,
-                            request: request,
-                            success: true,
-                            error: null
-                        });
-                    }
-                });
+                await setSettings(settings);
+                if (typeof callback === "function") {
+                    callback({
+                        data: data,
+                        request: request,
+                        success: true,
+                        error: null
+                    });
+                }
                 break;
 
             default:

@@ -364,7 +364,7 @@ async function setSettingsPropertiesFromForm() {
         settings.sites[i].enabled = $('#toggle-' + settings.sites[i].id).prop('checked');
     }
 
-    setSettings(settings);
+    await setSettings(settings);
 };
 
 /**
@@ -378,7 +378,7 @@ async function setSettingsPropertiesFromAdvancedForm() {
         settings.sites[i].autoPopAdvancedFromApi = $('#toggle-' + settings.sites[i].id + '-advanced').prop('checked');
     }
 
-    setSettings(settings);
+    await setSettings(settings);
 };
 
 /**
@@ -390,7 +390,7 @@ async function setSettingsPropertiesFromIntegrationsForm() {
         settings.integrations[i].enabled = $('#toggle-' + settings.integrations[i].name).prop('checked');
     }
 
-    setSettings(settings);
+    await setSettings(settings);
 };
 
 /**
@@ -400,7 +400,7 @@ async function setSettingsPropertiesFromDebugForm() {
     const settings = await getSettings();
     settings.debug = $('#toggle-debug').prop('checked');
 
-    setSettings(settings);
+    await setSettings(settings);
 };
 
 /**

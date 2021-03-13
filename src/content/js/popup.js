@@ -15,13 +15,13 @@ $(async function () {
         // update enabled setting
         settings.enabled = !settings.enabled;
 
-        setSettings(settings, function() {
-            // update popup ui
-            setEnabledDisabledButtonState(settings);
+        await setSettings(settings);
 
-            // update icon
-            iconPort.postMessage({ x: "y" });
-        });
+        // update popup ui
+        setEnabledDisabledButtonState(settings);
+
+        // update icon
+        iconPort.postMessage({ x: "y" });
     });
 
     $('#btnSettings').click(async function() {
