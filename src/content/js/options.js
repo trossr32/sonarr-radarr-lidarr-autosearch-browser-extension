@@ -140,7 +140,7 @@ var initialiseBasicForm = function (settings) {
             setTestButtonIcon(siteId, 'Progress');
 
             $('#' + siteId + 'ApiTestMessage').hide();
-            callApi({ siteId: siteId, endpoint: 'Version' }, function(response) {
+            callApi({ siteId: siteId, endpoint: 'Version' }, async function(response) {
                 if (response.success) {
                     setTestButtonIcon(siteId, "Worked");
 
@@ -149,7 +149,8 @@ var initialiseBasicForm = function (settings) {
                         .addClass('bg-success')
                         .html(`Success! Detected version ${response.data.version}`)
                         .show();
-                    getSettings(updateAdvancedForm);
+                    const settings = await getSettings();
+                    updateAdvancedForm(settings);
                 } else {
                     setTestButtonIcon(siteId, "Failed");
                     $('#' + siteId + 'ApiTestMessage')
@@ -355,55 +356,51 @@ var initialiseDebugForm = function (settings) {
 /**
  * Update settings from the settings tab form fields
  */
-var setSettingsPropertiesFromForm = function () {
-    getSettings(function(settings) {
-        for (var i = 0; i < settings.sites.length; i++) {
-            settings.sites[i].domain = $('#' + settings.sites[i].id + 'Domain').val();
-            settings.sites[i].apiKey = $('#' + settings.sites[i].id + 'ApiKey').val();
-            settings.sites[i].enabled = $('#toggle-' + settings.sites[i].id).prop('checked');
-        }
+async function setSettingsPropertiesFromForm() {
+    const settings = await getSettings();
+    for (var i = 0; i < settings.sites.length; i++) {
+        settings.sites[i].domain = $('#' + settings.sites[i].id + 'Domain').val();
+        settings.sites[i].apiKey = $('#' + settings.sites[i].id + 'ApiKey').val();
+        settings.sites[i].enabled = $('#toggle-' + settings.sites[i].id).prop('checked');
+    }
 
-        setSettings(settings);
-    });    
+    setSettings(settings);
 };
 
 /**
  * Update settings from the advanced settings tab form fields
  */
-var setSettingsPropertiesFromAdvancedForm = function () {
-    getSettings(function(settings) {
-        for (var i = 0; i < settings.sites.length; i++) {
-            settings.sites[i].searchPath = $('#' + settings.sites[i].id + 'SearchPath').val();
-            settings.sites[i].searchInputSelector = $('#' + settings.sites[i].id + 'SearchInputSelector').val();
-            settings.sites[i].autoPopAdvancedFromApi = $('#toggle-' + settings.sites[i].id + '-advanced').prop('checked');
-        }
+async function setSettingsPropertiesFromAdvancedForm() {
+    const settings = await getSettings();
+    for (var i = 0; i < settings.sites.length; i++) {
+        settings.sites[i].searchPath = $('#' + settings.sites[i].id + 'SearchPath').val();
+        settings.sites[i].searchInputSelector = $('#' + settings.sites[i].id + 'SearchInputSelector').val();
+        settings.sites[i].autoPopAdvancedFromApi = $('#toggle-' + settings.sites[i].id + '-advanced').prop('checked');
+    }
 
-        setSettings(settings);
-    });
+    setSettings(settings);
 };
 
 /**
  * Update settings from the integrations tab form fields
  */
-var setSettingsPropertiesFromIntegrationsForm = function () {
-    getSettings(function(settings) {
-        for (var i = 0; i < settings.integrations.length; i++) {
-            settings.integrations[i].enabled = $('#toggle-' + settings.integrations[i].name).prop('checked');
-        }
+async function setSettingsPropertiesFromIntegrationsForm() {
+    const settings = await getSettings();
+    for (var i = 0; i < settings.integrations.length; i++) {
+        settings.integrations[i].enabled = $('#toggle-' + settings.integrations[i].name).prop('checked');
+    }
 
-        setSettings(settings);
-    });
+    setSettings(settings);
 };
 
 /**
  * Update settings from the debug tab form fields
  */
-var setSettingsPropertiesFromDebugForm = function () {
-    getSettings(function(settings) {
-        settings.debug = $('#toggle-debug').prop('checked');
+async function setSettingsPropertiesFromDebugForm() {
+    const settings = await getSettings();
+    settings.debug = $('#toggle-debug').prop('checked');
 
-        setSettings(settings);
-    });
+    setSettings(settings);
 };
 
 /**
@@ -434,11 +431,12 @@ browser.storage.onChanged.addListener(function(changes, area) {
                 oldSite.autoPopAdvancedFromApi != newSite.autoPopAdvancedFromApi)) {
                     log('Advanced settings update check required, calling version API');
 
-                    callApi({ siteId: newSite.id, endpoint: 'Version' }, function(response) {
+                    callApi({ siteId: newSite.id, endpoint: 'Version' }, async function(response) {
                         if (response.success) {
                             log([`API call succeeded, updating advanced settings for ${newSite.id}`, response]);
 
-                            getSettings(updateAdvancedForm);
+                            const settings = await getSettings();
+                            updateAdvancedForm(settings);
                         } else {
                             log(['API call failed', response]);
                         }
@@ -450,14 +448,13 @@ browser.storage.onChanged.addListener(function(changes, area) {
     }
 });
 
-$(function () {
+$(async function () {
     // initialise page on load
-    getSettings(function(settings) {
-        initialiseBasicForm(settings);
-        initialiseAdvancedForm(settings);
-        initialiseIntegrationsForm(settings);
-        initialiseDebugForm(settings);
-    });
+    const settings = await getSettings();
+    initialiseBasicForm(settings);
+    initialiseAdvancedForm(settings);
+    initialiseIntegrationsForm(settings);
+    initialiseDebugForm(settings);
 
     // deactivate all other tabs on click. this shouldn't be required, but bootstrap 5 beta seems a bit buggy with tab deactivation.
     $('.tab-pane').on('click', function() {

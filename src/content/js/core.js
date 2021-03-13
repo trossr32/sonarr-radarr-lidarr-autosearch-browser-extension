@@ -240,14 +240,13 @@ var sessionId,
  * logs to console if the debug flag is set
  * @param {any[]} content 
  */
-var log = function(content) {
-    getSettings(function(settings) {
-        if (!settings.debug) {
-            return;
-        }
-    
-        console.log(content);
-    });
+async function log(content) {
+    const settings = await getSettings();
+    if (!settings.debug) {
+        return;
+    }
+
+    console.log(content);
 }
 
 /*
@@ -269,47 +268,44 @@ browser.storage.onChanged.addListener(logStorageChange);
  * Retrieves settings from local storage
  * Checks for potentially missing properties in the settings object (caused by new properties being added on new versions of the code) 
  * and create those properties as defaults or from the defaultSettings object.
- * @param {function} callback - function to call on completion
  */
-async function getSettings(callback) {
+async function getSettings() {
     var data = await browser.storage.sync.get({ 'sonarrRadarrLidarrAutosearchSettings': defaultSettings });
-    if (typeof callback === "function") {
-        if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('enabled')) {
-            data.sonarrRadarrLidarrAutosearchSettings.enabled = true;
-        }
-
-        if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('debug')) {
-            data.sonarrRadarrLidarrAutosearchSettings.debug = false;
-        }
-
-        if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('integrations')) {
-            data.sonarrRadarrLidarrAutosearchSettings.integrations = defaultSettings.integrations;
-        }
-
-        // check integrations array
-        for (let i = 0; i < defaultSettings.integrations.length; i++) {
-            // try to find the integration
-            if (data.sonarrRadarrLidarrAutosearchSettings.integrations.some(integration => integration.id === defaultSettings.integrations[i].id)) {
-                continue;
-            }
-
-            // integration not found
-            data.sonarrRadarrLidarrAutosearchSettings.integrations.push(defaultSettings.integrations[i]);
-        }
-
-        // check sites array
-        for (let i = 0; i < data.sonarrRadarrLidarrAutosearchSettings.sites.length; i++) {
-            if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('apiKey')) {
-                data.sonarrRadarrLidarrAutosearchSettings.sites[i].apiKey = '';
-            }
-
-            if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('autoPopAdvancedFromApi')) {
-                data.sonarrRadarrLidarrAutosearchSettings.sites[i].autoPopAdvancedFromApi = true;
-            }
-        }
-
-        callback(data.sonarrRadarrLidarrAutosearchSettings);
+    if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('enabled')) {
+        data.sonarrRadarrLidarrAutosearchSettings.enabled = true;
     }
+
+    if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('debug')) {
+        data.sonarrRadarrLidarrAutosearchSettings.debug = false;
+    }
+
+    if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('integrations')) {
+        data.sonarrRadarrLidarrAutosearchSettings.integrations = defaultSettings.integrations;
+    }
+
+    // check integrations array
+    for (let i = 0; i < defaultSettings.integrations.length; i++) {
+        // try to find the integration
+        if (data.sonarrRadarrLidarrAutosearchSettings.integrations.some(integration => integration.id === defaultSettings.integrations[i].id)) {
+            continue;
+        }
+
+        // integration not found
+        data.sonarrRadarrLidarrAutosearchSettings.integrations.push(defaultSettings.integrations[i]);
+    }
+
+    // check sites array
+    for (let i = 0; i < data.sonarrRadarrLidarrAutosearchSettings.sites.length; i++) {
+        if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('apiKey')) {
+            data.sonarrRadarrLidarrAutosearchSettings.sites[i].apiKey = '';
+        }
+
+        if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('autoPopAdvancedFromApi')) {
+            data.sonarrRadarrLidarrAutosearchSettings.sites[i].autoPopAdvancedFromApi = true;
+        }
+    }
+
+    return data.sonarrRadarrLidarrAutosearchSettings;
 };
 
 /**
@@ -366,93 +362,58 @@ var getApiUrl = (site, endpoint) => {
             .find(e => e.key == endpoint);
 
     var url = new URL(site.domain.replace(/(.+)\/$/, '$1') + '/api/' + _endpoint.value);
-    
+
     url.searchParams.append('apikey', site.apiKey);
-    
+
     return url;
 }
 
 /**
- * Call an instance API 
- * @param {ApiRequest} request 
+ * Call an instance API
+ * @param {ApiRequest} request
  * @param {function} callback - function to call on completion
  * @returns {ApiResponse}
  */
-var callApi = function(request, callback) {
-    getSettings(function(settings) {
-        let site = settings.sites
-            .filter(s => s.enabled)
-            .find(s => s.id == request.siteId);
+async function callApi(request, callback) {
+    const settings = await getSettings();
+    let site = settings.sites
+        .filter(s => s.enabled)
+        .find(s => s.id == request.siteId);
 
-        if (site == null) {
-            if (typeof callback === "function") {
-                callback({
-                    data: null,
-                    request: request,
-                    success: false,
-                    error: 'site config not found (likely it\'s not enabled)'
-                });
-            }
-
-            return;
+    if (site == null) {
+        if (typeof callback === "function") {
+            callback({
+                data: null,
+                request: request,
+                success: false,
+                error: 'site config not found (likely it\'s not enabled)'
+            });
         }
 
-        if (site.apiKey == null || site.apiKey === '') {
-            if (typeof callback === "function") {
-                callback({
-                    data: null,
-                    request: request,
-                    success: false,
-                    error: 'no api key set for site'
-                });
-            }
+        return;
+    }
 
-            return;
+    if (site.apiKey == null || site.apiKey === '') {
+        if (typeof callback === "function") {
+            callback({
+                data: null,
+                request: request,
+                success: false,
+                error: 'no api key set for site'
+            });
         }
 
-        var url = getApiUrl(site, request.endpoint);
+        return;
+    }
 
-        $.getJSON(url, function(data) {
-            switch (request.endpoint) {
-                // if this is a 'Version' call try to update settings if with version specific data
-                case 'Version':
-                    // if auto population is turned off the just return response via callback
-                    if (!site.autoPopAdvancedFromApi && request.source != 'ApiAutoPopEnabled') {
-                        if (typeof callback === "function") {
-                            callback({
-                                data: data,
-                                request: request,
-                                success: true,
-                                error: null
-                            });
-                        }
+    var url = getApiUrl(site, request.endpoint);
 
-                        return;
-                    }
-
-                    // auto population is enabled, so get the config for this version and update settings
-                    var config = getVersionConfig(site.id, data.version);
-
-                    for (let i = 0; i < settings.sites.length; i++) {
-                        if (settings.sites[i].id === site.id) {
-                            settings.sites[i].searchPath = config.searchPath;
-                            settings.sites[i].searchInputSelector = config.searchInputSelector;
-                        }                    
-                    }
-
-                    setSettings(settings, function (settings) {
-                        if (typeof callback === "function") {
-                            callback({
-                                data: data,
-                                request: request,
-                                success: true,
-                                error: null
-                            });
-                        }
-                    });
-                    break;
-                
-                default:
+    $.getJSON(url, function(data) {
+        switch (request.endpoint) {
+            // if this is a 'Version' call try to update settings if with version specific data
+            case 'Version':
+                // if auto population is turned off the just return response via callback
+                if (!site.autoPopAdvancedFromApi && request.source != 'ApiAutoPopEnabled') {
                     if (typeof callback === "function") {
                         callback({
                             data: data,
@@ -461,18 +422,52 @@ var callApi = function(request, callback) {
                             error: null
                         });
                     }
-                    break;
-            }
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            if (typeof callback === "function") {
-                callback({
-                    data: null,
-                    request: request,
-                    success: false,
-                    error: textStatus
+
+                    return;
+                }
+
+                // auto population is enabled, so get the config for this version and update settings
+                var config = getVersionConfig(site.id, data.version);
+
+                for (let i = 0; i < settings.sites.length; i++) {
+                    if (settings.sites[i].id === site.id) {
+                        settings.sites[i].searchPath = config.searchPath;
+                        settings.sites[i].searchInputSelector = config.searchInputSelector;
+                    }
+                }
+
+                setSettings(settings, function (settings) {
+                    if (typeof callback === "function") {
+                        callback({
+                            data: data,
+                            request: request,
+                            success: true,
+                            error: null
+                        });
+                    }
                 });
-            }
-        });
-    });    
+                break;
+
+            default:
+                if (typeof callback === "function") {
+                    callback({
+                        data: data,
+                        request: request,
+                        success: true,
+                        error: null
+                    });
+                }
+                break;
+        }
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+        if (typeof callback === "function") {
+            callback({
+                data: null,
+                request: request,
+                success: false,
+                error: textStatus
+            });
+        }
+    });
 }

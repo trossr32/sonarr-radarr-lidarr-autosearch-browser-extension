@@ -5,22 +5,22 @@ var setEnabledDisabledButtonState = function(settings) {
     $('#toggleActive').html('<i class="fas fa-power-off"></i>&nbsp;&nbsp;&nbsp;&nbsp;' + (settings.enabled ? 'Disable' : '&nbsp;Enable'));
 };
 
-$(function () {
+$(async function () {
     // initialise page on load
-    getSettings(setEnabledDisabledButtonState);
+    const settings = await getSettings();
+    setEnabledDisabledButtonState(settings);
     
-    $('#toggleActive').click(function(e) {
-        getSettings(function(settings) {
-            // update enabled setting
-            settings.enabled = !settings.enabled;
+    $('#toggleActive').click(async function(e) {
+        const settings = await getSettings();
+        // update enabled setting
+        settings.enabled = !settings.enabled;
 
-            setSettings(settings, function() {
-                // update popup ui
-                setEnabledDisabledButtonState(settings);
+        setSettings(settings, function() {
+            // update popup ui
+            setEnabledDisabledButtonState(settings);
 
-                // update icon
-                iconPort.postMessage({ x: "y" });
-            });            
+            // update icon
+            iconPort.postMessage({ x: "y" });
         });
     });
 
