@@ -416,6 +416,23 @@ var base64Icons = [
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: 8px 10px 0 0; float: left;'
             }
+        },
+        {
+            id: 'tvcalendar',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'p[data-episode] > a:first-of-type',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'pogdesign.co.uk/cat'
+            },
+            icon: {
+                containerSelector: 'p[data-episode]',
+                locator: 'append',
+                imgStyles: 'width: 18px; margin: -22px 0 0 0; float: right;'
+            }
         }
     ];
 

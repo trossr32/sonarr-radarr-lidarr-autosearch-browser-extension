@@ -279,9 +279,9 @@ var initialiseAdvancedForm = function (settings) {
  */
 var updateAdvancedForm = function (settings) {
     $.each(settings.sites, function (is, site) {
-        if ($('#toggle-' + site.id + '-advanced').prop('checked')) {
-            $('#' + site.id + 'SearchPath').val(site.searchPath);
-            $('#' + site.id + 'SearchInputSelector').val(site.searchInputSelector);
+        if ($(`#toggle-${site.id}-advanced`).prop('checked')) {
+            $(`#${site.id}SearchPath`).val(site.searchPath);
+            $(`#${site.id}SearchInputSelector`).val(site.searchInputSelector);
         }
     }); 
 };
@@ -290,17 +290,17 @@ var updateAdvancedForm = function (settings) {
  * Build the integrations tab
  */
 var initialiseIntegrationsForm = function (settings) {
-    var wrapper = $('<div class="row"></div>');
+    var wrapper = $('<div class="row row-cols-2 row-cols-md-4 row-cols-xl-6"></div>');
 
     $.each(settings.integrations, function (i, integration) {
         wrapper
             .append(
                 $('<div class="col p-3"></div>')
                     .append($('<div class="card text-white bg-dark mb-3"></div>')
-                        .append($('<div class="card-img-top card-integration" style="background: url(\'content/assets/images/integrations/' + integration.image + '\') center/100% no-repeat;"></div>'))
+                        .append($(`<div class="card-img-top card-integration" style="background: url('content/assets/images/integrations/${integration.image}') center/100% no-repeat;"></div>`))
                         .append($('<div class="card-body" style="text-align: center;"></div>')
-                            .append($('<h5 class="card-title mb-4">' + integration.name + '</h5>'))
-                            .append($('<input type="checkbox" id="toggle-' + integration.name + '">').prop('checked', integration.enabled))
+                            .append($(`<h5 class="card-title mb-4">${integration.name}</h5>`))
+                            .append($(`<input type="checkbox" id="toggle-${integration.id}">`).prop('checked', integration.enabled))
                         )
                     )
             );
@@ -310,7 +310,7 @@ var initialiseIntegrationsForm = function (settings) {
 
     // enable toggles
     $.each(settings.integrations, function (i, integration) {
-        $('#toggle-' + integration.name).bootstrapToggle({
+        $(`#toggle-${integration.id}`).bootstrapToggle({
             on: 'Enabled',
             off: 'Disabled',
             onstyle: 'success',
@@ -320,7 +320,7 @@ var initialiseIntegrationsForm = function (settings) {
         });
 
         // site enabled/disabled toggle change event
-        $('#toggle-' + integration.name).on('change', setSettingsPropertiesFromIntegrationsForm);
+        $(`#toggle-${integration.id}`).on('change', setSettingsPropertiesFromIntegrationsForm);
     });
 };
 
@@ -358,9 +358,9 @@ var initialiseDebugForm = function (settings) {
 var setSettingsPropertiesFromForm = function () {
     getSettings(function(settings) {
         for (var i = 0; i < settings.sites.length; i++) {
-            settings.sites[i].domain = $('#' + settings.sites[i].id + 'Domain').val();
-            settings.sites[i].apiKey = $('#' + settings.sites[i].id + 'ApiKey').val();
-            settings.sites[i].enabled = $('#toggle-' + settings.sites[i].id).prop('checked');
+            settings.sites[i].domain = $(`#${settings.sites[i].id}Domain`).val();
+            settings.sites[i].apiKey = $(`#${settings.sites[i].id}ApiKey`).val();
+            settings.sites[i].enabled = $(`#toggle-${settings.sites[i].id}`).prop('checked');
         }
 
         setSettings(settings);
@@ -373,9 +373,9 @@ var setSettingsPropertiesFromForm = function () {
 var setSettingsPropertiesFromAdvancedForm = function () {
     getSettings(function(settings) {
         for (var i = 0; i < settings.sites.length; i++) {
-            settings.sites[i].searchPath = $('#' + settings.sites[i].id + 'SearchPath').val();
-            settings.sites[i].searchInputSelector = $('#' + settings.sites[i].id + 'SearchInputSelector').val();
-            settings.sites[i].autoPopAdvancedFromApi = $('#toggle-' + settings.sites[i].id + '-advanced').prop('checked');
+            settings.sites[i].searchPath = $(`#${settings.sites[i].id}SearchPath`).val();
+            settings.sites[i].searchInputSelector = $(`#${settings.sites[i].id}SearchInputSelector`).val();
+            settings.sites[i].autoPopAdvancedFromApi = $(`#toggle-${settings.sites[i].id}-advanced`).prop('checked');
         }
 
         setSettings(settings);
@@ -388,7 +388,7 @@ var setSettingsPropertiesFromAdvancedForm = function () {
 var setSettingsPropertiesFromIntegrationsForm = function () {
     getSettings(function(settings) {
         for (var i = 0; i < settings.integrations.length; i++) {
-            settings.integrations[i].enabled = $('#toggle-' + settings.integrations[i].name).prop('checked');
+            settings.integrations[i].enabled = $(`#toggle-${settings.integrations[i].id}`).prop('checked');
         }
 
         setSettings(settings);
