@@ -263,7 +263,7 @@ var logStorageChange = function(changes, area) {
     }
 }
 
-chrome.storage.onChanged.addListener(logStorageChange);
+browser.storage.onChanged.addListener(logStorageChange);
 
 /**
  * Retrieves settings from local storage
@@ -271,46 +271,45 @@ chrome.storage.onChanged.addListener(logStorageChange);
  * and create those properties as defaults or from the defaultSettings object.
  * @param {function} callback - function to call on completion
  */
-var getSettings = function(callback) {
-    chrome.storage.sync.get({ 'sonarrRadarrLidarrAutosearchSettings': defaultSettings }, function (data) {
-        if (typeof callback === "function") {
-            if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('enabled')) {
-                data.sonarrRadarrLidarrAutosearchSettings.enabled = true;
-            }
-
-            if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('debug')) {
-                data.sonarrRadarrLidarrAutosearchSettings.debug = false;
-            }
-
-            if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('integrations')) {
-                data.sonarrRadarrLidarrAutosearchSettings.integrations = defaultSettings.integrations;
-            }
-
-            // check integrations array
-            for (let i = 0; i < defaultSettings.integrations.length; i++) {
-                // try to find the integration
-                if (data.sonarrRadarrLidarrAutosearchSettings.integrations.some(integration => integration.id === defaultSettings.integrations[i].id)) {
-                    continue;
-                }
-
-                // integration not found
-                data.sonarrRadarrLidarrAutosearchSettings.integrations.push(defaultSettings.integrations[i]);
-            }
-
-            // check sites array
-            for (let i = 0; i < data.sonarrRadarrLidarrAutosearchSettings.sites.length; i++) {
-                if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('apiKey')) {
-                    data.sonarrRadarrLidarrAutosearchSettings.sites[i].apiKey = '';
-                }
-
-                if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('autoPopAdvancedFromApi')) {
-                    data.sonarrRadarrLidarrAutosearchSettings.sites[i].autoPopAdvancedFromApi = true;
-                }
-            }
-            
-            callback(data.sonarrRadarrLidarrAutosearchSettings);
+async function getSettings(callback) {
+    var data = await browser.storage.sync.get({ 'sonarrRadarrLidarrAutosearchSettings': defaultSettings });
+    if (typeof callback === "function") {
+        if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('enabled')) {
+            data.sonarrRadarrLidarrAutosearchSettings.enabled = true;
         }
-    });
+
+        if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('debug')) {
+            data.sonarrRadarrLidarrAutosearchSettings.debug = false;
+        }
+
+        if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('integrations')) {
+            data.sonarrRadarrLidarrAutosearchSettings.integrations = defaultSettings.integrations;
+        }
+
+        // check integrations array
+        for (let i = 0; i < defaultSettings.integrations.length; i++) {
+            // try to find the integration
+            if (data.sonarrRadarrLidarrAutosearchSettings.integrations.some(integration => integration.id === defaultSettings.integrations[i].id)) {
+                continue;
+            }
+
+            // integration not found
+            data.sonarrRadarrLidarrAutosearchSettings.integrations.push(defaultSettings.integrations[i]);
+        }
+
+        // check sites array
+        for (let i = 0; i < data.sonarrRadarrLidarrAutosearchSettings.sites.length; i++) {
+            if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('apiKey')) {
+                data.sonarrRadarrLidarrAutosearchSettings.sites[i].apiKey = '';
+            }
+
+            if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('autoPopAdvancedFromApi')) {
+                data.sonarrRadarrLidarrAutosearchSettings.sites[i].autoPopAdvancedFromApi = true;
+            }
+        }
+
+        callback(data.sonarrRadarrLidarrAutosearchSettings);
+    }
 };
 
 /**
@@ -320,7 +319,7 @@ var getSettings = function(callback) {
  * @param {Settings} data - settings to save
  * @param {function} callback - function to call on completion
  */
-var setSettings = function (data, callback) {
+async function setSettings(data, callback) {
     if (!data.hasOwnProperty('enabled')) {
         data.enabled = true;
     }
@@ -336,11 +335,10 @@ var setSettings = function (data, callback) {
     var obj = {};
     obj['sonarrRadarrLidarrAutosearchSettings'] = data;
 
-    chrome.storage.sync.set(obj, function() {
-        if (typeof callback === "function") {
-            callback(data);
-        }
-    });
+    await browser.storage.sync.set(obj);
+    if (typeof callback === "function") {
+        callback(data);
+    }
 };
 
 /**

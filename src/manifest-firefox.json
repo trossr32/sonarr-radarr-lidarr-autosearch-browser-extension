@@ -1,20 +1,30 @@
 {
   "manifest_version": 2,
   "name": "Sonarr/Radarr/Lidarr autosearch",
-  "description": "Exposes a context menu that enables direct searching for tv shows, movies or artists in Sonarr, Radarr and Lidarr.",
+  "description": "Exposes a context menu that enables direct searching for tv shows, movies or artists in Sonarr, Radarr and Lidarr. Adds Sonarr or Radarr icons as direct search links on IMDb, TVDb, TMDb, Trakt, TVmaze, MusicBrainz and Letterboxd websites.",
   "version": "2.0.0.0",
   "browser_action": {
     "default_icon": "content/assets/images/SonarrRadarrLidarr128.png",
     "default_popup": "popup.html"
   },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "sonarr-radarr-lidarr-autosearch@robgreen.me",
+      "strict_min_version": "42.0"
+    }
+  },
   "icons": {
     "16": "content/assets/images/SonarrRadarrLidarr16.png",
     "48": "content/assets/images/SonarrRadarrLidarr48.png"
   },
-  "options_page": "options.html",
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "background": {
     "scripts": [
       "content/js/jquery-3.5.1.min.js",
+      "content/js/browser-polyfill.min.js",
       "content/js/core.js",
       "eventPage.js"
     ],
@@ -28,6 +38,7 @@
       ],
       "js": [
         "content/js/jquery-3.5.1.min.js",
+        "content/js/browser-polyfill.min.js",
         "content/js/core.js",
         "content/js/sonarr_radarr_lidarr_autosearch.js"
       ]
