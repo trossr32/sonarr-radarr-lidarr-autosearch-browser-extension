@@ -463,7 +463,8 @@ var getElementValue = function(el, selector) {
     }
 }
 
-var init = function (settings) {
+async function init() {
+	const settings = await getSettings();
     if (!settings.enabled) {
         return;
     }
@@ -591,4 +592,4 @@ var init = function (settings) {
         });
 };
 
-getSettings(init);
+init();
