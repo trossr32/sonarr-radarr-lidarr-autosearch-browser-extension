@@ -134,33 +134,33 @@ var initialiseBasicForm = function (settings) {
         });
     
         // api key test buttons
-        $('#' + site.id + 'ApiKeyTest').on('click', function () {
+        $('#' + site.id + 'ApiKeyTest').on('click', async function () {
             var siteId = $(this).attr('data-site-id');
     
             setTestButtonIcon(siteId, 'Progress');
 
             $('#' + siteId + 'ApiTestMessage').hide();
-            callApi({ siteId: siteId, endpoint: 'Version' }, function(response) {
-                if (response.success) {
-                    setTestButtonIcon(siteId, "Worked");
+            const response = await callApi({ siteId: siteId, endpoint: 'Version' });
+            if (response.success) {
+                setTestButtonIcon(siteId, "Worked");
 
-                    $('#' + siteId + 'ApiTestMessage')
-                        .removeClass('bg-danger')
-                        .addClass('bg-success')
-                        .html(`Success! Detected version ${response.data.version}`)
-                        .show();
-                    getSettings(updateAdvancedForm);
-                } else {
-                    setTestButtonIcon(siteId, "Failed");
-                    $('#' + siteId + 'ApiTestMessage')
-                        .removeClass('bg-success')
-                        .addClass('bg-danger')
-                        .html('Failed, please double check the domain and API key')
-                        .show();
-                }
+                $('#' + siteId + 'ApiTestMessage')
+                    .removeClass('bg-danger')
+                    .addClass('bg-success')
+                    .html(`Success! Detected version ${response.data.version}`)
+                    .show();
+                const settings = await getSettings();
+                updateAdvancedForm(settings);
+            } else {
+                setTestButtonIcon(siteId, "Failed");
+                $('#' + siteId + 'ApiTestMessage')
+                    .removeClass('bg-success')
+                    .addClass('bg-danger')
+                    .html('Failed, please double check the domain and API key')
+                    .show();
+            }
 
-                // alert?
-            });
+            // alert?
         });
     }); 
 };
@@ -355,61 +355,57 @@ var initialiseDebugForm = function (settings) {
 /**
  * Update settings from the settings tab form fields
  */
-var setSettingsPropertiesFromForm = function () {
-    getSettings(function(settings) {
-        for (var i = 0; i < settings.sites.length; i++) {
-            settings.sites[i].domain = $(`#${settings.sites[i].id}Domain`).val();
-            settings.sites[i].apiKey = $(`#${settings.sites[i].id}ApiKey`).val();
-            settings.sites[i].enabled = $(`#toggle-${settings.sites[i].id}`).prop('checked');
-        }
+async function setSettingsPropertiesFromForm() {
+    const settings = await getSettings();
+    for (var i = 0; i < settings.sites.length; i++) {
+        settings.sites[i].domain = $(`#${settings.sites[i].id}Domain`).val();
+        settings.sites[i].apiKey = $(`#${settings.sites[i].id}ApiKey`).val();
+        settings.sites[i].enabled = $(`#toggle-${settings.sites[i].id}`).prop('checked');
+    }
 
-        setSettings(settings);
-    });    
+    await setSettings(settings);
 };
 
 /**
  * Update settings from the advanced settings tab form fields
  */
-var setSettingsPropertiesFromAdvancedForm = function () {
-    getSettings(function(settings) {
-        for (var i = 0; i < settings.sites.length; i++) {
-            settings.sites[i].searchPath = $(`#${settings.sites[i].id}SearchPath`).val();
-            settings.sites[i].searchInputSelector = $(`#${settings.sites[i].id}SearchInputSelector`).val();
-            settings.sites[i].autoPopAdvancedFromApi = $(`#toggle-${settings.sites[i].id}-advanced`).prop('checked');
-        }
+async function setSettingsPropertiesFromAdvancedForm() {
+    const settings = await getSettings();
+    for (var i = 0; i < settings.sites.length; i++) {
+        settings.sites[i].searchPath = $(`#${settings.sites[i].id}SearchPath`).val();
+        settings.sites[i].searchInputSelector = $(`#${settings.sites[i].id}SearchInputSelector`).val();
+        settings.sites[i].autoPopAdvancedFromApi = $(`#toggle-${settings.sites[i].id}-advanced`).prop('checked');
+    }
 
-        setSettings(settings);
-    });
+    await setSettings(settings);
 };
 
 /**
  * Update settings from the integrations tab form fields
  */
-var setSettingsPropertiesFromIntegrationsForm = function () {
-    getSettings(function(settings) {
-        for (var i = 0; i < settings.integrations.length; i++) {
-            settings.integrations[i].enabled = $(`#toggle-${settings.integrations[i].id}`).prop('checked');
-        }
+async function setSettingsPropertiesFromIntegrationsForm() {
+    const settings = await getSettings();
+    for (var i = 0; i < settings.integrations.length; i++) {
+        settings.integrations[i].enabled = $(`#toggle-${settings.integrations[i].id}`).prop('checked');
+    }
 
-        setSettings(settings);
-    });
+    await setSettings(settings);
 };
 
 /**
  * Update settings from the debug tab form fields
  */
-var setSettingsPropertiesFromDebugForm = function () {
-    getSettings(function(settings) {
-        settings.debug = $('#toggle-debug').prop('checked');
+async function setSettingsPropertiesFromDebugForm() {
+    const settings = await getSettings();
+    settings.debug = $('#toggle-debug').prop('checked');
 
-        setSettings(settings);
-    });
+    await setSettings(settings);
 };
 
 /**
  * Listen for storage changes
  */
-browser.storage.onChanged.addListener(function(changes, area) {
+browser.storage.onChanged.addListener(async function(changes, area) {
     let changedItems = Object.keys(changes);
 
     for (let item of changedItems) {
@@ -434,30 +430,29 @@ browser.storage.onChanged.addListener(function(changes, area) {
                 oldSite.autoPopAdvancedFromApi != newSite.autoPopAdvancedFromApi)) {
                     log('Advanced settings update check required, calling version API');
 
-                    callApi({ siteId: newSite.id, endpoint: 'Version' }, function(response) {
-                        if (response.success) {
-                            log([`API call succeeded, updating advanced settings for ${newSite.id}`, response]);
+                    const response = await callApi({ siteId: newSite.id, endpoint: 'Version' });
+                    if (response.success) {
+                        log([`API call succeeded, updating advanced settings for ${newSite.id}`, response]);
 
-                            getSettings(updateAdvancedForm);
-                        } else {
-                            log(['API call failed', response]);
-                        }
+                        const settings = await getSettings();
+                        updateAdvancedForm(settings);
+                    } else {
+                        log(['API call failed', response]);
+                    }
 
-                        // notify?
-                    });
+                    // notify?
                 }
         }
     }
 });
 
-$(function () {
+$(async function () {
     // initialise page on load
-    getSettings(function(settings) {
-        initialiseBasicForm(settings);
-        initialiseAdvancedForm(settings);
-        initialiseIntegrationsForm(settings);
-        initialiseDebugForm(settings);
-    });
+    const settings = await getSettings();
+    initialiseBasicForm(settings);
+    initialiseAdvancedForm(settings);
+    initialiseIntegrationsForm(settings);
+    initialiseDebugForm(settings);
 
     // deactivate all other tabs on click. this shouldn't be required, but bootstrap 5 beta seems a bit buggy with tab deactivation.
     $('.tab-pane').on('click', function() {

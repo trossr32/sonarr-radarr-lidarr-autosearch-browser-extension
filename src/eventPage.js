@@ -1,20 +1,18 @@
 browser.runtime.onConnect.addListener(function(port) {
     switch (port.name) {
         case 'init':
-            port.onMessage.addListener(function (request) {
-                getSettings(async function (settings) {
-                    await setIcon(settings);
-                    await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
-                    await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
-                });
+            port.onMessage.addListener(async function (request) {
+                const settings = await getSettings();
+                await setIcon(settings);
+                await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
+                await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
             });
             break;
 
         case 'icon':
-            port.onMessage.addListener(function (request) {
-                getSettings(async function (settings) {
-                    await setIcon(settings);
-                });
+            port.onMessage.addListener(async function (request) {
+                const settings = await getSettings();
+                await setIcon(settings);
             });
             break;
     }
@@ -53,16 +51,15 @@ async function buildMenus(settings) {
  * @param {*} info 
  * @param {*} tab 
  */
-function onClickHandler(info, tab) {
-    getSettings(async function (settings) {
-        for (var i = 0; i < settings.sites.length; i++) {
-            if (info.menuItemId == (settings.sites[i].id + 'Menu')) {
-                await browser.tabs.create({
-                    'url': settings.sites[i].domain.replace(/\/$/, '') + settings.sites[i].searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
-                });
-            }
+async function onClickHandler(info, tab) {
+    const settings = await getSettings();
+    for (var i = 0; i < settings.sites.length; i++) {
+        if (info.menuItemId == (settings.sites[i].id + 'Menu')) {
+            await browser.tabs.create({
+                'url': settings.sites[i].domain.replace(/\/$/, '') + settings.sites[i].searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
+            });
         }
-    });
+    }
 };
 
 browser.contextMenus.onClicked.addListener(onClickHandler);
@@ -70,10 +67,9 @@ browser.contextMenus.onClicked.addListener(onClickHandler);
 /**
  * set up context menu tree at install time.
  */
-browser.runtime.onInstalled.addListener(function () {
-    getSettings(function(settings) {
-        buildMenus(settings);
-    });
+browser.runtime.onInstalled.addListener(async function () {
+    const settings = await getSettings();
+    buildMenus(settings);
 });
 
 /**
