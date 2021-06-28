@@ -10,9 +10,13 @@ This is an extension for Chrome, the new chromium Microsoft Edge and Firefox tha
 
 2. When right-clicking selected text on any page this extension exposes a context menu with entries for Sonarr, Radarr and Lidarr that allow a direct search for the selected text in a new tab.
 
-3. Adds Sonarr or Radarr icons as direct search links on IMDb, TVDb, TMDb, Trakt, TVmaze, MusicBrainz and Letterboxd websites.
+3. Adds Sonarr or Radarr icons as direct search links on IMDb, TVDb, TMDb, Trakt, TVmaze, MusicBrainz, Letterboxd and TV Calendar websites.
 
-**New feature** - Integration ids are now used where the platform supports them. 
+**New features (V2)**
+- TV Calendar integration
+- Automated config based on Sonarr, Radarr or Lidarr version obtained from the respective API
+
+**New feature (V1.7)** - Integration ids are now used where the platform supports them. 
 - Radarr: IMDb (native id), TMDb (native id), Trakt (TMDb id) & letterboxd (TMDb id).
 - Sonarr: TVDb (native id) & Trakt (TVDb id).
 - Lidarr: MusicBrainz (native id) was already implemented.
@@ -51,7 +55,7 @@ If any of the sites on this tab are set as enabled then this extension will atte
 ![TVDb Sonarr example](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/src/content/assets/images/integrations/tvdb_example_screenshot.png)
 
 # Create package
-A Powershell script and batch files that execute that PS script are included but these simply zip the ChromiumExtension directory or run web-ext build against the FirefoxAddOn directory, as that's all that's required to publish this to the Chrome Web Store, Microsoft Edge Addons and Firefox Addons sites.
+A Powershell script is included to create distributions of the Firefox and Chrome/Edge packages.
 
 # Contribute
 If you can make this extension better I'm happy for the help! Please create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug or want to suggest a new feature.
