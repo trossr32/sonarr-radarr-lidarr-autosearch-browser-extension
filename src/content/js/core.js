@@ -129,6 +129,12 @@ var sessionId,
                 name: 'Letterboxd',
                 image: 'letterboxd.svg',
                 enabled: true
+            },
+            {
+                id: 'tvcalendar',
+                name: 'TV Calendar',
+                image: 'tvcalendar.png',
+                enabled: true
             }
         ],
         enabled: true,

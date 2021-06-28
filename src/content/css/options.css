@@ -47,6 +47,11 @@ a, a:focus, a:hover {
     padding-top: 100%;
 }
 
+.card-img, .card-img-bottom, .card-img-top {
+    width: 80%;
+    margin: 0 auto;
+}
+
 .list-group-item {
     background-color: #212529!important;
     border: 1px solid rgba(255,255,255,0.5);
