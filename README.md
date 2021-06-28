@@ -55,7 +55,7 @@ If any of the sites on this tab are set as enabled then this extension will atte
 ![TVDb Sonarr example](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/src/content/assets/images/integrations/tvdb_example_screenshot.png)
 
 # Create package
-A Powershell script is included to create distributions of the Firefox and Chrome/Edge packages.
+A Powershell script and chrome and firefox bash files are included to create distributions of the Firefox and Chrome/Edge packages.
 
 # Contribute
 If you can make this extension better I'm happy for the help! Please create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug or want to suggest a new feature.
