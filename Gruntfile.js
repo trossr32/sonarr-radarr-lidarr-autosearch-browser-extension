@@ -86,7 +86,7 @@ module.exports = function (grunt) {
                     'Gruntfile.js',
                     'src/**/*.*'
                 ],
-                tasks: ['debug'],
+                tasks: ['release'],
                 options: {
                     spawn: false,
                 },

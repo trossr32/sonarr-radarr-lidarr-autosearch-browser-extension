@@ -169,8 +169,20 @@ var sessionId,
                 name: 'TV Calendar',
                 image: 'tvcalendar.png',
                 enabled: true
+            },
+            {
+                id: 'rottentomatoes',
+                name: 'Rotten Tomatoes',
+                image: 'rotten-tomatoes.svg',
+                enabled: true
             }
-        ],
+            // {
+            //     id: 'nextepisode',
+            //     name: 'Next Episode',
+            //     image: 'nextepisode.png',
+            //     enabled: true
+            // }
+        ], 
         config: {
             enabled: true,
             debug: false,        

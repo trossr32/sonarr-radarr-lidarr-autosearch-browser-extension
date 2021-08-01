@@ -433,7 +433,101 @@ var base64Icons = [
                 locator: 'append',
                 imgStyles: 'width: 18px; margin: -22px 0 0 0; float: right;'
             }
+        },
+        {
+            id: 'rottentomatoes',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            match: {
+                term: 'rottentomatoes.com/m'
+            },
+            icon: {
+                containerSelector: 'h1.scoreboard__title',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
+            }
+        },
+        {
+            id: 'rottentomatoes',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: '#tvPosterLink',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'rottentomatoes.com/tv'
+            },
+            icon: {
+                containerSelector: 'h1.movie_title',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
+            }
         }
+        // {
+        //     id: 'nextepisode',
+        //     defaultSite: 'radarr',
+        //     search: {
+        //         containerSelector: 'a[href*="moviedb.org"]',
+        //         selectorType: 'href',
+        //         modifiers: [
+        //             {
+        //                 type: 'regex-match',
+        //                 pattern: /\/(?<search>\d{4,10})/i
+        //             }, {
+        //                 type: 'prepend',
+        //                 var: 'tmdb:'
+        //             }
+        //         ]
+        //     },
+        //     match: {
+        //         term: 'next-episode.net/movies'
+        //     },
+        //     icon: {
+        //         containerSelector: 'div[id^="title_"]',
+        //         locator: 'prepend',
+        //         imgStyles: 'width: 25px; margin: 0px 10px -5px 0;'
+        //     }
+        // },
+        // {
+        //     id: 'nextepisode',
+        //     rules: [
+        //         {
+        //             siteId: 'sonarr',
+        //             match: {
+        //                 pattern: /TVSeries/i,
+        //                 operator: 'eq'
+        //             }
+        //         }
+        //     ],
+        //     search: {
+        //         containerSelector: 'a[href*="imdb.com"]',
+        //         selectorType: 'href',
+        //         modifiers: [
+        //             {
+        //                 type: 'regex-match',
+        //                 pattern: /(?<search>tt\d{5,10})/i
+        //             }, {
+        //                 type: 'prepend',
+        //                 var: 'imdb:'
+        //             }
+        //         ]
+        //     },
+        //     match: {
+        //         term: 'next-episode.net',
+        //         containerSelector: 'body',
+        //         selectorType: 'itemType'
+        //     },
+        //     icon: {
+        //         containerSelector: '#show_name > h1',
+        //         locator: 'prepend',
+        //         imgStyles: 'width: 25px; margin: 0px 10px -5px 0;'
+        //     }
+        // }
     ];
 
 /**
@@ -552,6 +646,8 @@ async function init() {
                                 .filter(s => { return s.enabled; })
                                 .find(s => s.id == integration.defaultSite);
                         } else {
+                            log('interating rules');
+
                             $.each(integration.rules, 
                                 function (ir, r) {
                                     var matchValue = getElementValue(matchContainer, integration.match.attribute);
@@ -559,6 +655,8 @@ async function init() {
                                     var isMatch = r.match.pattern.test(matchValue);
 
                                     var hasMatch = r.match.operator === 'eq' ? isMatch : !isMatch; // 'ne', convert to switch if other values are required
+
+                                    log('matchContainer', matchContainer, 'integration.match.attribute', integration.match.attribute, 'matchValue', matchValue, 'isMatch', isMatch, 'hasMatch', hasMatch);
 
                                     if (hasMatch) {
                                         site = settings.sites
