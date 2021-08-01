@@ -1,0 +1,27 @@
+{
+    "name": "sonarr-radarr-autosearch-browser-extension",
+    "version": "2.0.0",
+    "devDependencies": {
+        "@fortawesome/fontawesome-free": "~5.15.2",
+        "@popperjs/core": "^2.6.0",
+        "bootstrap": "~5.0.2",
+        "bootstrap4-toggle": "^3.6.1",
+        "grunt": "~1.3.0",
+        "grunt-contrib-clean": "^2.0.0",
+        "grunt-contrib-concat": "~1.0.1",
+        "grunt-contrib-copy": "^1.0.0",
+        "grunt-contrib-jshint": "~3.0.0",
+        "grunt-contrib-watch": "^1.1.0",
+        "grunt-sass": "^3.1.0",
+        "grunt-shell": "^3.0.1",
+        "grunt-string-replace": "^1.3.1",
+        "jquery": "~3.5.1",
+        "load-grunt-tasks": "^5.1.0",
+        "sass": "^1.32.5",
+        "webextension-polyfill": "~0.7.0"
+    },
+    "dependencies": {
+        "bootstrap-slider": "^11.0.2",
+        "gem": "^2.4.3"
+    }
+}
