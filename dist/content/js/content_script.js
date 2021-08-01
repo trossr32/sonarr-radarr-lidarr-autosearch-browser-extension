@@ -11,71 +11,6 @@ var base64Icons = [
         }
     ],
     integrations = [
-        /* old imdb layout (current as of 11.01.2021) */
-        /* sonarr version which doesn't work with id search */
-        {
-            id: 'imdb',
-            rules: [
-                {
-                    siteId: 'sonarr',
-                    match: {
-                        pattern: /tv\s(|mini(\s|-))series/i,
-                        operator: 'eq'
-                    }
-                }
-            ],
-            search: {
-                containerSelector: '.title_wrapper h1',
-                selectorType: 'text',
-                modifiers: []
-            },
-            match: {
-                term: 'imdb.com',
-                containerSelector: '.title_wrapper',
-                attribute: 'text',
-            },
-            icon: {
-                containerSelector: '.title_wrapper h1',
-                locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
-            }
-        },
-        /* radarr version which works with id search */
-        {
-            id: 'imdb',
-            rules: [
-                {
-                    siteId: 'radarr',
-                    match: {
-                        pattern: /tv\s(|mini(\s|-))series/i,
-                        operator: 'ne'
-                    }
-                }
-            ],
-            search: {
-                containerSelector: 'link[rel="canonical"]',
-                selectorType: 'href',
-                modifiers: [
-                    {
-                        type: 'regex-match',
-                        pattern: /(?<search>tt\d{5,10})/i
-                    }, {
-                        type: 'prepend',
-                        var: 'imdb:'
-                    }
-                ]
-            },
-            match: {
-                term: 'imdb.com',
-                containerSelector: '.title_wrapper',
-                attribute: 'text',
-            },
-            icon: {
-                containerSelector: '.title_wrapper h1',
-                locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
-            }
-        },
         /* new imdb layout (beta as of 11.01.2021) */
         /* sonarr version which doesn't work with id search */
         {
@@ -267,6 +202,7 @@ var base64Icons = [
             }
         },
         // trakt for sonarr, uses tvdb id
+        // instance for tv series view
         {
             id: 'trakt',
             rules: [
@@ -300,6 +236,34 @@ var base64Icons = [
                 containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        // instance for tv series group view
+        {
+            id: 'trakt',
+            rules: [
+                {
+                    siteId: 'sonarr',
+                    match: {
+                        pattern: /tv/i,
+                        operator: 'eq'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: '.titles > h3',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'trakt.tv',
+                containerSelector: '#main-nav ul li a.selected',
+                attribute: 'text'
+            },
+            icon: {
+                containerSelector: '.actions',
+                locator: 'append',
+                imgStyles: 'width: 23px; margin: 0 0 2px 10px;'
             }
         },
         // trakt for radarr, uses tmdb id
@@ -336,6 +300,34 @@ var base64Icons = [
                 containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        // instance for trakt movies group view
+        {
+            id: 'trakt',
+            rules: [
+                {
+                    siteId: 'radarr',
+                    match: {
+                        pattern: /movies/i,
+                        operator: 'eq'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: '.titles > h3',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'trakt.tv',
+                containerSelector: '#main-nav ul li a.selected',
+                attribute: 'text'
+            },
+            icon: {
+                containerSelector: '.actions',
+                locator: 'append',
+                imgStyles: 'width: 23px; margin: 0 0 2px 10px;'
             }
         },
         {
@@ -672,7 +664,7 @@ async function init() {
                             return;
                         }
 
-                        log(['integration matched to site: ', integration, site]);
+                        log(['integration matched to site: ', integration, site], $(integration.search.containerSelector));
 
                         /* iterate all the containers */
                         $.each($(integration.search.containerSelector), function(i_el, container) {
