@@ -15,7 +15,7 @@ This is an extension for Chromium browsers and Firefox that:
 **New features (V2.1)**
 - Rotten tomatoes integration.
 - Improved Trakt integration.
-- Set the wait time when searching for a servarr search input element to 6 seconds and add debugging settings to allow increasong/decreasing this time.
+- Set the wait time when searching for a servarr search input element to 6 seconds and add debugging settings to allow increasing/decreasing this time.
 - Grunt added as a task runner and all external libs now added via npm. 
 - Fully consolidate chromium and firefox dists.
 
