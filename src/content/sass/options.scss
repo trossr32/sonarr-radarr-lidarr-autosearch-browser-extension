@@ -1,0 +1,145 @@
+$color-back: #1d1e22;
+
+body {
+    background-color: $color-back;
+    color: #fff
+}
+
+.nav-tabs .nav-link.active {
+    color: #fff;
+    background-color: $color-back;
+}
+
+.nav > li > a:focus, .nav > li > a:hover {
+    background-color: $color-back;
+}
+
+a, a:focus, a:hover {
+    color: deepskyblue;
+}
+
+.col-form-label {
+    margin-top: 6px;
+}
+
+#settingsTabs {
+    margin-bottom: 40px;
+}
+
+.clear {
+    clear: both;
+}
+
+.site-disabled {
+    background-color: rgba(35,35,35,0.8); 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+}
+
+.card-header {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.card-integration {
+    overflow: hidden; 
+    height: 0; 
+    padding-top: 100%;
+}
+
+.card-img, .card-img-bottom, .card-img-top {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.list-group-item {
+    background-color: #212529!important;
+    border: 1px solid rgba(255,255,255,0.5);
+}
+
+.list-group-item .card-text {
+    color: #ddd;
+}
+
+.form-text {
+    color: #ccc;
+}
+
+.badge-notify {
+    font-weight: 400;
+    font-size: .9em;
+    padding: .5em .8em;
+}
+
+.slider.slider-horizontal .slider-track {
+    height: 6px;
+    width: 100%;
+    margin-top: -3px;
+    top: 50%;
+    left: 0;
+}
+
+$slider-color: rgb(59, 230, 198);
+$slider-color-secondary: rgb(37, 151, 130);
+
+.slider-handle {
+    -webkit-box-shadow: inset 0 1px 0 rgb(255 255 255 / 20%), 0 1px 2px rgb(0 0 0 / 5%);
+    -moz-box-shadow: inset 0 1px 0 rgba(255,255,255,0.2),0 1px 2px rgba(0,0,0,0.05);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 20%), 0 1px 2px rgb(0 0 0 / 5%);
+    position: absolute;
+    top: 0;
+    width: 20px;
+    height: 20px;
+    background-color: rgb(59, 230, 198);
+    border: 0px solid transparent;
+}
+
+.slider-track {
+    -webkit-box-shadow: inset 0 1px 2px rgb(0 0 0 / 10%);
+    -moz-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    box-shadow: inset 0 1px 2px rgb(0 255 0 / 10%);
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    position: absolute;
+    cursor: pointer;
+}
+
+.slider-selection.tick-slider-selection, 
+.slider-tick,
+.slider-tick.in-selection,
+.slider-track,
+.slider-handle {
+    background-color: $slider-color;
+    background-image: -moz-linear-gradient(top, $slider-color, $slider-color-secondary);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from($slider-color), to($slider-color-secondary));
+    background-image: -webkit-linear-gradient(top, $slider-color, $slider-color-secondary);
+    background-image: -o-linear-gradient(top, $slider-color, $slider-color-secondary);
+    background-image: linear-gradient(to bottom, $slider-color, $slider-color-secondary);
+    background-repeat: repeat-x;
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#{$slider-color}', endColorstr='#{$slider-color-secondary}',GradientType=0);
+}
+
+.slider-tick.in-selection {
+    opacity: 1;
+}
+
+.slider-tick {
+    display: none;
+    /*-webkit-box-shadow: inset 0 -1px 0 rgb(0 0 0 / 15%);
+    -moz-box-shadow: inset 0 -1px 0 rgba(0,0,0,0.15);
+    box-shadow: inset 0 -1px 0 rgb(0 0 0 / 15%);
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    position: absolute;
+    cursor: pointer;
+    width: 5px;
+    height: 5px;
+    filter: none;
+    opacity: 0.8;
+    border: 0px solid transparent;
+    margin: 7px 0px 0px -2px !important;*/
+}

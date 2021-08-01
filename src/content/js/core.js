@@ -15,8 +15,19 @@
  */
 
 /**
- * A Sonarr, Radarr or Lidarr setting
+ * All settings
  * @typedef {Object} Setting
+ * @property {SiteSetting[]} sites - all site settings
+ * @property {Integration[]} integrations - all integrations
+ * @property {bool} enabled - is enabled
+ * @property {bool} debug - log to console
+ * @property {int} searchInputWaitForMs - jQuery selector for the search input on the search page
+ * @property {int} searchInputMaxAttempts - text that is shown for this site's entry in the context menu
+ */
+
+/**
+ * A Servarr site setting
+ * @typedef {Object} SiteSetting
  * @property {string} id - site identifier (sonarr / radarr / lidarr)
  * @property {string} domain - site domain
  * @property {bool} enabled - is enabled
@@ -28,8 +39,31 @@
  */
 
 /**
- * All site settings
- * @typedef {Setting[]} Settings
+ * A site integration
+ * @typedef {Object} Integration
+ * @property {string} id - integration identifier
+ * @property {string} name - integration name
+ * @property {string} image - logo
+ * @property {bool} enabled - is enabled
+ */
+
+/**
+ * All instance API specific configurations
+ * @typedef {ApiConfig[]} ApiConfigs
+ */
+
+/**
+ * API configuration endpoints for a Servarr instance
+ * @typedef {Object} ApiConfig
+ * @property {string} id - site identifier (sonarr / radarr / lidarr)
+ * @property {ApiConfigEndpoint[]} endpoints - API endpoints for the Servarr instance
+ */
+
+/**
+ * API configuration endpoint details
+ * @typedef {Object} ApiConfigEndpoint
+ * @property {string} key - identifier
+ * @property {string} value - API URL part
  */
 
 /**
@@ -62,8 +96,8 @@ var sessionId,
                 id: 'sonarr',
                 domain: 'http://my.sonarrurl.domain',
                 enabled: true,
-                searchPath: '/addseries/',
-                searchInputSelector: '.add-series-search .x-series-search',
+                searchPath: '/add/new/',
+                searchInputSelector: 'input[name="seriesLookup"]',
                 menuText: 'Search Sonarr for tv',
                 apiKey: '',
                 autoPopAdvancedFromApi: true
@@ -71,8 +105,8 @@ var sessionId,
                 id: 'radarr',
                 domain: 'http://my.radarrurl.domain',
                 enabled: true,
-                searchPath: '/addmovies/',
-                searchInputSelector: '.add-movies-search .x-movies-search',
+                searchPath: '/add/new/',
+                searchInputSelector: 'input[name="movieLookup"]',
                 menuText: 'Search Radarr for movie',
                 apiKey: '',
                 autoPopAdvancedFromApi: true
@@ -135,10 +169,26 @@ var sessionId,
                 name: 'TV Calendar',
                 image: 'tvcalendar.png',
                 enabled: true
+            },
+            {
+                id: 'rottentomatoes',
+                name: 'Rotten Tomatoes',
+                image: 'rotten-tomatoes.svg',
+                enabled: true
             }
-        ],
-        enabled: true,
-        debug: false
+            // {
+            //     id: 'nextepisode',
+            //     name: 'Next Episode',
+            //     image: 'nextepisode.png',
+            //     enabled: true
+            // }
+        ], 
+        config: {
+            enabled: true,
+            debug: false,        
+            searchInputWaitForMs: 300,
+            searchInputMaxAttempts: 20
+        }
     },
     /* may need to expand this out differently for use with v3, as adding a v3 to the URL for a v3 of radarr or sonarr gives some more or different info. 
      * the issue is the version can only be detected from the API, and you can't call a different API version without first knowing the version!
@@ -243,16 +293,44 @@ var sessionId,
     ];
 
 /**
- * logs to console if the debug flag is set
+ * Logs to console if the debug flag is set. 
+ * Always warns or errors regardless of if the debug flag is set. 
+ * Should be a string or array of objects.
+ * Adds an identifier to the start of the content if it's a string, otherwise as a string object at the beginning of the array.
  * @param {any[]} content 
+ * @param {string} logLevel
  */
-async function log(content) {
+async function log(content, logLevel = 'info') {
     const settings = await getSettings();
-    if (!settings.debug) {
+
+    if (!settings.config.debug && logLevel === 'info') {
         return;
     }
 
-    console.log(content);
+    const identifier = `[ServarrExt]`;
+
+    // concat identifier if it's a string
+    if (typeof content === "string" || content instanceof String) {
+        content = `${identifier} ${content}`;
+    } 
+    // otherwise it's an array
+    else {
+        content.unshift(identifier);
+    }
+
+    switch (logLevel) {
+        case 'info':
+            console.log(content);
+            return;
+          
+        case 'warn':
+            console.warn(content);
+            return;
+          
+        case 'error':
+            console.error(content);
+            return;  
+    }
 }
 
 /*
@@ -266,7 +344,7 @@ var logStorageChange = function(changes, area) {
         log(['Old value: ', changes[item].oldValue]);
         log(['New value: ', changes[item].newValue]);
     }
-}
+};
 
 browser.storage.onChanged.addListener(logStorageChange);
 
@@ -276,25 +354,34 @@ browser.storage.onChanged.addListener(logStorageChange);
  * and create those properties as defaults or from the defaultSettings object.
  */
 async function getSettings() {
-    var data = await browser.storage.sync.get({ 'sonarrRadarrLidarrAutosearchSettings': defaultSettings });
-    if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('enabled')) {
-        data.sonarrRadarrLidarrAutosearchSettings.enabled = true;
-    }
+    let data = await browser.storage.sync.get({ 'sonarrRadarrLidarrAutosearchSettings': defaultSettings });
 
-    if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('debug')) {
-        data.sonarrRadarrLidarrAutosearchSettings.debug = false;
-    }
+    // if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('enabled')) {
+    //     data.sonarrRadarrLidarrAutosearchSettings.enabled = true;
+    // }
+
+    // if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('debug')) {
+    //     data.sonarrRadarrLidarrAutosearchSettings.debug = false;
+    // }
 
     if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('integrations')) {
         data.sonarrRadarrLidarrAutosearchSettings.integrations = defaultSettings.integrations;
     }
 
+    if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('config')) {
+        data.sonarrRadarrLidarrAutosearchSettings.config = defaultSettings.config;
+    }
+
     // check integrations array
     for (let i = 0; i < defaultSettings.integrations.length; i++) {
+        /* jshint ignore:start */
+        
         // try to find the integration
         if (data.sonarrRadarrLidarrAutosearchSettings.integrations.some(integration => integration.id === defaultSettings.integrations[i].id)) {
             continue;
         }
+
+        /* jshint ignore:end */
 
         // integration not found
         data.sonarrRadarrLidarrAutosearchSettings.integrations.push(defaultSettings.integrations[i]);
@@ -312,7 +399,7 @@ async function getSettings() {
     }
 
     return data.sonarrRadarrLidarrAutosearchSettings;
-};
+}
 
 /**
  * Saves settings to local storage
@@ -333,12 +420,18 @@ async function setSettings(data) {
         data.integrations = defaultSettings.integrations;
     }
 
-    var obj = {};
-    obj['sonarrRadarrLidarrAutosearchSettings'] = data;
+    if (!data.hasOwnProperty('config')) {
+        data.config = defaultSettings.config;
+    }
+
+    let obj = {
+        'sonarrRadarrLidarrAutosearchSettings': data
+    };
+    //obj['sonarrRadarrLidarrAutosearchSettings'] = data;
 
     await browser.storage.sync.set(obj);
     return data;
-};
+}
 
 /**
  * Get search path / selector configuration for a given site and version
@@ -359,17 +452,17 @@ var getVersionConfig = (siteId, version) =>
  * @returns {URL} - the url
  */
 var getApiUrl = (site, endpoint) => {
-    var _endpoint = apiConfig
+    let _endpoint = apiConfig
         .find(a => a.id == site.id)
         .endpoints
             .find(e => e.key == endpoint);
 
-    var url = new URL(site.domain.replace(/(.+)\/$/, '$1') + '/api/' + _endpoint.value);
+    let url = new URL(`${site.domain.replace(/(.+)\/$/, '$1')}/api/${_endpoint.value}`);
 
     url.searchParams.append('apikey', site.apiKey);
 
     return url;
-}
+};
 
 /**
  * Call an instance API
@@ -400,10 +493,11 @@ async function callApi(request) {
         };
     }
 
-    var url = getApiUrl(site, request.endpoint);
+    let url = getApiUrl(site, request.endpoint);
 
     try {
         const data = await $.getJSON(url);
+
         switch (request.endpoint) {
             // if this is a 'Version' call try to update settings if with version specific data
             case 'Version':
@@ -418,7 +512,7 @@ async function callApi(request) {
                 }
 
                 // auto population is enabled, so get the config for this version and update settings
-                var config = getVersionConfig(site.id, data.version);
+                let config = getVersionConfig(site.id, data.version);
 
                 for (let i = 0; i < settings.sites.length; i++) {
                     if (settings.sites[i].id === site.id) {
@@ -428,6 +522,7 @@ async function callApi(request) {
                 }
 
                 await setSettings(settings);
+
                 return {
                     data: data,
                     request: request,
@@ -450,5 +545,5 @@ async function callApi(request) {
             success: false,
             error: error
         };
-    };
+    }
 }
