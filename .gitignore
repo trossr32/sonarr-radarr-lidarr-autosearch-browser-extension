@@ -1,4 +1,5 @@
-dist-firefox/*
+dist/*
+dist-chromium/*
 dist-chromium/*
 
 ## Ignore Visual Studio temporary files, build results, and

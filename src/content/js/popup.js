@@ -1,19 +1,21 @@
 var iconPort = browser.runtime.connect({ name: 'icon' });
 
 var setEnabledDisabledButtonState = function(settings) {
-    $('#toggleActive').removeClass('btn-success btn-danger').addClass('btn-' + (settings.enabled ? 'danger' : 'success'));
-    $('#toggleActive').html('<i class="fas fa-power-off"></i>&nbsp;&nbsp;&nbsp;&nbsp;' + (settings.enabled ? 'Disable' : '&nbsp;Enable'));
+    $('#toggleActive').removeClass('btn-success btn-danger').addClass(`btn-${(settings.config.enabled ? 'danger' : 'success')}`);
+    $('#toggleActive').html(`<i class="fas fa-power-off"></i>&nbsp;&nbsp;&nbsp;&nbsp;${(settings.config.enabled ? 'Disable' : '&nbsp;Enable')}`);
 };
 
 $(async function () {
     // initialise page on load
     const settings = await getSettings();
+
     setEnabledDisabledButtonState(settings);
     
-    $('#toggleActive').click(async function(e) {
+    $('#toggleActive').on('click', async function(e) {
         const settings = await getSettings();
+        
         // update enabled setting
-        settings.enabled = !settings.enabled;
+        settings.config.enabled = !settings.config.enabled;
 
         await setSettings(settings);
 
@@ -24,7 +26,7 @@ $(async function () {
         iconPort.postMessage({ x: "y" });
     });
 
-    $('#btnSettings').click(async function() {
+    $('#btnSettings').on('click', async function() {
         await browser.runtime.openOptionsPage(); // add open flag in settings?
     });
 });

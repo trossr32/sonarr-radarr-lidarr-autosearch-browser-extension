@@ -1,17 +1,28 @@
+/**
+ * Get settings, set the extension icon and execute the content script
+ */
+async function initRun() {
+    const settings = await getSettings();
+
+    await setIcon(settings);
+    await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
+    await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
+}
+
+browser.tabs.onActivated.addListener(initRun);
+
 browser.runtime.onConnect.addListener(function(port) {
     switch (port.name) {
         case 'init':
             port.onMessage.addListener(async function (request) {
-                const settings = await getSettings();
-                await setIcon(settings);
-                await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
-                await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
+                await initRun();
             });
             break;
 
         case 'icon':
             port.onMessage.addListener(async function (request) {
                 const settings = await getSettings();
+                
                 await setIcon(settings);
             });
             break;
@@ -26,11 +37,11 @@ async function buildMenus(settings) {
     await browser.contextMenus.removeAll();
 
     // if extension is disabled gtfo
-    if (!settings.enabled) {
+    if (!settings.config.enabled) {
         return;
     }
 
-    var enabledSites = settings.sites.filter(site => { return site.enabled; });
+    let enabledSites = settings.sites.filter(site => { return site.enabled; });
 
     // if no sites are enabled gtfo
     if (enabledSites.length === 0) {
@@ -41,8 +52,8 @@ async function buildMenus(settings) {
     browser.contextMenus.create({ "title": "Search Sonarr/Radarr/Lidarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
 
     // create child menus from enabled sites array
-    for (var i = 0; i < enabledSites.length; i++) {
-        browser.contextMenus.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": enabledSites[i].id + "Menu", "contexts": ["selection"] });
+    for (let i = 0; i < enabledSites.length; i++) {
+        browser.contextMenus.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": `${enabledSites[i].id}Menu`, "contexts": ["selection"] });
     }
 }
 
@@ -53,8 +64,9 @@ async function buildMenus(settings) {
  */
 async function onClickHandler(info, tab) {
     const settings = await getSettings();
-    for (var i = 0; i < settings.sites.length; i++) {
-        if (info.menuItemId == (settings.sites[i].id + 'Menu')) {
+
+    for (let i = 0; i < settings.sites.length; i++) {
+        if (info.menuItemId == (`${settings.sites[i].id}Menu`)) {
             await browser.tabs.create({
                 'url': settings.sites[i].domain.replace(/\/$/, '') + settings.sites[i].searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
             });
@@ -69,6 +81,7 @@ browser.contextMenus.onClicked.addListener(onClickHandler);
  */
 browser.runtime.onInstalled.addListener(async function () {
     const settings = await getSettings();
+
     buildMenus(settings);
 });
 
@@ -77,7 +90,9 @@ browser.runtime.onInstalled.addListener(async function () {
  * @param {Settings} settings 
  */
 async function setIcon(settings) {
-    var tab = await browser.tabs.getCurrent();
-    var img = 'content/assets/images/SonarrRadarrLidarr' + (settings.enabled ? '' : '-faded') + '16.png';
+    let tab = await browser.tabs.getCurrent();
+    
+    let img = `content/assets/images/SonarrRadarrLidarr${(settings.config.enabled ? '' : '-faded')}16.png`;
+
     await browser.browserAction.setIcon({ path: img });
 };

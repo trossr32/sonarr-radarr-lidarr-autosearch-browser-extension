@@ -11,71 +11,6 @@ var base64Icons = [
         }
     ],
     integrations = [
-        /* old imdb layout (current as of 11.01.2021) */
-        /* sonarr version which doesn't work with id search */
-        {
-            id: 'imdb',
-            rules: [
-                {
-                    siteId: 'sonarr',
-                    match: {
-                        pattern: /tv\s(|mini(\s|-))series/i,
-                        operator: 'eq'
-                    }
-                }
-            ],
-            search: {
-                containerSelector: '.title_wrapper h1',
-                selectorType: 'text',
-                modifiers: []
-            },
-            match: {
-                term: 'imdb.com',
-                containerSelector: '.title_wrapper',
-                attribute: 'text',
-            },
-            icon: {
-                containerSelector: '.title_wrapper h1',
-                locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
-            }
-        },
-        /* radarr version which works with id search */
-        {
-            id: 'imdb',
-            rules: [
-                {
-                    siteId: 'radarr',
-                    match: {
-                        pattern: /tv\s(|mini(\s|-))series/i,
-                        operator: 'ne'
-                    }
-                }
-            ],
-            search: {
-                containerSelector: 'link[rel="canonical"]',
-                selectorType: 'href',
-                modifiers: [
-                    {
-                        type: 'regex-match',
-                        pattern: /(?<search>tt\d{5,10})/i
-                    }, {
-                        type: 'prepend',
-                        var: 'imdb:'
-                    }
-                ]
-            },
-            match: {
-                term: 'imdb.com',
-                containerSelector: '.title_wrapper',
-                attribute: 'text',
-            },
-            icon: {
-                containerSelector: '.title_wrapper h1',
-                locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
-            }
-        },
         /* new imdb layout (beta as of 11.01.2021) */
         /* sonarr version which doesn't work with id search */
         {
@@ -267,6 +202,7 @@ var base64Icons = [
             }
         },
         // trakt for sonarr, uses tvdb id
+        // instance for tv series view
         {
             id: 'trakt',
             rules: [
@@ -300,6 +236,34 @@ var base64Icons = [
                 containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        // instance for tv series group view
+        {
+            id: 'trakt',
+            rules: [
+                {
+                    siteId: 'sonarr',
+                    match: {
+                        pattern: /tv/i,
+                        operator: 'eq'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: '.titles > h3',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'trakt.tv',
+                containerSelector: '#main-nav ul li a.selected',
+                attribute: 'text'
+            },
+            icon: {
+                containerSelector: '.actions',
+                locator: 'append',
+                imgStyles: 'width: 23px; margin: 0 0 2px 10px;'
             }
         },
         // trakt for radarr, uses tmdb id
@@ -336,6 +300,34 @@ var base64Icons = [
                 containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+            }
+        },
+        // instance for trakt movies group view
+        {
+            id: 'trakt',
+            rules: [
+                {
+                    siteId: 'radarr',
+                    match: {
+                        pattern: /movies/i,
+                        operator: 'eq'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: '.titles > h3',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'trakt.tv',
+                containerSelector: '#main-nav ul li a.selected',
+                attribute: 'text'
+            },
+            icon: {
+                containerSelector: '.actions',
+                locator: 'append',
+                imgStyles: 'width: 23px; margin: 0 0 2px 10px;'
             }
         },
         {
@@ -433,21 +425,127 @@ var base64Icons = [
                 locator: 'append',
                 imgStyles: 'width: 18px; margin: -22px 0 0 0; float: right;'
             }
+        },
+        {
+            id: 'rottentomatoes',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            match: {
+                term: 'rottentomatoes.com/m'
+            },
+            icon: {
+                containerSelector: 'h1.scoreboard__title',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
+            }
+        },
+        {
+            id: 'rottentomatoes',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: '#tvPosterLink',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'rottentomatoes.com/tv'
+            },
+            icon: {
+                containerSelector: 'h1.movie_title',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
+            }
         }
+        // {
+        //     id: 'nextepisode',
+        //     defaultSite: 'radarr',
+        //     search: {
+        //         containerSelector: 'a[href*="moviedb.org"]',
+        //         selectorType: 'href',
+        //         modifiers: [
+        //             {
+        //                 type: 'regex-match',
+        //                 pattern: /\/(?<search>\d{4,10})/i
+        //             }, {
+        //                 type: 'prepend',
+        //                 var: 'tmdb:'
+        //             }
+        //         ]
+        //     },
+        //     match: {
+        //         term: 'next-episode.net/movies'
+        //     },
+        //     icon: {
+        //         containerSelector: 'div[id^="title_"]',
+        //         locator: 'prepend',
+        //         imgStyles: 'width: 25px; margin: 0px 10px -5px 0;'
+        //     }
+        // },
+        // {
+        //     id: 'nextepisode',
+        //     rules: [
+        //         {
+        //             siteId: 'sonarr',
+        //             match: {
+        //                 pattern: /TVSeries/i,
+        //                 operator: 'eq'
+        //             }
+        //         }
+        //     ],
+        //     search: {
+        //         containerSelector: 'a[href*="imdb.com"]',
+        //         selectorType: 'href',
+        //         modifiers: [
+        //             {
+        //                 type: 'regex-match',
+        //                 pattern: /(?<search>tt\d{5,10})/i
+        //             }, {
+        //                 type: 'prepend',
+        //                 var: 'imdb:'
+        //             }
+        //         ]
+        //     },
+        //     match: {
+        //         term: 'next-episode.net',
+        //         containerSelector: 'body',
+        //         selectorType: 'itemType'
+        //     },
+        //     icon: {
+        //         containerSelector: '#show_name > h1',
+        //         locator: 'prepend',
+        //         imgStyles: 'width: 25px; margin: 0px 10px -5px 0;'
+        //     }
+        // }
     ];
 
 /**
- * Attempts to find a jQuery element using the supplied selector every 100 milliseconds until found 
- * or max number of attempts reached (defaulted to 10 attempts, one second)
+ * Attempts to find a jQuery element using the supplied selector every n milliseconds 
+ * (defined by waitForMs param) until found or the max number of attempts is reached.
+ * Wait interval and max attempts are defined in settings.
  * @param {string} selector - jQuery selector
  * @param {function} callback - callback function
  * @param {int} maxAttempts - max attempts
+ * @param {int} waitForMs - time in ms to wait between attempts
  * @param {int} count - attempt iterator
  */
-var waitForEl = function(selector, callback, maxAttempts = 10, count) {
+var waitForEl = function(selector, callback, maxAttempts, waitForMs, count) {
+    if (!count || count === 0) {
+        log('waiting for search input element to be available...');
+    }    
+
     if ($(selector).length) {
+        if (!count || count === 0) {
+            log('found search input without any retry attempts');
+        } else {
+            log(`took ${count * waitForMs} ms for the search input to be found`);
+        }
+
         callback();
-    } else {
+    } else {     
         setTimeout(function() {
             if (!count) {
                 count = 0;
@@ -456,11 +554,13 @@ var waitForEl = function(selector, callback, maxAttempts = 10, count) {
             count++;
             
             if (count < maxAttempts) {
-                waitForEl(selector, callback, maxAttempts, count);
+                waitForEl(selector, callback, maxAttempts, waitForMs, count);
             } else {
+                log('Failed to find the input search element. Try refreshing the page or increasing the wait time in the debug settings. If neither of these work the jQuery selectors for the search input element may be incorrect.', 'error');
+
                 return;
             }
-        }, 100);
+        }, waitForMs);
     }
 };
 
@@ -478,11 +578,12 @@ var getElementValue = function(el, selector) {
         default: // attribute
             return el.attr(selector);
     }
-}
+};
 
 async function init() {
 	const settings = await getSettings();
-    if (!settings.enabled) {
+
+    if (!settings.config.enabled) {
         return;
     }
 
@@ -512,7 +613,7 @@ async function init() {
     
                             searchInput.dispatchEvent(event);
                         }
-                    });
+                    }, settings.config.searchInputMaxAttempts, settings.config.searchInputWaitForMs);
                 }
             }
         });
@@ -520,10 +621,10 @@ async function init() {
     log(['integrations: ', integrations]);
 
     /* iterate all integrations that are enabled in the settings */
-    $.each(settings.integrations.filter(integration => { return integration.enabled }), 
+    $.each(settings.integrations.filter(integration => { return integration.enabled; }), 
         function (i, settingsIntegration) {
             /* iterate all integrations that match the current setting integration */
-            $.each(integrations.filter(_i => { return _i.id == settingsIntegration.id }),
+            $.each(integrations.filter(_i => { return _i.id == settingsIntegration.id; }),
                 function (ii, integration) {
                     /* test the integration should be used by matching against the url */
                     if (window.location.href.includes(integration.match.term)) {
@@ -534,20 +635,24 @@ async function init() {
 
                         if (integration.hasOwnProperty('defaultSite')) {
                             site = settings.sites
-                                .filter(s => { return s.enabled })
+                                .filter(s => { return s.enabled; })
                                 .find(s => s.id == integration.defaultSite);
                         } else {
+                            log('interating rules');
+
                             $.each(integration.rules, 
                                 function (ir, r) {
                                     var matchValue = getElementValue(matchContainer, integration.match.attribute);
 
-                                    var hasMatch = r.match.operator === 'eq'
-                                        ? r.match.pattern.test(matchValue)
-                                        : !(r.match.pattern.test(matchValue)); // 'ne', convert to switch if other values are required
+                                    var isMatch = r.match.pattern.test(matchValue);
+
+                                    var hasMatch = r.match.operator === 'eq' ? isMatch : !isMatch; // 'ne', convert to switch if other values are required
+
+                                    log('matchContainer', matchContainer, 'integration.match.attribute', integration.match.attribute, 'matchValue', matchValue, 'isMatch', isMatch, 'hasMatch', hasMatch);
 
                                     if (hasMatch) {
                                         site = settings.sites
-                                            .filter(s => { return s.enabled })
+                                            .filter(s => { return s.enabled; })
                                             .find(s => s.id == r.siteId);
 
                                         return false;
@@ -559,19 +664,23 @@ async function init() {
                             return;
                         }
 
-                        log(['integration matched to site: ', integration, site]);
+                        log(['integration matched to site: ', integration, site], $(integration.search.containerSelector));
 
                         /* iterate all the containers */
                         $.each($(integration.search.containerSelector), function(i_el, container) {
+                            if ($(container).attr('data-servarr-ext-completed')) {
+                                return;
+                            }
+
                             var searchTerm = getElementValue($(container), integration.search.selectorType);
                             
                             if (integration.search.modifiers.length == 0){
-                                searchTerm = searchTerm.trim()
+                                searchTerm = searchTerm.trim();
                             } else {
                                 $.each(integration.search.modifiers, function(i, modifier) {
                                     switch (modifier.type) {
                                         case 'replace':
-                                            searchTerm = searchTerm.toLowerCase().replace(modifier.from, modifier.to).trim()
+                                            searchTerm = searchTerm.toLowerCase().replace(modifier.from, modifier.to).trim();
                                             break;
 
                                         case 'regex-match':
@@ -593,20 +702,22 @@ async function init() {
 
                             log(['search url: ', searchUrl]);
 
-                            var icon = base64Icons.find(i => i.id == site.id)
+                            var icon = base64Icons.find(i => i.id == site.id);
 
-                            var el = $('<a href="' + searchUrl + '" target="_blank" tooltip="' + site.menuText + '" title="' + site.menuText + '"></a>')
-                                .append($('<img src="' + icon.base64 + '" style="' + integration.icon.imgStyles + '">'));
+                            var el = $(`<a href="${searchUrl}" target="_blank" tooltip="${site.menuText}" title="${site.menuText}"></a>`)
+                                .append($(`<img src="${icon.base64}" style="${integration.icon.imgStyles}">`));
 
                             if (integration.icon.locator == "append") {
                                 $(integration.icon.containerSelector).eq(i_el).append(el);
                             } else {
                                 $(integration.icon.containerSelector).eq(i_el).prepend(el);
                             }
+
+                            $(container).attr('data-servarr-ext-completed', true);
                         });
                     }
                 });            
         });
-};
+}
 
 init();
