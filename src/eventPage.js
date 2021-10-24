@@ -1,21 +1,38 @@
 /**
  * Get settings, set the extension icon and execute the content script
  */
-async function initRun() {
-    const settings = await getSettings();
+async function initRun(evt) {
+    await log(`running init from ${evt} event`);
+    
+    try {
+        const settings = await getSettings();
 
-    await setIcon(settings);
-    await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
-    await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
+        await setIcon(settings);
+        await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
+        await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
+    }
+    catch(e) {
+        await log(e.message, 'error');
+    }
 }
 
-browser.tabs.onActivated.addListener(initRun);
+browser.tabs.onActivated.addListener(function () {
+    initRun('onActivated')
+});
+
+browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+    log(['change info status', changeInfo]);
+
+    if (changeInfo.status == 'complete') {
+        initRun('onUpdated')
+    }
+});
 
 browser.runtime.onConnect.addListener(function(port) {
     switch (port.name) {
         case 'init':
             port.onMessage.addListener(async function (request) {
-                await initRun();
+                await initRun('onConnect');
             });
             break;
 
@@ -90,8 +107,6 @@ browser.runtime.onInstalled.addListener(async function () {
  * @param {Settings} settings 
  */
 async function setIcon(settings) {
-    let tab = await browser.tabs.getCurrent();
-    
     let img = `content/assets/images/SonarrRadarrLidarr${(settings.config.enabled ? '' : '-faded')}16.png`;
 
     await browser.browserAction.setIcon({ path: img });
