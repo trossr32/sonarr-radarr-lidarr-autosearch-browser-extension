@@ -83,8 +83,4 @@ Thanks to the following for helping with this project:
 
 <a href='https://ko-fi.com/K3K22CEIT' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi4.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
-<table><tr><td>
-![JetBrains logo](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/staging/src/content/assets/images/jetbrains.png)
-</td><td>
-And finally thanks to <a href='https://www.jetbrains.com' target='_blank'>JetBrains</a> for providing an open source license for their products to support this project. You guys are awesome 
-</td></tr></table>
+![JetBrains logo](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/staging/src/content/assets/images/jetbrains.png) | And finally thanks to <a href='https://www.jetbrains.com' target='_blank'>JetBrains</a> for providing an open source license for their products to support this project. You guys are awesome 
