@@ -175,6 +175,18 @@ var sessionId,
                 name: 'Rotten Tomatoes',
                 image: 'rotten-tomatoes.svg',
                 enabled: true
+            },
+            {
+                id: 'metacritic',
+                name: 'metacritic',
+                image: 'metacritic.svg',
+                enabled: true
+            },
+            {
+                id: 'simkl',
+                name: 'simkl',
+                image: 'simkl.png',
+                enabled: true
             }
             // {
             //     id: 'nextepisode',
@@ -307,7 +319,7 @@ async function log(content, logLevel = 'info') {
         return;
     }
 
-    const identifier = `[ServarrExt]`;
+    const identifier = `[ServarrExt ${new Date().toISOString()}]`;
 
     // concat identifier if it's a string
     if (typeof content === "string" || content instanceof String) {
