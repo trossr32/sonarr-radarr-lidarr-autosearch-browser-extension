@@ -12,7 +12,6 @@ var base64Icons = [
         }
     ],
     integrations = [
-        /* new imdb layout (beta as of 11.01.2021) */
         /* sonarr version which doesn't work with id search */
         {
             id: 'imdb',
@@ -558,6 +557,52 @@ var base64Icons = [
                 locator: 'prepend',
                 imgStyles: 'width: 40px;'
             }
+        },
+        // iptorrent tv
+        {
+            id: 'iptorrents',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'b.MovieTitle > a',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'iptorrents.com/tv'
+            },
+            icon: {
+                containerSelector: 'b.MovieTitle',
+                wrapLinkWithContainer: '<div></div>',
+                locator: 'append',
+                imgStyles: 'width: 20px; margin: 5px 0 0 0;'
+            }
+        },
+        // iptorrent movies
+        {
+            id: 'iptorrents',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'b.MovieTitle > a',
+                selectorType: 'href',
+                modifiers: [
+                    {
+                        type: 'regex-match',
+                        pattern: /(?<search>tt\d{5,10})/i
+                    }, {
+                        type: 'prepend',
+                        var: 'imdb:'
+                    }
+                ]
+            },
+            match: {
+                term: 'iptorrents.com/movies'
+            },
+            icon: {
+                containerSelector: 'b.MovieTitle',
+                wrapLinkWithContainer: '<div></div>',
+                locator: 'append',
+                imgStyles: 'width: 20px; margin: 5px 0 0 0;'
+            }
         }
         // {
         //     id: 'nextepisode',
@@ -848,8 +893,8 @@ init();
 //     }
 
 //     console.log('window has not run');
-    
+
 //     window.hasRun = true;
-    
+
 //     init();
 // })();

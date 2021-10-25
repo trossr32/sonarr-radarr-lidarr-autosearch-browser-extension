@@ -187,6 +187,12 @@ var sessionId,
                 name: 'simkl',
                 image: 'simkl.png',
                 enabled: true
+            },
+            {
+                id: 'iptorrents',
+                name: 'IPTorrents',
+                image: 'iptorrents.png',
+                enabled: true
             }
             // {
             //     id: 'nextepisode',
