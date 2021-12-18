@@ -736,23 +736,27 @@ async function init() {
     $.each(settings.sites,
         function (i, site) {
             if (window.location.href.includes(site.domain)) {
-                log(['sonarr/radarr/lidarr site match found: ', site]);
+                log(['servarr site match found: ', site]);
 
-                var search = window.location.href.replace(/(.+\/)/g, '');
-                var sdef = site.searchPath.replace(/(\/)/g, '');
+                if (window.location.href.indexOf(site.searchPath) === -1) {
+                    return;
+                }
+            
+                let search = window.location.href.replace(/(.+\/)/g, '');
+                let sdef = site.searchPath.replace(/(\/)/g, '');
 
                 search = search.replace(sdef, '');
 
                 if (search.trim() !== '') {
                     waitForEl(site.searchInputSelector, function() {
                         // use jquery selector and then retrieve the DOM element
-                        var searchInput = $(site.searchInputSelector)[0];
+                        let searchInput = $(site.searchInputSelector)[0];
                     
                         if (searchInput) {
                             // jquery can't be used to trigger the input event here so rely on vanilla js for event triggering
                             searchInput.value = decodeURIComponent(search.trim());
     
-                            var event = document.createEvent('Event');
+                            let event = document.createEvent('Event');
                             event.initEvent('input', true, true);
     
                             searchInput.dispatchEvent(event);
