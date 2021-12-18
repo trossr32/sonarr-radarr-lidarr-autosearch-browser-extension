@@ -20,6 +20,8 @@ The extension can be disabled from the extension's popup and each context menu i
 
 **New features (V2.3)**
 - IPTorrents integration.
+- Bug fix: Servarr sites search term discovery in search URL was adding 'new' with no search parameter.
+- Bug fix: Reduce z-index on Simkl icon to prevent it from displaying above the site header.
 
 **New features (V2.2)**
 - Metacritic integration.

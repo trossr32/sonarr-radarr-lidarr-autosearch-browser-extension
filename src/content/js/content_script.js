@@ -513,7 +513,7 @@ var base64Icons = [
             },
             icon: {
                 containerSelector: 'td.SimklTVDetailPoster div:nth-of-type(1)',
-                wrapLinkWithContainer: '<div style="position: absolute; top: 5px; left: 5px; width: 50px; z-index: 100;"></div>',
+                wrapLinkWithContainer: '<div style="position: absolute; top: 5px; left: 5px; width: 50px; z-index: 1;"></div>',
                 locator: 'prepend',
                 imgStyles: 'width: 40px;'
             }
@@ -553,7 +553,7 @@ var base64Icons = [
             },
             icon: {
                 containerSelector: 'td.SimklTVDetailPoster div:nth-of-type(1)',
-                wrapLinkWithContainer: '<div style="position: absolute; top: 5px; left: 5px; width: 50px; z-index: 100;"></div>',
+                wrapLinkWithContainer: '<div style="position: absolute; top: 5px; left: 5px; width: 50px; z-index: 1;"></div>',
                 locator: 'prepend',
                 imgStyles: 'width: 40px;'
             }
