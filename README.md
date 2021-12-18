@@ -79,6 +79,15 @@ grunt release
 
 The grunt release config executes a Powershell script to run web-ext, this can be changed to a bash file if preferred (see comments in the Gruntfile.js).
 
+## Tests
+
+Next to no test coverage at the moment and is currently just a development tool to assert code changes, but uses <a href='https://jestjs.io' target='_blank'>Jest</a> for any available:
+
+```
+npm i 
+npm run test
+```
+
 ## Contribute
 If you can make this extension better I'm happy for the help! Please create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug or want to suggest a new feature.
 
