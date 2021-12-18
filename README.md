@@ -20,6 +20,7 @@ The extension can be disabled from the extension's popup and each context menu i
 
 **New features (V2.3)**
 - IPTorrents integration.
+- Last.fm integration.
 - Bug fix: Servarr sites search term discovery in search URL was adding 'new' with no search parameter.
 - Bug fix: Reduce z-index on Simkl icon to prevent it from displaying above the site header.
 
@@ -35,10 +36,6 @@ The extension can be disabled from the extension's popup and each context menu i
 - Set the wait time when searching for a servarr search input element to 6 seconds and add debugging settings to allow increasing/decreasing this time.
 - Grunt added as a task runner and all external libs now added via npm. 
 - Fully consolidate chromium and firefox dists.
-
-**New features (V2)**
-- TV Calendar integration.
-- Automated config based on Sonarr, Radarr or Lidarr version obtained from the respective API.
 
 ## Getting started
 
