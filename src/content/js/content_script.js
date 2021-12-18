@@ -603,6 +603,40 @@ var base64Icons = [
                 locator: 'append',
                 imgStyles: 'width: 20px; margin: 5px 0 0 0;'
             }
+        },
+        {
+            id: 'lastfm',
+            defaultSite: 'lidarr',
+            search: {
+                containerSelector: '.header-new-title',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'last.fm/music'
+            },
+            icon: {
+                containerSelector: '.header-new-title',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: 0 10px 6px 0;'
+            }
+        },
+        {
+            id: 'lastfm',
+            defaultSite: 'lidarr',
+            search: {
+                containerSelector: '.header-new-crumb > span',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'last.fm/music'
+            },
+            icon: {
+                containerSelector: '.header-new-crumb > span',
+                locator: 'prepend',
+                imgStyles: 'width: 25px; margin: 0 10px 6px 0;'
+            }
         }
         // {
         //     id: 'nextepisode',
