@@ -12,7 +12,6 @@ var base64Icons = [
         }
     ],
     integrations = [
-        /* new imdb layout (beta as of 11.01.2021) */
         /* sonarr version which doesn't work with id search */
         {
             id: 'imdb',
@@ -514,7 +513,7 @@ var base64Icons = [
             },
             icon: {
                 containerSelector: 'td.SimklTVDetailPoster div:nth-of-type(1)',
-                wrapLinkWithContainer: '<div style="position: absolute; top: 5px; left: 5px; width: 50px; z-index: 100;"></div>',
+                wrapLinkWithContainer: '<div style="position: absolute; top: 5px; left: 5px; width: 50px; z-index: 1;"></div>',
                 locator: 'prepend',
                 imgStyles: 'width: 40px;'
             }
@@ -554,9 +553,89 @@ var base64Icons = [
             },
             icon: {
                 containerSelector: 'td.SimklTVDetailPoster div:nth-of-type(1)',
-                wrapLinkWithContainer: '<div style="position: absolute; top: 5px; left: 5px; width: 50px; z-index: 100;"></div>',
+                wrapLinkWithContainer: '<div style="position: absolute; top: 5px; left: 5px; width: 50px; z-index: 1;"></div>',
                 locator: 'prepend',
                 imgStyles: 'width: 40px;'
+            }
+        },
+        // iptorrent tv
+        {
+            id: 'iptorrents',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'b.MovieTitle > a',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'iptorrents.com/tv'
+            },
+            icon: {
+                containerSelector: 'b.MovieTitle',
+                wrapLinkWithContainer: '<div></div>',
+                locator: 'append',
+                imgStyles: 'width: 20px; margin: 5px 0 0 0;'
+            }
+        },
+        // iptorrent movies
+        {
+            id: 'iptorrents',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'b.MovieTitle > a',
+                selectorType: 'href',
+                modifiers: [
+                    {
+                        type: 'regex-match',
+                        pattern: /(?<search>tt\d{5,10})/i
+                    }, {
+                        type: 'prepend',
+                        var: 'imdb:'
+                    }
+                ]
+            },
+            match: {
+                term: 'iptorrents.com/movies'
+            },
+            icon: {
+                containerSelector: 'b.MovieTitle',
+                wrapLinkWithContainer: '<div></div>',
+                locator: 'append',
+                imgStyles: 'width: 20px; margin: 5px 0 0 0;'
+            }
+        },
+        {
+            id: 'lastfm',
+            defaultSite: 'lidarr',
+            search: {
+                containerSelector: '.header-new-title',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'last.fm/music'
+            },
+            icon: {
+                containerSelector: '.header-new-title',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: 0 10px 6px 0;'
+            }
+        },
+        {
+            id: 'lastfm',
+            defaultSite: 'lidarr',
+            search: {
+                containerSelector: '.header-new-crumb > span',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                term: 'last.fm/music'
+            },
+            icon: {
+                containerSelector: '.header-new-crumb > span',
+                locator: 'prepend',
+                imgStyles: 'width: 25px; margin: 0 10px 6px 0;'
             }
         }
         // {
@@ -691,23 +770,27 @@ async function init() {
     $.each(settings.sites,
         function (i, site) {
             if (window.location.href.includes(site.domain)) {
-                log(['sonarr/radarr/lidarr site match found: ', site]);
+                log(['servarr site match found: ', site]);
 
-                var search = window.location.href.replace(/(.+\/)/g, '');
-                var sdef = site.searchPath.replace(/(\/)/g, '');
+                if (window.location.href.indexOf(site.searchPath) === -1) {
+                    return;
+                }
+            
+                let search = window.location.href.replace(/(.+\/)/g, '');
+                let sdef = site.searchPath.replace(/(\/)/g, '');
 
                 search = search.replace(sdef, '');
 
                 if (search.trim() !== '') {
                     waitForEl(site.searchInputSelector, function() {
                         // use jquery selector and then retrieve the DOM element
-                        var searchInput = $(site.searchInputSelector)[0];
+                        let searchInput = $(site.searchInputSelector)[0];
                     
                         if (searchInput) {
                             // jquery can't be used to trigger the input event here so rely on vanilla js for event triggering
                             searchInput.value = decodeURIComponent(search.trim());
     
-                            var event = document.createEvent('Event');
+                            let event = document.createEvent('Event');
                             event.initEvent('input', true, true);
     
                             searchInput.dispatchEvent(event);
@@ -848,8 +931,8 @@ init();
 //     }
 
 //     console.log('window has not run');
-    
+
 //     window.hasRun = true;
-    
+
 //     init();
 // })();

@@ -116,7 +116,7 @@ var sessionId,
                 enabled: false,
                 searchPath: '/add/search/',
                 searchInputSelector: 'input[name="searchBox"]',
-                menuText: 'Search Lidarr for artist',
+                menuText: 'Search Lidarr',
                 apiKey: '',
                 autoPopAdvancedFromApi: true
             }
@@ -186,6 +186,18 @@ var sessionId,
                 id: 'simkl',
                 name: 'simkl',
                 image: 'simkl.png',
+                enabled: true
+            },
+            {
+                id: 'iptorrents',
+                name: 'IPTorrents',
+                image: 'iptorrents.png',
+                enabled: true
+            },
+            {
+                id: 'lastfm',
+                name: 'last.fm',
+                image: 'lastfm.png',
                 enabled: true
             }
             // {
