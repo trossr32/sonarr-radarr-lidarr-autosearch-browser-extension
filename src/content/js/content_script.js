@@ -858,8 +858,18 @@ async function init() {
                             $.each($(integration.search.containerSelector), function(i_el, container) {
                                 let containerEl = $(container);
 
+                                // Check if the container is a servarr icon. For example, on musicbrainz the container is an anchor in an h1, and the icon 
+                                // will be an anchor inserted prior to container. In subsequent lookups, the container selector will pick up both the relevant 
+                                // container and the icon. Icons have a data-servarr-icon attribute added so they can be skipped in this scenario.
+                                if (containerEl.attr('data-servarr-icon')) {
+                                    log(`element '${container}' picked up an existing icon, so skipping`);
+                                    
+                                    return;
+                                }
+
+                                // Check if the container has already been processed and had an icon added.
                                 if (containerEl.attr('data-servarr-ext-completed')) {
-                                    log(`element '${container}' already has an icon attributed`);
+                                    log(`element '${container}' already has an icon attributed, so skipping`);
                                     
                                     return;
                                 }
@@ -901,7 +911,7 @@ async function init() {
                                 log(['search url: ', searchUrl]);
 
                                 let icon = base64Icons.find(i => i.id == site.id),
-                                    linkEl = $(`<a href="${searchUrl}" target="_blank" tooltip="${site.menuText}" title="${site.menuText}"></a>`)
+                                    linkEl = $(`<a href="${searchUrl}" target="_blank" tooltip="${site.menuText}" title="${site.menuText}" data-servarr-icon="true"></a>`)
                                         .append($(`<img src="${icon.base64}" style="${integration.icon.imgStyles}">`));
 
                                 let el = integration.icon.hasOwnProperty('wrapLinkWithContainer') ? $(integration.icon.wrapLinkWithContainer).append(linkEl) : linkEl;
