@@ -18,8 +18,8 @@ The extension can be disabled from the extension's popup and each context menu i
 
 ## Change log
 
-**Bug fix (V2.3.2)**
-- Bug fix: Cater for Radarr v4 by amending the API url to include the /api/v3/ prefix. The extension will attempt with /api/v3/ first, then /api/ if it fails.
+**Enhancement (V2.3.2)**
+- Cater for Radarr v4 by amending the API url to include the /api/v3/ prefix. The extension will attempt with /api/v3/ first, then /api/ if it fails.
 
 **Bug fix (V2.3.1)**
 - Bug fix: On Musicbrainz multiple lidarr icons were spawning every time the tab was activated.
