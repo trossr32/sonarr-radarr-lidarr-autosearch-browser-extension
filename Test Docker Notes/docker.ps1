@@ -1,5 +1,6 @@
 # docker run -d --name=sonarr-preview -e PUID=1000 -e PGID=1000 -e TZ=Europe/London -p 8989:8989 linuxserver/sonarr:preview
 # docker run -d --name=radarr-nightly -e PUID=1000 -e PGID=1000 -e TZ=Europe/London -p 7878:7878 linuxserver/radarr:nightly
+# docker run -d --name=radarr-develop -e PUID=1000 -e PGID=1000 -e TZ=Europe/London -p 7878:7878 linuxserver/radarr:develop
 # docker run -d --name=lidarr-nightly -e PUID=1000 -e PGID=1000 -e TZ=Europe/London -p 8686:8686 linuxserver/lidarr:nightly
 
 # docker run -d --name=sonarr-latest -e PUID=1000 -e PGID=1000 -e TZ=Europe/London -p 8989:8989 linuxserver/sonarr:latest
