@@ -89,7 +89,7 @@
 /**
  * Global variables
  */
-var sessionId,
+let sessionId,
     defaultSettings = {
         sites: [
             {
@@ -283,7 +283,7 @@ var sessionId,
                     searchInputSelector: '.add-series-search .x-series-search'
                 },
                 {
-                    versionMatch: /^3/,
+                    versionMatch: /^[3|4]/,
                     searchPath: '/add/new/',
                     searchInputSelector: 'input[name="seriesLookup"]'
                 }
@@ -298,7 +298,7 @@ var sessionId,
                     searchInputSelector: '.add-movies-search .x-movies-search'
                 },
                 {
-                    versionMatch: /^3/,
+                    versionMatch: /^[3|4]/,
                     searchPath: '/add/new/',
                     searchInputSelector: 'input[name="movieLookup"]'
                 }
@@ -360,7 +360,7 @@ async function log(content, logLevel = 'info') {
 /*
 * Log old and new values when an item in a storage area is changed
 */
-var logStorageChange = function(changes, area) {
+let logStorageChange = function(changes, area) {
     let changedItems = Object.keys(changes);
   
     for (let item of changedItems) {
@@ -463,7 +463,7 @@ async function setSettings(data) {
  * @param {string} version 
  * @returns {VersionConfigItem}
  */
-var getVersionConfig = (siteId, version) =>
+let getVersionConfig = (siteId, version) =>
     versionConfig
         .find(v => v.id === siteId)
         .configs
@@ -475,13 +475,13 @@ var getVersionConfig = (siteId, version) =>
  * @param {string} endpoint 
  * @returns {URL} - the url
  */
-var getApiUrl = (site, endpoint) => {
+let getApiUrl = (site, endpoint, useV3 = true) => {
     let _endpoint = apiConfig
         .find(a => a.id == site.id)
         .endpoints
             .find(e => e.key == endpoint);
 
-    let url = new URL(`${site.domain.replace(/(.+)\/$/, '$1')}/api/${_endpoint.value}`);
+    let url = new URL(`${site.domain.replace(/(.+)\/$/, '$1')}/api/${(useV3 ? 'v3/' : '')}${_endpoint.value}`);
 
     url.searchParams.append('apikey', site.apiKey);
 
@@ -517,57 +517,69 @@ async function callApi(request) {
         };
     }
 
+    /**
+     * Wrap the actual API call in a function so it can be called for multiple url options
+     * @param {string} url 
+     * @returns {ApiResponse}
+     */
+    async function performCall(url) {
+        try {
+            const data = await $.getJSON(url);
+            const response = {
+                data: data,
+                request: request,
+                success: true,
+                error: null
+            };
+    
+            switch (request.endpoint) {
+                // if this is a 'Version' call try to update settings with version specific data
+                case 'Version':
+                    // if auto population is turned off the just return response
+                    if (!site.autoPopAdvancedFromApi && request.source != 'ApiAutoPopEnabled') {
+                        return response;
+                    }
+    
+                    // auto population is enabled, so get the config for this version and update settings
+                    let config = getVersionConfig(site.id, data.version);
+    
+                    for (let i = 0; i < settings.sites.length; i++) {
+                        if (settings.sites[i].id === site.id) {
+                            settings.sites[i].searchPath = config.searchPath;
+                            settings.sites[i].searchInputSelector = config.searchInputSelector;
+                        }
+                    }
+    
+                    await setSettings(settings);
+    
+                    return response;
+    
+                default:
+                    return response;
+            }
+        } catch (error) {
+            return {
+                data: null,
+                request: request,
+                success: false,
+                error: error
+            };
+        }
+    }
+
+    // try the explicit v3 api first
     let url = getApiUrl(site, request.endpoint);
 
-    try {
-        const data = await $.getJSON(url);
+    let response = await performCall(url);
 
-        switch (request.endpoint) {
-            // if this is a 'Version' call try to update settings if with version specific data
-            case 'Version':
-                // if auto population is turned off the just return response
-                if (!site.autoPopAdvancedFromApi && request.source != 'ApiAutoPopEnabled') {
-                    return {
-                        data: data,
-                        request: request,
-                        success: true,
-                        error: null
-                    };
-                }
-
-                // auto population is enabled, so get the config for this version and update settings
-                let config = getVersionConfig(site.id, data.version);
-
-                for (let i = 0; i < settings.sites.length; i++) {
-                    if (settings.sites[i].id === site.id) {
-                        settings.sites[i].searchPath = config.searchPath;
-                        settings.sites[i].searchInputSelector = config.searchInputSelector;
-                    }
-                }
-
-                await setSettings(settings);
-
-                return {
-                    data: data,
-                    request: request,
-                    success: true,
-                    error: null
-                };
-
-            default:
-                return {
-                    data: data,
-                    request: request,
-                    success: true,
-                    error: null
-                };
-        }
-    } catch (error) {
-        return {
-            data: null,
-            request: request,
-            success: false,
-            error: error
-        };
+    if (response.success) {
+        return response;
     }
+
+    // try the api without v3
+    url = getApiUrl(site, request.endpoint, false);
+
+    response = await performCall(url);
+
+    return response;
 }
