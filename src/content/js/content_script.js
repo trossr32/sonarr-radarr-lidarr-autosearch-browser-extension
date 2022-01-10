@@ -637,6 +637,42 @@ var base64Icons = [
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: 0 10px 6px 0;'
             }
+        },
+        // senscritique sonarr
+        {
+            id: 'senscritique',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: '.pvi-product-title',
+                selectorType: 'title',
+                modifiers: []
+            },
+            match: {
+                term: 'senscritique.com/serie'
+            },
+            icon: {
+                containerSelector: '.pvi-product-title',
+                locator: 'prepend',
+                imgStyles: 'width: 30px; margin: 7px 0 0 0;'
+            }
+        },
+        // senscritique radarr
+        {
+            id: 'senscritique',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: '.pvi-product-title',
+                selectorType: 'title',
+                modifiers: []
+            },
+            match: {
+                term: 'senscritique.com/film'
+            },
+            icon: {
+                containerSelector: '.pvi-product-title',
+                locator: 'prepend',
+                imgStyles: 'width: 30px; margin: 7px 0 0 0;'
+            }
         }
         // {
         //     id: 'nextepisode',
