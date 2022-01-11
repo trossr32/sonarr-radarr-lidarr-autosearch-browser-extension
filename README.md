@@ -18,9 +18,10 @@ The extension can be disabled from the extension's popup and each context menu i
 
 ## Change log
 
-**New features (V2.4)**
+**New features & bug fix (V2.4)**
 - Allociné integration. (Thanks to <a href='https://github.com/ledge74' target='_blank'>Flo</a> for making this contribution.)
 - SensCritique integration. (Thanks to <a href='https://github.com/ledge74' target='_blank'>Flo</a> for making this contribution.)
+- Bug fix: context menu wasn't updating correctly when servarr integrations were enabled or disabled.
 
 **Enhancement (V2.3.2)**
 - Cater for Radarr v4 by amending the API url to include the /api/v3/ prefix. The extension will attempt with /api/v3/ first, then /api/ if it fails.
