@@ -1,4 +1,4 @@
-var base64Icons = [
+ var base64Icons = [
         {
             id: 'sonarr',
             base64: 'data:image/png;base64,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'
@@ -637,6 +637,94 @@ var base64Icons = [
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: 0 10px 6px 0;'
             }
+        },
+        // allocine sonarr
+        {
+            id: 'allocine',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            where: [
+                {
+                    selector: 'meta[property="og:type"]',
+                    attribute: 'content',
+                    operator: 'eq',
+                    value: 'video.tv_show'
+                }
+            ],
+            match: {
+                term: 'allocine.fr/series'
+            },
+            icon: {
+                containerSelector: '.titlebar-page .titlebar-title',
+                locator: 'prepend',
+                imgStyles: 'width: 32px; margin: -8px 10px 0 0;'
+            }
+        },
+        // allocine radarr
+        {
+            id: 'allocine',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            where: [
+                {
+                    selector: 'meta[property="og:type"]',
+                    attribute: 'content',
+                    operator: 'eq',
+                    value: 'video.movie'
+                }
+            ],
+            match: {
+                term: 'allocine.fr/film'
+            },
+            icon: {
+                containerSelector: '.titlebar-page .titlebar-title',
+                locator: 'prepend',
+                imgStyles: 'width: 32px; margin: -2px 10px 0 0;'
+            }
+        },
+        // senscritique sonarr
+        {
+            id: 'senscritique',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: '.pvi-product-title',
+                selectorType: 'title',
+                modifiers: []
+            },
+            match: {
+                term: 'senscritique.com/serie'
+            },
+            icon: {
+                containerSelector: '.pvi-product-title',
+                locator: 'prepend',
+                imgStyles: 'width: 30px; margin: 7px 0 0 0;'
+            }
+        },
+        // senscritique radarr
+        {
+            id: 'senscritique',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: '.pvi-product-title',
+                selectorType: 'title',
+                modifiers: []
+            },
+            match: {
+                term: 'senscritique.com/film'
+            },
+            icon: {
+                containerSelector: '.pvi-product-title',
+                locator: 'prepend',
+                imgStyles: 'width: 30px; margin: 7px 0 0 0;'
+            }
         }
         // {
         //     id: 'nextepisode',
@@ -844,6 +932,25 @@ async function init() {
 
                         if (site == null) {
                             return;
+                        }
+
+                        // if the site integration has a where property, then the rules within the where must be evaluated
+                        // and asserted to be correct before the integration is used
+                        if (integration.hasOwnProperty('where')) {
+                            $.each(integration.where, function(i, rule) {
+                                switch (rule.operator){
+                                    case 'eq':
+                                        if (rule.value !== getElementValue($(rule.selector), rule.attribute)) {
+                                            site = null;
+                                        }                                        
+
+                                        break;  
+                                }
+                            });
+
+                            if (site == null) {
+                                return;
+                            }
                         }
 
                         log(['integration matched to site: ', integration, site], $(integration.search.containerSelector));

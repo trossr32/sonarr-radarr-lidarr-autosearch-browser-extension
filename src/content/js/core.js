@@ -199,6 +199,18 @@ let sessionId,
                 name: 'last.fm',
                 image: 'lastfm.png',
                 enabled: true
+            },
+            {
+                id: 'allocine',
+                name: 'Allociné',
+                image: 'allocine.png',
+                enabled: true              
+            },
+            {
+                id: 'senscritique',
+                name: 'SensCritique',
+                image: 'senscritique.png',
+                enabled: true
             }
             // {
             //     id: 'nextepisode',
