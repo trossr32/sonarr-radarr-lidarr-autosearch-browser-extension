@@ -638,6 +638,42 @@ var base64Icons = [
                 imgStyles: 'width: 25px; margin: 0 10px 6px 0;'
             }
         },
+        // allocine sonarr
+        {
+            id: 'allocine',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            match: {
+                term: 'allocine.fr/series'
+            },
+            icon: {
+                containerSelector: '.titlebar-page .titlebar-title',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
+            }
+        },
+        // allocine radarr
+        {
+            id: 'allocine',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            match: {
+                term: 'allocine.fr/film'
+            },
+            icon: {
+                containerSelector: '.titlebar-page .titlebar-title',
+                locator: 'prepend',
+                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
+            }
+        },
         // senscritique sonarr
         {
             id: 'senscritique',
