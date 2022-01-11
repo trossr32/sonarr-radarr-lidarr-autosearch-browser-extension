@@ -8,6 +8,7 @@ async function initRun(evt) {
         const settings = await getSettings();
 
         await setIcon(settings);
+        await buildMenus(settings);
         await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
         await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
     }
