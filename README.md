@@ -80,7 +80,7 @@ npm i
 grunt release
 ```
 
-The grunt release config executes a Powershell script to run web-ext, this can be changed to a bash file if preferred (see comments in the Gruntfile.js).
+The grunt release config executes a Powershell script to run web-ext, this can be changed to a bash file if preferred (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/Gruntfile.js#L118">see comments in the Gruntfile.js</a>).
 
 ## Tests
 
