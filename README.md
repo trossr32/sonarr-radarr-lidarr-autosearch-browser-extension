@@ -18,6 +18,9 @@ The extension can be disabled from the extension's popup and each context menu i
 
 ## Change log
 
+**Bug fix (V2.4.1)**
+- Bug fix: Fix imdb integration following their site redesign.
+
 **New features & bug fix (V2.4)**
 - Allociné integration. (Thanks to <a href='https://github.com/ledge74' target='_blank'>Flo</a> for making this contribution.)
 - SensCritique integration. (Thanks to <a href='https://github.com/ledge74' target='_blank'>Flo</a> for making this contribution.)
