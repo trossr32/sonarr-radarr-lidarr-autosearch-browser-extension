@@ -25,7 +25,7 @@
                 }
             ],
             search: {
-                containerSelector: '[class^="TitleHeader__TitleText"]',
+                containerSelector: 'h1',
                 selectorType: 'text',
                 modifiers: []
             },
@@ -35,7 +35,7 @@
                 attribute: 'content',
             },
             icon: {
-                containerSelector: '[class^="TitleHeader__TitleText"]',
+                containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
             }
@@ -71,7 +71,7 @@
                 attribute: 'content',
             },
             icon: {
-                containerSelector: '[class^="TitleHeader__TitleText"]',
+                containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
             }
