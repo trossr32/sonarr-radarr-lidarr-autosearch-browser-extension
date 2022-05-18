@@ -695,7 +695,7 @@
             id: 'senscritique',
             defaultSite: 'sonarr',
             search: {
-                containerSelector: '.pvi-product-title',
+                containerSelector: 'h1',
                 selectorType: 'title',
                 modifiers: []
             },
@@ -703,7 +703,7 @@
                 term: 'senscritique.com/serie'
             },
             icon: {
-                containerSelector: '.pvi-product-title',
+                containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 30px; margin: 7px 0 0 0;'
             }
@@ -713,7 +713,7 @@
             id: 'senscritique',
             defaultSite: 'radarr',
             search: {
-                containerSelector: '.pvi-product-title',
+                containerSelector: 'h1',
                 selectorType: 'title',
                 modifiers: []
             },
@@ -721,7 +721,7 @@
                 term: 'senscritique.com/film'
             },
             icon: {
-                containerSelector: '.pvi-product-title',
+                containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 30px; margin: 7px 0 0 0;'
             }
