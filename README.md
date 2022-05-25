@@ -105,9 +105,9 @@ To contribute, please create your PR to merge into the staging branch.
 ## Thanks
 Thanks to the following for helping with this project:
 
-<a href='https://github.com/banterboy' target='_blank'>banterboy</a><br />
-<a href='https://github.com/aommm' target='_blank'>aommm</a><br />
-<a href='https://github.com/ledge74' target='_blank'>Flo</a>
+<a href='https://github.com/banterboy' target='_blank'>banterboy</a> <br />
+<a href='https://github.com/aommm' target='_blank'>aommm</a> <br />
+<a href='https://github.com/ledge74' target='_blank'>Flo</a> <br />
 <a href='https://github.com/almottier' target='_blank'>almottier</a>
 
 <a href='https://ko-fi.com/K3K22CEIT' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi4.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
