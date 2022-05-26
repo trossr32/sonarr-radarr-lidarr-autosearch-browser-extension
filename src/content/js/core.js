@@ -19,10 +19,12 @@
  * @typedef {Object} Setting
  * @property {SiteSetting[]} sites - all site settings
  * @property {Integration[]} integrations - all integrations
+ * @property {InjectedIconConfig} injectedIconConfig - injected icon type and position configuration
  * @property {bool} enabled - is enabled
  * @property {bool} debug - log to console
  * @property {int} searchInputWaitForMs - jQuery selector for the search input on the search page
  * @property {int} searchInputMaxAttempts - text that is shown for this site's entry in the context menu
+ * @property {bool} customIconPosition - The type of injected icon. 'false' injects in the element defined in the config. 'true' injects a custom icon.
  */
 
 /**
@@ -84,6 +86,18 @@
  * @property {string} versionMatch - regex pattern to match against the site version
  * @property {string} searchPath - URL path to the site search / add new page
  * @property {string} searchInputSelector - jQuery selector for the search input on the search page
+ */
+
+/**
+ * Version configuration for a site version
+ * @typedef {Object} InjectedIconConfig
+ * @property {string} type - 'anchored' for lef tor right side anchoring, 'floating' for floating.
+ * @property {string} side - 'left' or 'right'. for anchored this sets which side is anchored to, for floating this combined with the sideOffset sets the absolute horizontal position.
+ * @property {string} sideOffset - for floating only. this combined with the side sets the absolute horizontal position.
+ * @property {string} position - 'top' or 'bottom'. for anchored and floating this combined with the positionOffset sets the absolute vertical position.
+ * @property {string} positionOffset - this combined with the position sets the absolute vertical position.
+ * @property {string} backgroundColor - The background colour of the icon container.
+ * @property {string} fontColor - The font colour of the icon container.
  */
 
 /**
@@ -218,12 +232,22 @@ let sessionId,
             //     image: 'nextepisode.png',
             //     enabled: true
             // }
-        ], 
+        ],
+        injectedIconConfig: {
+            type: 'anchored', // anchored, floating
+            side: 'left', // left, right
+            sideOffset: '5%',
+            position: 'bottom', // top, bottom
+            positionOffset: '5%',
+            backgroundColor: '#222',
+            fontColor: '#fff',
+        }, 
         config: {
             enabled: true,
             debug: false,        
             searchInputWaitForMs: 300,
-            searchInputMaxAttempts: 20
+            searchInputMaxAttempts: 20,
+            customIconPosition: false
         }
     },
     /* may need to expand this out differently for use with v3, as adding a v3 to the URL for a v3 of radarr or sonarr gives some more or different info. 
@@ -355,7 +379,7 @@ async function log(content, logLevel = 'info') {
     }
 
     switch (logLevel) {
-        case 'info':
+        case 'info':    
             console.log(content);
             return;
           
@@ -408,6 +432,10 @@ async function getSettings() {
         data.sonarrRadarrLidarrAutosearchSettings.config = defaultSettings.config;
     }
 
+    if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('injectedIconConfig')) {
+        data.sonarrRadarrLidarrAutosearchSettings.injectedIconConfig = defaultSettings.injectedIconConfig;
+    }
+
     // check integrations array
     for (let i = 0; i < defaultSettings.integrations.length; i++) {
         /* jshint ignore:start */
@@ -434,6 +462,11 @@ async function getSettings() {
         }
     }
 
+    // check config customIconPosition property
+    if (!data.sonarrRadarrLidarrAutosearchSettings.config.hasOwnProperty('customIconPosition')) {
+        data.sonarrRadarrLidarrAutosearchSettings.config.customIconPosition = defaultSettings.config.customIconPosition;
+    }
+
     return data.sonarrRadarrLidarrAutosearchSettings;
 }
 
@@ -458,6 +491,14 @@ async function setSettings(data) {
 
     if (!data.hasOwnProperty('config')) {
         data.config = defaultSettings.config;
+    }
+
+    if (!data.config.hasOwnProperty('customIconPosition')) {
+        data.config.customIconPosition = defaultSettings.config.customIconPosition;
+    }
+
+    if (!data.hasOwnProperty('injectedIconConfig')) {
+        data.injectedIconConfig = defaultSettings.injectedIconConfig;
     }
 
     let obj = {

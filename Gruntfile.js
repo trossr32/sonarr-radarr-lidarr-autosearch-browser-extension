@@ -55,6 +55,7 @@ module.exports = function (grunt) {
                     { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/css/bootstrap4-toggle.min.css', dest: 'dist/content/css', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/css/bootstrap4-toggle.min.css.map', dest: 'dist/content/css', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/bootstrap-slider/dist/css/bootstrap-slider.min.css', dest: 'dist/content/css', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/@melloware/coloris/dist/coloris.min.css', dest: 'dist/content/css', filter: 'isFile' },
                     //{ expand: true, flatten: false, cwd: "src", src: '**/*.css', dest: 'dist', filter: 'isFile' },
 
                     // content
@@ -110,7 +111,7 @@ module.exports = function (grunt) {
     });
 
     // debug group task
-    grunt.registerTask('debug', ['jshint', 'clean:debug', 'copy']);
+    grunt.registerTask('debug', ['jshint', 'clean:debug', 'sass', 'copy']);
     
     // release group task
     grunt.registerTask('release', ['jshint', 'clean:release', 'sass', 'copy:release', 'shell:ps']);
