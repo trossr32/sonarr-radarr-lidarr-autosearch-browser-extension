@@ -450,15 +450,15 @@
             id: 'rottentomatoes',
             defaultSite: 'sonarr',
             search: {
-                containerSelector: '#tvPosterLink',
-                selectorType: 'text',
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
                 modifiers: []
             },
             match: {
                 term: 'rottentomatoes.com/tv'
             },
             icon: {
-                containerSelector: 'h1.movie_title',
+                containerSelector: 'h1.title',
                 locator: 'prepend',
                 imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
             }
@@ -878,7 +878,7 @@ return `<style id="servarr-ext_custom-icon-style">
   background-color: ${injectedIconConfig.backgroundColor};
   text-decoration: none;
   height: 52px;
-  z-index: 99999;
+  z-index: 9999999;
   ${injectedIconConfig.position}: ${injectedIconConfig.positionOffset};
 }
 

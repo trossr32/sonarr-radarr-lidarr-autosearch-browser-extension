@@ -139,17 +139,23 @@
                     <h4 style="float: left; margin: 1px 0 0 0;">Custom icon settings</h4>
                 </div>
                 <div class="card-body">
-                    <p class="card-text">These settings affect how this extension will identify the search page on Sonarr, Radarr or Lidarr and how the search field on that page will be identified.</p>
                     <p class="card-text">
-                        If an API key is entered on the settings page and the 'Auto populate from API' version is enabled then these values will be automatically populated based on the Sonarr, Radarr or Lidarr version you are running. 
-                        This is the recommended way to configure the extension. Auto population will only work if the API call works, otherwise default values will be used.
+                        All integrations have a configured location where a servarr icon will be injected if a search term is found on the browsed page. 
+                        These settings will override these locations and instead show an icon anchored to the side of the browser window or floating at a specified position.
+                    </p>
+                    <p class="card-text">
+                        Once enabled, an example icon should appear on this page which will change in real time based on the toggles and fields below.
+                    </p>
+                    <p class="card-text">
+                        If custom icons are enabled, they will only be shown if a single instance of the usual image container is found. 
+                        In situations where multiple elements are found on the page, the integration's configured icon containers will be used as a fallback.
+                        Sometimes this will be obvious with multiple icons being injected on a page, but in other cases a fallback may be caused by a selector being found multiple times even though an icon is only injected once.
                     </p>
 
-                    <h6 class="card-subtitle mb-2 mt-4">Search path URL</h6>
-                    <p class="card-text">This should be the path (less protocol, domain and port) of the search page.</p>
-                    
-                    <h6 class="card-subtitle mb-2 mt-4">Search field selector</h6>
-                    <p class="card-text">This is a <a href="https://api.jquery.com/category/selectors/" target="_blank">jQuery selector</a> that is used to find the search input field on the search page.</p>
+                    <h6 class="card-subtitle mb-2 mt-4">Enhancements</h6>
+                    <p class="card-text">
+                        If you like this functionality and have any suggestions for improvements on the implementation (enable/disable per integration, perhaps?), then please <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues" target="_blank">raise an issue on Github</a> for discussion.
+                    </p>
                 </div>
             </div>
 

@@ -42,7 +42,7 @@ return `<style id="servarr-ext_custom-icon-style">
     background-color: ${injectedIconConfig.backgroundColor};
     text-decoration: none;
     height: 52px;
-    z-index: 99999;
+    z-index: 9999999;
     ${injectedIconConfig.position}: ${injectedIconConfig.positionOffset};
 }
 
