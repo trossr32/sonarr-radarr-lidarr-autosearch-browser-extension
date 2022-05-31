@@ -143,3 +143,16 @@ $slider-color-secondary: rgb(37, 151, 130);
     border: 0px solid transparent;
     margin: 7px 0px 0px -2px !important;*/
 }
+
+div.toggle.disabled > div.toggle-group > span, 
+div.toggle.disabled > div.toggle-group > label { 
+    cursor: not-allowed !important; 
+}
+
+.form-control:disabled, .form-control[readonly] {
+    opacity: 0.3 !important;
+}
+
+.clr-picker {
+    background-color: #222 !important;
+}
