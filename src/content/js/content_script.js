@@ -18,7 +18,7 @@
                 {
                     siteId: 'sonarr',
                     match: {
-                        pattern: /tv\s(|mini(\s|-))series/i,
+                        pattern: /tv_show/i,
                         operator: 'eq'
                     }
                 }
@@ -30,7 +30,7 @@
             },
             match: {
                 term: 'imdb.com',
-                containerSelector: 'meta[property="og:title"]',
+                containerSelector: 'meta[property="og:type"]',
                 attribute: 'content',
             },
             icon: {
@@ -46,8 +46,8 @@
                 {
                     siteId: 'radarr',
                     match: {
-                        pattern: /tv\s(|mini(\s|-))series/i,
-                        operator: 'ne'
+                        pattern: /movie/i,
+                        operator: 'eq'
                     }
                 }
             ],
@@ -66,7 +66,7 @@
             },
             match: {
                 term: 'imdb.com',
-                containerSelector: 'meta[property="og:title"]',
+                containerSelector: 'meta[property="og:type"]',
                 attribute: 'content',
             },
             icon: {
@@ -1115,6 +1115,8 @@ async function init() {
                                 log(['search url: ', searchUrl]);
 
                                 // Either add an icon to it's configured container or add a custom icon to the page
+                                log(['settings.config.customIconPosition', settings.config.customIconPosition, '$(integration.icon.containerSelector)', $(integration.icon.containerSelector)]);
+
                                 if (!settings.config.customIconPosition || $(integration.icon.containerSelector).length > 1) {
                                     // add an icon to the configured container
                                     let icon = base64Icons.find(i => i.id == site.id),
