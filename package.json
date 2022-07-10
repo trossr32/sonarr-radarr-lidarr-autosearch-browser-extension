@@ -19,7 +19,8 @@
         "jquery": "~3.5.1",
         "load-grunt-tasks": "^5.1.0",
         "sass": "^1.32.5",
-        "webextension-polyfill": "~0.7.0"
+        "webextension-polyfill": "~0.7.0",
+        "@melloware/coloris": "^0.12.2"
     },
     "dependencies": {
         "bootstrap-slider": "^11.0.2",

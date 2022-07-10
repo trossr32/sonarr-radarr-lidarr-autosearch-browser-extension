@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="content/css/bootstrap.min.css">
     <link rel="stylesheet" href="content/css/bootstrap4-toggle.min.css">
     <link rel="stylesheet" href="content/css/bootstrap-slider.min.css">
+    <link rel="stylesheet" href="content/css/coloris.min.css" />
     <link rel="stylesheet" href="content/css/options.css" />
     <script src="content/js/jquery.min.js"></script>
     <script src="content/js/browser-polyfill.min.js"></script>
@@ -13,6 +14,7 @@
     <script src="content/js/bootstrap4-toggle.min.js"></script>
     <script src="content/js/bootstrap-slider.min.js"></script>
     <script src="content/js/all.min.js"></script>
+    <script src="content/js/coloris.min.js"></script>
     <script src="content/js/core.js"></script>
     <script src="content/js/options.js"></script>
 </head>
@@ -41,6 +43,11 @@
         <li class="nav-item">
             <a class="nav-link" id="integrations-tab" data-bs-toggle="tab" href="#integrations" role="tab" aria-controls="integrations" aria-selected="false">
                 <i class="fas fa-link"></i>&nbsp;&nbsp;&nbsp;Integrations
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="custom-icon-tab" data-bs-toggle="tab" href="#custom-icon" role="tab" aria-controls="custom-icon" aria-selected="false">
+                <i class="fas fa-arrows-alt"></i>&nbsp;&nbsp;&nbsp;Custom icons
             </a>
         </li>
         <li class="nav-item">
@@ -122,6 +129,37 @@
                     </table>
                 </div>
             </div>
+        </div>
+        <div class="tab-pane fade" id="custom-icon" role="tabpanel" aria-labelledby="custom-icon-tab">
+            <div class="card text-white bg-dark mb-3">
+                <div class="card-header">
+                    <div style="float: left; margin: 0 20px 0 0;">
+                        <i class="fas fa-question-circle fa-2x" style=" width: 30px;"></i>
+                    </div>
+                    <h4 style="float: left; margin: 1px 0 0 0;">Custom icon settings</h4>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        All integrations have a configured location where a servarr icon will be injected if a search term is found on the browsed page. 
+                        These settings will override these locations and instead show an icon anchored to the side of the browser window or floating at a specified position.
+                    </p>
+                    <p class="card-text">
+                        Once enabled, an example icon should appear on this page which will change in real time based on the toggles and fields below.
+                    </p>
+                    <p class="card-text">
+                        If custom icons are enabled, they will only be shown if a single instance of the usual image container is found. 
+                        In situations where multiple elements are found on the page, the integration's configured icon containers will be used as a fallback.
+                        Sometimes this will be obvious with multiple icons being injected on a page, but in other cases a fallback may be caused by a selector being found multiple times even though an icon is only injected once.
+                    </p>
+
+                    <h6 class="card-subtitle mb-2 mt-4">Enhancements</h6>
+                    <p class="card-text">
+                        If you like this functionality and have any suggestions for improvements on the implementation (enable/disable per integration, perhaps?), then please <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues" target="_blank">raise an issue on Github</a> for discussion.
+                    </p>
+                </div>
+            </div>
+
+            <form id="customIconOptionsForm"></form>
         </div>
         <div class="tab-pane fade" id="debug" role="tabpanel" aria-labelledby="debug-tab">
             <form id="debugOptionsForm"></form>
