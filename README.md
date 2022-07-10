@@ -21,6 +21,7 @@ The extension can be disabled from the extension's popup and each context menu i
 **New features & bug fix (V2.5)**
 - New feature to allow absolute positioning of the servarr icon either anchored to the side of the page or floating at a user defined position. Only works when one instance of the icon should be injected to the page, otherwise falls back to default positioning. Unsure if this is a feature anyone will actually want to use, but if you find it useful or have any suggestions for improvement please let me know.
 - Bug fix: IMDb was not correctly identifying TV shows and was falling back to everything being identified as a movie when viewing the German version of the site.
+- Remove 'tabs' permission for the extension as not required. Google took down the package because of this permission being included and not required, so this release should see the extension available on the Chrome Web Store soon.
 
 **Enhancement (V2.4.2)**
 - SensCritique implementation update (Thanks to <a href='https://github.com/almottier' target='_blank'>almottier</a> for making this contribution.)
