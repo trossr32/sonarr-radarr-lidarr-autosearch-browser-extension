@@ -225,6 +225,12 @@ let sessionId,
                 name: 'SensCritique',
                 image: 'senscritique.png',
                 enabled: true
+            },
+            {
+                id: 'myanimelist',
+                name: 'MyAnimeList',
+                image: 'myanimelist.png',
+                enabled: true
             }
             // {
             //     id: 'nextepisode',
