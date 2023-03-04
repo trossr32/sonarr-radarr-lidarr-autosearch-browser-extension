@@ -724,6 +724,58 @@
                 locator: 'prepend',
                 imgStyles: 'width: 30px; margin: 7px 0 0 0;'
             }
+        },
+	// myanimelist sonarr
+        {
+            id: 'myanimelist',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            where: [
+                {
+                    selector: 'meta[property="og:type"]',
+                    attribute: 'content',
+                    operator: 'eq',
+                    value: 'video.tv_show'
+                }
+            ],
+            match: {
+                term: 'myanimelist.net/anime'
+            },
+            icon: {
+                containerSelector: 'h1',
+                locator: 'prepend',
+                imgStyles: 'width: 16px; margin-right: 5px;'
+            }
+        },
+        // myanimelist radarr
+        {
+            id: 'myanimelist',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            where: [
+                {
+                    selector: 'meta[property="og:type"]',
+                    attribute: 'content',
+                    operator: 'eq',
+                    value: 'video.movie'
+                }
+            ],
+            match: {
+                term: 'myanimelist.net/anime'
+            },
+            icon: {
+                containerSelector: 'h1',
+                locator: 'prepend',
+                imgStyles: 'width: 16px; margin-right: 5px;'
+            }
         }
         // {
         //     id: 'nextepisode',
