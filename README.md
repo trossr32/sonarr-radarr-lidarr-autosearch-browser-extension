@@ -19,7 +19,7 @@ The extension can be disabled from the extension's popup and each context menu i
 ## Change log (just the most recent; see [releases](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/releases) for full history)
 
 **New features (V2.7)**
-- Readarr integration. Added as 2 separate configurations for ebooks and audiobooks. Works similarly to Lidarr, i.e. there are no site integrations so this only really exposes new entries in the context menu.
+- Readarr integration. Added as 2 separate configurations for ebooks and audiobooks. Works similarly to Lidarr, i.e. there are no site integrations so this only exposes new entries in the context menu.
 
 **Bug fix (V2.6.1)**
 - Bug fix: Lidarr test failing (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/111">#111</a>)
