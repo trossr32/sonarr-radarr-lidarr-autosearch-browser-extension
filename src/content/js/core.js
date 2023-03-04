@@ -350,7 +350,7 @@ let sessionId,
             id: 'lidarr',
             configs: [
                 {
-                    versionMatch: /^0/,
+                    versionMatch: /^[0|1]/,
                     searchPath: '/add/search/',
                     searchInputSelector: 'input[name="searchBox"]'
                 }
@@ -381,7 +381,11 @@ async function log(content, logLevel = 'info') {
     } 
     // otherwise it's an array
     else {
-        content.unshift(identifier);
+        try {
+            content.unshift(identifier);            
+        } catch (e) {
+            content = new Array(identifier, content);
+        }
     }
 
     switch (logLevel) {
@@ -541,6 +545,11 @@ let getApiUrl = (site, endpoint, useV3 = true) => {
             .find(e => e.key == endpoint);
 
     let url = new URL(`${site.domain.replace(/(.+)\/$/, '$1')}/api/${(useV3 ? 'v3/' : '')}${_endpoint.value}`);
+
+    // lidarr uses a different URL structure, so overwrite
+    if (site.id === 'lidarr') {
+        url = new URL(`${site.domain.replace(/(.+)\/$/, '$1')}/api/${_endpoint.value}`);
+    }
 
     url.searchParams.append('apikey', site.apiKey);
 
