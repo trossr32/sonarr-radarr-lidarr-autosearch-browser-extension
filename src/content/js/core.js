@@ -108,7 +108,7 @@ let sessionId,
         sites: [
             {
                 id: 'sonarr',
-                domain: 'http://my.sonarrurl.domain',
+                domain: 'http://my.sonarr-url.domain:8989',
                 enabled: true,
                 searchPath: '/add/new/',
                 searchInputSelector: 'input[name="seriesLookup"]',
@@ -117,7 +117,7 @@ let sessionId,
                 autoPopAdvancedFromApi: true
             }, {
                 id: 'radarr',
-                domain: 'http://my.radarrurl.domain',
+                domain: 'http://my.radarr-url.domain:7878',
                 enabled: true,
                 searchPath: '/add/new/',
                 searchInputSelector: 'input[name="movieLookup"]',
@@ -126,11 +126,29 @@ let sessionId,
                 autoPopAdvancedFromApi: true
             }, {
                 id: 'lidarr',
-                domain: 'http://my.lidarrurl.domain',
+                domain: 'http://my.lidarr-url.domain:8686',
                 enabled: false,
                 searchPath: '/add/search/',
                 searchInputSelector: 'input[name="searchBox"]',
                 menuText: 'Search Lidarr',
+                apiKey: '',
+                autoPopAdvancedFromApi: true
+            }, {
+                id: 'readarr_ebook',
+                domain: 'http://my.readarr-ebook-url.domain:8787',
+                enabled: false,
+                searchPath: '/add/search/',
+                searchInputSelector: 'input[name="searchBox"]',
+                menuText: 'Search Readarr (ebook)',
+                apiKey: '',
+                autoPopAdvancedFromApi: true
+            }, {
+                id: 'readarr_audiobook',
+                domain: 'http://my.readarr-audiobook-url.domain:8788',
+                enabled: false,
+                searchPath: '/add/search/',
+                searchInputSelector: 'input[name="searchBox"]',
+                menuText: 'Search Readarr (audiobook)',
                 apiKey: '',
                 autoPopAdvancedFromApi: true
             }
@@ -313,6 +331,40 @@ let sessionId,
                     value: 'v1/qualityprofile'
                 }
             ]
+        },
+        {
+            id: 'readarr_ebook',
+            endpoints: [
+                {
+                    key: 'Version',
+                    value: 'v1/system/status'
+                },
+                {
+                    key: 'Status',
+                    value: 'v1/system/status'
+                },
+                {
+                    key: 'QualityProfiles',
+                    value: 'v1/qualityprofile'
+                }
+            ]
+        },
+        {
+            id: 'readarr_audiobook',
+            endpoints: [
+                {
+                    key: 'Version',
+                    value: 'v1/system/status'
+                },
+                {
+                    key: 'Status',
+                    value: 'v1/system/status'
+                },
+                {
+                    key: 'QualityProfiles',
+                    value: 'v1/qualityprofile'
+                }
+            ]
         }
     ],
     versionConfig = [
@@ -348,6 +400,26 @@ let sessionId,
         },
         {
             id: 'lidarr',
+            configs: [
+                {
+                    versionMatch: /^[0|1]/,
+                    searchPath: '/add/search/',
+                    searchInputSelector: 'input[name="searchBox"]'
+                }
+            ]
+        },
+        {
+            id: 'readarr_ebook',
+            configs: [
+                {
+                    versionMatch: /^[0|1]/,
+                    searchPath: '/add/search/',
+                    searchInputSelector: 'input[name="searchBox"]'
+                }
+            ]
+        },
+        {
+            id: 'readarr_audiobook',
             configs: [
                 {
                     versionMatch: /^[0|1]/,
@@ -462,6 +534,20 @@ async function getSettings() {
     }
 
     // check sites array
+    for (let i = 0; i < defaultSettings.sites.length; i++) {
+        /* jshint ignore:start */
+        
+        // try to find the site
+        if (data.sonarrRadarrLidarrAutosearchSettings.sites.some(integration => integration.id === defaultSettings.sites[i].id)) {
+            continue;
+        }
+
+        /* jshint ignore:end */
+
+        // site not found
+        data.sonarrRadarrLidarrAutosearchSettings.sites.push(defaultSettings.sites[i]);
+    }
+
     for (let i = 0; i < data.sonarrRadarrLidarrAutosearchSettings.sites.length; i++) {
         if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('apiKey')) {
             data.sonarrRadarrLidarrAutosearchSettings.sites[i].apiKey = '';
@@ -546,8 +632,8 @@ let getApiUrl = (site, endpoint, useV3 = true) => {
 
     let url = new URL(`${site.domain.replace(/(.+)\/$/, '$1')}/api/${(useV3 ? 'v3/' : '')}${_endpoint.value}`);
 
-    // lidarr uses a different URL structure, so overwrite
-    if (site.id === 'lidarr') {
+    // lidarr & readarr uses a different URL structure, so overwrite
+    if (site.id === 'lidarr' || site.id === 'readarr_ebook' || site.id === 'readarr_audiobook') {
         url = new URL(`${site.domain.replace(/(.+)\/$/, '$1')}/api/${_endpoint.value}`);
     }
 
