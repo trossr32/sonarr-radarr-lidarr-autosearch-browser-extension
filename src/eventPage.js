@@ -67,7 +67,7 @@ async function buildMenus(settings) {
     }
 
     // create parent menu
-    browser.contextMenus.create({ "title": "Search Sonarr/Radarr/Lidarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
+    browser.contextMenus.create({ "title": "Search Servarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
 
     // create child menus from enabled sites array
     for (let i = 0; i < enabledSites.length; i++) {
