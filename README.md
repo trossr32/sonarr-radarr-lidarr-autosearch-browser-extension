@@ -16,6 +16,22 @@ This is an extension for Chromium browsers and Firefox that:
 
 The extension can be disabled from the extension's popup and each context menu item can be disabled from the settings page.
 
+## Support
+
+Help everyone by adding new features or fixing a bug. See [Contributing](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/README.md#contribute) below.
+
+:star: :star: Give the repo a star :star: :star:
+
+Leave a review:
+
+[Chrome web store](https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc?hl=en-GB) <br />
+[Firefox add-ons](https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/) <br />
+[Edge add-ons](https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal)
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/K3K22CEIT)
+
+All support is very gratefully received, thank you :raised_hands: :sunglasses: :+1:
+
 ## Change log (just the most recent; see [releases](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/releases) for full history)
 
 **New features (V2.7)**
