@@ -127,7 +127,7 @@
                 modifiers: [
                     {
                         type: 'regex-match',
-                        pattern: /\/(?<search>\d{4,10})-/i
+                        pattern: /\/(?<search>\d{2,10})-/i
                     }, {
                         type: 'prepend',
                         var: 'tmdb:'
@@ -226,7 +226,7 @@
                 modifiers: [
                     {
                         type: 'regex-match',
-                        pattern: /\/(?<search>\d{4,10})/i
+                        pattern: /\/(?<search>\d{2,10})/i
                     }, {
                         type: 'prepend',
                         var: 'tvdb:'
@@ -292,7 +292,7 @@
                 modifiers: [
                     {
                         type: 'regex-match',
-                        pattern: /\/(?<search>\d{4,10})/i
+                        pattern: /\/(?<search>\d{2,10})/i
                     }, {
                         type: 'prepend',
                         var: 'tmdb:'
@@ -792,7 +792,7 @@
         //         modifiers: [
         //             {
         //                 type: 'regex-match',
-        //                 pattern: /\/(?<search>\d{4,10})/i
+        //                 pattern: /\/(?<search>\d{2,10})/i
         //             }, {
         //                 type: 'prepend',
         //                 var: 'tmdb:'
