@@ -24,7 +24,7 @@
                 {
                     siteId: 'sonarr',
                     match: {
-                        pattern: /tv_show/i,
+                        pattern: /(tv_show|other)/i,
                         operator: 'eq'
                     }
                 }
@@ -52,7 +52,7 @@
                 {
                     siteId: 'radarr',
                     match: {
-                        pattern: /movie/i,
+                        pattern: /(movie|other)/i,
                         operator: 'eq'
                     }
                 }
@@ -127,7 +127,7 @@
                 modifiers: [
                     {
                         type: 'regex-match',
-                        pattern: /\/(?<search>\d{4,10})-/i
+                        pattern: /\/(?<search>\d{2,10})-/i
                     }, {
                         type: 'prepend',
                         var: 'tmdb:'
@@ -226,7 +226,7 @@
                 modifiers: [
                     {
                         type: 'regex-match',
-                        pattern: /\/(?<search>\d{4,10})/i
+                        pattern: /\/(?<search>\d{2,10})/i
                     }, {
                         type: 'prepend',
                         var: 'tvdb:'
@@ -292,7 +292,7 @@
                 modifiers: [
                     {
                         type: 'regex-match',
-                        pattern: /\/(?<search>\d{4,10})/i
+                        pattern: /\/(?<search>\d{2,10})/i
                     }, {
                         type: 'prepend',
                         var: 'tmdb:'
@@ -731,7 +731,7 @@
                 imgStyles: 'width: 30px; margin: 7px 0 0 0;'
             }
         },
-	// myanimelist sonarr
+	    // myanimelist sonarr
         {
             id: 'myanimelist',
             defaultSite: 'sonarr',
@@ -792,7 +792,7 @@
         //         modifiers: [
         //             {
         //                 type: 'regex-match',
-        //                 pattern: /\/(?<search>\d{4,10})/i
+        //                 pattern: /\/(?<search>\d{2,10})/i
         //             }, {
         //                 type: 'prepend',
         //                 var: 'tmdb:'
@@ -938,21 +938,20 @@ var title = (s, removeUnderscore) => {
 };
 
 /**
- * Get HTML markup for a custom icon to inject into the body.
+ * Add a custom icon and inject into the body.
  * @param {InjectedIconConfig} injectedIconConfig - injected icon config
  * @param {string} iconDataUri - icon data uri
  * @param {string} siteId - id of the servarr site; sonarr, radarr, lidarr, etc.
  * @returns {string} - HTML to inject
  */
- function getCustomIconMarkup(injectedIconConfig, siteId, linkHref) {
-return `<style id="servarr-ext_custom-icon-style">
+ function addCustomIconMarkup(injectedIconConfig, siteId, linkHref) {
+    let styles = `<style id="servarr-ext_custom-icon-style">
 .servarr-ext_icon a {
   position: absolute;
   background-color: ${injectedIconConfig.backgroundColor};
   text-decoration: none;
   height: 52px;
   z-index: 9999999;
-  ${injectedIconConfig.position}: ${injectedIconConfig.positionOffset};
 }
 
 .servarr-ext_anchored-icon a {
@@ -962,7 +961,6 @@ return `<style id="servarr-ext_custom-icon-style">
 
 .servarr-ext_floating-icon a {
   width: 52px;
-  ${injectedIconConfig.side}: ${injectedIconConfig.sideOffset};
   border-radius: 50px;
 }
 
@@ -987,33 +985,69 @@ return `<style id="servarr-ext_custom-icon-style">
 .servarr-ext_icon-image {
   width: 40px;
   height: 40px;
-  background: url('${base64Icons_40px.find(i => i.id == siteId).base64}') no-repeat;
 }
 
 .servarr-ext_anchored-icon .servarr-ext_icon-image {
   top: 6px;
 }
 
-.servarr-ext_floating-icon .servarr-ext_icon-image {
-  margin: ${(siteId == 'radarr' ? '6px 0px 0px 8px' : '6px 0px 0px 6px')};
-}
-
 .servarr-ext_anchored-left-icon .servarr-ext_icon-image {
   float: right;
-  margin: ${(siteId == 'radarr' ? '6px -10px 0 0' : '6px -10px 0 0')};
 }
 
 .servarr-ext_anchored-right-icon .servarr-ext_icon-image {
   float: left;
-  margin: ${(siteId == 'radarr' ? '6px 0px 0px -5px' : '6px 0px 0px -9px')};
 }
-</style>
-<div id="servarr-ext_custom-icon-wrapper" class="servarr-ext_icon servarr-ext_${injectedIconConfig.type}-icon ${(injectedIconConfig.type == 'anchored' ? ('servarr-ext_anchored-' + injectedIconConfig.side + '-icon') : '')}">
-    <a href="${linkHref}" target="_blank" data-servarr-icon="true">
-        <div class="servarr-ext_icon-image"></div>
-        <!-- ${(injectedIconConfig.type == 'anchored' ? ('<div class="servarr-ext_anchor-label">Search<br />' + title(siteId, true) + '</div>') : '')} -->
-    </a>
+</style>`;
+
+    let siteStyles = `.servarr-ext_icon-image-${siteId} {
+    background: url('${base64Icons_40px.find(i => i.id == siteId).base64}') no-repeat;
+}
+
+.servarr-ext_floating-icon .servarr-ext_icon-image-${siteId} {
+    margin: ${(siteId == 'radarr' ? '6px 0px 0px 8px' : '6px 0px 0px 6px')};
+}
+
+.servarr-ext_anchored-left-icon .servarr-ext_icon-image-${siteId} {
+    margin: ${(siteId == 'radarr' ? '6px -10px 0 0' : '6px -10px 0 0')};
+}
+
+.servarr-ext_anchored-right-icon .servarr-ext_icon-image-${siteId} {
+    margin: ${(siteId == 'radarr' ? '6px 0px 0px -5px' : '6px 0px 0px -9px')};
+}`;
+
+    // anchor tag
+    let anchor = `<a href="${linkHref}" target="_blank" data-servarr-icon="true" class="servarr-ext_anchor-${siteId} servarr-ext_${injectedIconConfig.type}-anchor-${siteId}">
+    <div class="servarr-ext_icon-image servarr-ext_icon-image-${siteId}"></div>
+    <!-- ${(injectedIconConfig.type == 'anchored' ? ('<div class="servarr-ext_anchor-label">Search<br />' + title(siteId, true) + '</div>') : '')} -->
+</a>`;
+
+    // check if the wrapper already exists
+    if ($('#servarr-ext_custom-icon-wrapper').length) {
+        log(['found servarr-ext_custom-icon-wrapper']);
+
+        let positionOffset = injectedIconConfig.type == 'anchored' ? `calc(${injectedIconConfig.positionOffset} ${(injectedIconConfig.position === 'top' ? '+' : '-')} 57px)` : injectedIconConfig.positionOffset;
+        let sideOffset = injectedIconConfig.type == 'anchored' ? injectedIconConfig.sideOffset : `calc(${injectedIconConfig.sideOffset} ${(injectedIconConfig.position === 'left' ? '+' : '-')} 57px)`;
+
+        siteStyles += `.servarr-ext_anchor-${siteId} { ${injectedIconConfig.position}: ${positionOffset}; }
+.servarr-ext_floating-anchor-${siteId} { ${injectedIconConfig.side}: ${sideOffset}; }`;
+
+        $('body').prepend(`<style id="servarr-ext_custom-icon-style-${siteId}">${siteStyles}</style>`);
+
+        $('#servarr-ext_custom-icon-wrapper').append(anchor);
+
+        return;
+    }
+
+    // anchor doesn't exist, create the wrapper
+    let wrapper = `<div id="servarr-ext_custom-icon-wrapper" class="servarr-ext_icon servarr-ext_${injectedIconConfig.type}-icon ${(injectedIconConfig.type == 'anchored' ? ('servarr-ext_anchored-' + injectedIconConfig.side + '-icon') : '')}">
+    ${anchor}
 </div>`;
+
+    siteStyles += `.servarr-ext_anchor-${siteId} { ${injectedIconConfig.position}: ${injectedIconConfig.positionOffset}; }
+.servarr-ext_floating-anchor-${siteId} { ${injectedIconConfig.side}: ${injectedIconConfig.sideOffset}; }`;
+
+    $('body').prepend(`${styles}<style id="servarr-ext_custom-icon-style-${siteId}">${siteStyles}</style>${wrapper}`);
 }
 
 async function init() {
@@ -1203,9 +1237,7 @@ async function init() {
                                     }
                                 } else {
                                     // show a custom icon based on the icon config
-                                    let el = getCustomIconMarkup(settings.injectedIconConfig, site.id, searchUrl);
-
-                                    $('body').prepend(el);
+                                    addCustomIconMarkup(settings.injectedIconConfig, site.id, searchUrl);
                                 }
 
                                 containerEl.attr('data-servarr-ext-completed', true);
