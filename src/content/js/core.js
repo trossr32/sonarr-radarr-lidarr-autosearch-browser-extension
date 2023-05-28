@@ -245,6 +245,12 @@ let sessionId,
                 enabled: true
             },
             {
+                id: 'primevideo',
+                name: 'Prime Video',
+                image: 'primevideo.png',
+                enabled: true
+            },
+            {
                 id: 'myanimelist',
                 name: 'MyAnimeList',
                 image: 'myanimelist.png',
