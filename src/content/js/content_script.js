@@ -783,6 +783,72 @@
                 imgStyles: 'width: 25px;margin: 0;vertical-align: baseline;'
             }
         },
+	    // primevideo sonarr
+        {
+            id: 'primevideo',
+            deferMs: 2000,
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'head > title',
+                selectorType: 'text',
+                modifiers: [
+                    {
+                        type: 'replace',
+                        from: /^Prime video: /i,
+                        to: ''
+                    }
+                ]
+            },
+            where: [
+                {
+                    selector: 'input[name=titleType]',
+                    attribute: 'value',
+                    operator: 'eq',
+                    value: 'season'
+                }
+            ],
+            match: {
+                term: 'www.primevideo.com/detail'
+            },
+            icon: {
+                containerSelector: 'h1',
+                locator: 'append',
+                imgStyles: 'width: 30px;margin: 8px 0 0 8px;'
+            }
+        },
+        // primevideo radarr
+        {
+            id: 'primevideo',
+            deferMs: 2000,
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'head > title',
+                selectorType: 'text',
+                modifiers: [
+                    {
+                        type: 'replace',
+                        from: /^Prime video: /i,
+                        to: ''
+                    }
+                ]
+            },
+            where: [
+                {
+                    selector: 'input[name=titleType]',
+                    attribute: 'value',
+                    operator: 'eq',
+                    value: 'movie'
+                }
+            ],
+            match: {
+                term: 'www.primevideo.com/detail'
+            },
+            icon: {
+                containerSelector: 'h1',
+                locator: 'append',
+                imgStyles: 'width: 30px;margin: 8px 0 0 8px;'
+            }
+        },
 	    // myanimelist sonarr
         {
             id: 'myanimelist',
@@ -1113,7 +1179,9 @@ async function init() {
 
     $.each(settings.sites,
         function (i, site) {
-            if (window.location.href.includes(site.domain)) {
+            // remove user and password from domain for urls looking like https://user:password@domain/path
+            let domain = site.domain.replace(/^(https?:\/\/)(.+):(.+)@/, '$1');
+            if (window.location.href.includes(domain)) {
                 log(['servarr site match found: ', site]);
 
                 if (window.location.href.indexOf(site.searchPath) === -1) {
@@ -1154,7 +1222,7 @@ async function init() {
                 function (ii, integration) {
                     /* test the integration should be used by matching against the url */
                     if (window.location.href.includes(integration.match.term)) {
-                        log(['integration matched to domain: ', integration]);
+                        log(['integration['+ii+'] '+integration.id+' matched to domain: ', integration]);
 
                         var matchContainer = $(integration.match.containerSelector),
                             site = null;
@@ -1187,8 +1255,10 @@ async function init() {
                         }
 
                         if (site == null) {
+                            log(['integration '+integration.id+' site not found', 'integration', integration]);
                             return;
                         }
+                        log(['integration '+integration.id+' site found: '+site.id, 'site', site, 'integration', integration]);
 
                         // if the site integration has a where property, then the rules within the where must be evaluated
                         // and asserted to be correct before the integration is used
@@ -1196,26 +1266,27 @@ async function init() {
                             $.each(integration.where, function(i, rule) {
                                 switch (rule.operator){
                                     case 'eq':
+                                        log(['integration '+integration.id+' site '+site.id+' rule: '+rule.attribute+' '+rule.operator+' '+rule.value+', found: '+getElementValue($(rule.selector), rule.attribute)]);
                                         if (rule.value !== getElementValue($(rule.selector), rule.attribute)) {
                                             site = null;
-                                        }                                        
-
+                                        }           
                                         break;  
                                 }
                             });
 
                             if (site == null) {
+                                log(['integration '+integration.id+' where rules failed']);
                                 return;
                             }
+                            log(['integration '+integration.id+' site '+site.id+' where rules successed']);
                         }
-
-                        log(['integration matched to site: ', integration, site], $(integration.search.containerSelector));
 
                         // This is a bit janky, but some sites (looking at you trakt) load quite slowly and need the processing to be deferred otherwise the
                         // containers aren't available. Integrations can therefore have a deferMs setting which will be used here to delay execution. 
                         // In the case of trakt, page refreshes and tab activations work fine, but page to page navigations don't   ¯\_(ツ)_/¯
                         let deferMs = integration.hasOwnProperty('deferMs') ? integration.deferMs : 0;
 
+                        log(['integration '+integration.id+' site '+site.id+', in '+deferMs+'ms, will look for '+integration.search.containerSelector, $(integration.search.containerSelector)]);
                         setTimeout(() => { 
                             /* iterate all the containers */
                             $.each($(integration.search.containerSelector), function(i_el, container) {
