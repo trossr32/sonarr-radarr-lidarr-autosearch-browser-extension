@@ -1061,7 +1061,9 @@ async function init() {
 
     $.each(settings.sites,
         function (i, site) {
-            if (window.location.href.includes(site.domain)) {
+            // remove user and password from domain for urls looking like https://user:password@domain/path
+            let domain = site.domain.replace(/^(https?:\/\/)(.+):(.+)@/, '$1');
+            if (window.location.href.includes(domain)) {
                 log(['servarr site match found: ', site]);
 
                 if (window.location.href.indexOf(site.searchPath) === -1) {
