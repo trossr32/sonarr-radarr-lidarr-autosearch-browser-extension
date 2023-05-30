@@ -245,6 +245,12 @@ let sessionId,
                 enabled: true
             },
             {
+                id: 'betaseries',
+                name: 'BetaSeries',
+                image: 'betaseries.png',
+                enabled: true
+            },
+            {
                 id: 'primevideo',
                 name: 'Prime Video',
                 image: 'primevideo.png',

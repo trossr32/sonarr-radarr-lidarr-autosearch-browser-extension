@@ -12,7 +12,7 @@ This is an extension for Chromium browsers and Firefox that:
 
 2. When right-clicking selected text on any page this extension exposes a context menu with entries for Sonarr, Radarr, Lidarr and Readarr that allow a direct search for the selected text in a new tab.
 
-3. Adds Servarr icons as direct search links on IMDb, TVDb, TMDb, Trakt, TVmaze, MusicBrainz, Letterboxd, TV Calendar, Rotten Tomatoes, metacritic, simkl, IPTorrents, last.fm, Allociné, SensCritique and MyAnimeList websites. (Only applicable to Sonarr and Radarr at present).
+3. Adds Servarr icons as direct search links on IMDb, TVDb, TMDb, Trakt, TVmaze, MusicBrainz, Letterboxd, TV Calendar, Rotten Tomatoes, metacritic, simkl, IPTorrents, last.fm, Allociné, SensCritique, Betaseries and MyAnimeList websites. (Only applicable to Sonarr and Radarr at present).
 
 The extension can be disabled from the extension's popup and each context menu item can be disabled from the settings page.
 

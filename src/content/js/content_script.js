@@ -710,7 +710,7 @@
             icon: {
                 containerSelector: 'h1',
                 locator: 'prepend',
-                imgStyles: 'width: 30px; margin: 7px 0 0 0;'
+                imgStyles: 'width: 30px; margin: 0 10px 0 0;'
             }
         },
         // senscritique radarr
@@ -728,7 +728,59 @@
             icon: {
                 containerSelector: 'h1',
                 locator: 'prepend',
-                imgStyles: 'width: 30px; margin: 7px 0 0 0;'
+                imgStyles: 'width: 30px; margin: 0 10px 0 0;'
+            }
+        },
+        // betaseries sonarr
+        {
+            id: 'betaseries',
+            defaultSite: 'sonarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            where: [
+                {
+                    selector: 'meta[property="og:type"]',
+                    attribute: 'content',
+                    operator: 'eq',
+                    value: 'video.tv_show'
+                }
+            ],
+            match: {
+                term: 'betaseries.com/serie'
+            },
+            icon: {
+                containerSelector: 'h1[class^="blockInformations__title"]',
+                locator: 'prepend',
+                imgStyles: 'width: 25px;margin: 0;vertical-align: baseline;'
+            }
+        },
+        // betaseries radarr
+        {
+            id: 'betaseries',
+            defaultSite: 'radarr',
+            search: {
+                containerSelector: 'meta[property="og:title"]',
+                selectorType: 'content',
+                modifiers: []
+            },
+            where: [
+                {
+                    selector: 'meta[property="og:type"]',
+                    attribute: 'content',
+                    operator: 'eq',
+                    value: 'video.movie'
+                }
+            ],
+            match: {
+                term: 'betaseries.com/film'
+            },
+            icon: {
+                containerSelector: 'h1[class^="blockInformations__title"]',
+                locator: 'prepend',
+                imgStyles: 'width: 25px;margin: 0;vertical-align: baseline;'
             }
         },
 	    // primevideo sonarr
