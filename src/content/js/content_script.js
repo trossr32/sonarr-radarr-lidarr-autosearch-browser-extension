@@ -35,7 +35,7 @@
                 modifiers: []
             },
             match: {
-                term: 'imdb.com',
+                terms: ['imdb.com'],
                 containerSelector: 'meta[property="og:type"]',
                 attribute: 'content',
             },
@@ -71,7 +71,7 @@
                 ]
             },
             match: {
-                term: 'imdb.com',
+                terms: ['imdb.com'],
                 containerSelector: 'meta[property="og:type"]',
                 attribute: 'content',
             },
@@ -99,7 +99,7 @@
                 modifiers: []
             },
             match: {
-                term: 'themoviedb.org',
+                terms: ['themoviedb.org'],
                 containerSelector: 'link[rel="canonical"]',
                 attribute: 'href'
             },
@@ -135,7 +135,7 @@
                 ]
             },
             match: {
-                term: 'themoviedb.org',
+                terms: ['themoviedb.org'],
                 containerSelector: 'link[rel="canonical"]',
                 attribute: 'href'
             },
@@ -168,7 +168,7 @@
                 ]
             },
             match: {
-                term: 'thetvdb.com',
+                terms: ['thetvdb.com'],
                 containerSelector: '#series_basic_info',
                 attribute: 'text'
             },
@@ -196,7 +196,7 @@
                 modifiers: []
             },
             match: {
-                term: 'thetvdb.com',
+                terms: ['thetvdb.com'],
                 containerSelector: '#series_basic_info',
                 attribute: 'text'
             },
@@ -234,7 +234,7 @@
                 ]
             },
             match: {
-                term: 'trakt.tv',
+                terms: ['trakt.tv'],
                 containerSelector: '#main-nav ul li a.selected',
                 attribute: 'text'
             },
@@ -263,7 +263,7 @@
                 modifiers: []
             },
             match: {
-                term: 'trakt.tv',
+                terms: ['trakt.tv'],
                 containerSelector: '#main-nav ul li a.selected',
                 attribute: 'text'
             },
@@ -300,7 +300,7 @@
                 ]
             },
             match: {
-                term: 'trakt.tv',
+                terms: ['trakt.tv'],
                 containerSelector: '#main-nav ul li a.selected',
                 attribute: 'text'
             },
@@ -329,7 +329,7 @@
                 modifiers: []
             },
             match: {
-                term: 'trakt.tv',
+                terms: ['trakt.tv'],
                 containerSelector: '#main-nav ul li a.selected',
                 attribute: 'text'
             },
@@ -348,7 +348,7 @@
                 modifiers: []
             },
             match: {
-                term: 'tvmaze.com/shows/'
+                terms: ['tvmaze.com/shows/']
             },
             icon: {
                 containerSelector: 'h1.show-for-medium',
@@ -365,7 +365,7 @@
                 modifiers: []
             },
             match: {
-                term: 'tvmaze.com/countdown'
+                terms: ['tvmaze.com/countdown']
             },
             icon: {
                 containerSelector: 'div.show-name',
@@ -388,7 +388,7 @@
                 ]
             },
             match: {
-                term: 'musicbrainz.org/artist'
+                terms: ['musicbrainz.org/artist']
             },
             icon: {
                 containerSelector: '.artistheader > h1',
@@ -410,7 +410,7 @@
                 ]
             },
             match: {
-                term: 'letterboxd.com/film/'
+                terms: ['letterboxd.com/film/']
             },
             icon: {
                 containerSelector: '#featured-film-header > h1',
@@ -427,7 +427,7 @@
                 modifiers: []
             },
             match: {
-                term: 'pogdesign.co.uk/cat'
+                terms: ['pogdesign.co.uk/cat']
             },
             icon: {
                 containerSelector: 'p[data-episode]',
@@ -444,7 +444,7 @@
                 modifiers: []
             },
             match: {
-                term: 'rottentomatoes.com/m'
+                terms: ['rottentomatoes.com/m']
             },
             icon: {
                 containerSelector: 'h1.scoreboard__title',
@@ -461,7 +461,7 @@
                 modifiers: []
             },
             match: {
-                term: 'rottentomatoes.com/tv'
+                terms: ['rottentomatoes.com/tv']
             },
             icon: {
                 containerSelector: 'h1.title',
@@ -493,7 +493,7 @@
                 modifiers: []
             },
             match: {
-                term: 'metacritic.com',
+                terms: ['metacritic.com'],
                 containerSelector: 'meta[property="og:type"]',
                 attribute: 'content'
             },
@@ -514,7 +514,7 @@
                 modifiers: []
             },
             match: {
-                term: 'simkl.com/tv',
+                terms: ['simkl.com/tv'],
             },
             icon: {
                 containerSelector: 'td.SimklTVDetailPoster div:nth-of-type(1)',
@@ -534,7 +534,7 @@
                 modifiers: []
             },
             match: {
-                term: 'simkl.com/tv/calendar',
+                terms: ['simkl.com/tv/calendar'],
             },
             icon: {
                 containerSelector: 'table.SimklTVCalendarDayList > tbody > tr > td > div > div.SimklTVCalendarDayListLink:nth-of-type(1)',
@@ -554,7 +554,7 @@
                 modifiers: []
             },
             match: {
-                term: 'simkl.com/movie'
+                terms: ['simkl.com/movie']
             },
             icon: {
                 containerSelector: 'td.SimklTVDetailPoster div:nth-of-type(1)',
@@ -573,7 +573,7 @@
                 modifiers: []
             },
             match: {
-                term: 'iptorrents.com/tv'
+                terms: ['iptorrents.com/tv']
             },
             icon: {
                 containerSelector: 'b.MovieTitle',
@@ -600,7 +600,7 @@
                 ]
             },
             match: {
-                term: 'iptorrents.com/movies'
+                terms: ['iptorrents.com/movies']
             },
             icon: {
                 containerSelector: 'b.MovieTitle',
@@ -618,7 +618,7 @@
                 modifiers: []
             },
             match: {
-                term: 'last.fm/music'
+                terms: ['last.fm/music']
             },
             icon: {
                 containerSelector: '.header-new-title',
@@ -635,7 +635,7 @@
                 modifiers: []
             },
             match: {
-                term: 'last.fm/music'
+                terms: ['last.fm/music']
             },
             icon: {
                 containerSelector: '.header-new-crumb > span',
@@ -661,7 +661,7 @@
                 }
             ],
             match: {
-                term: 'allocine.fr/series'
+                terms: ['allocine.fr/series']
             },
             icon: {
                 containerSelector: '.titlebar-page .titlebar-title',
@@ -687,7 +687,7 @@
                 }
             ],
             match: {
-                term: 'allocine.fr/film'
+                terms: ['allocine.fr/film']
             },
             icon: {
                 containerSelector: '.titlebar-page .titlebar-title',
@@ -705,7 +705,7 @@
                 modifiers: []
             },
             match: {
-                term: 'senscritique.com/serie'
+                terms: ['senscritique.com/serie']
             },
             icon: {
                 containerSelector: 'h1',
@@ -723,7 +723,7 @@
                 modifiers: []
             },
             match: {
-                term: 'senscritique.com/film'
+                terms: ['senscritique.com/film']
             },
             icon: {
                 containerSelector: 'h1',
@@ -749,7 +749,10 @@
                 }
             ],
             match: {
-                term: 'betaseries.com/serie'
+                terms: [
+                    'betaseries.com/serie',
+                    'betaseries.com/en/show'
+                ]
             },
             icon: {
                 containerSelector: 'h1[class^="blockInformations__title"]',
@@ -775,7 +778,10 @@
                 }
             ],
             match: {
-                term: 'betaseries.com/film'
+                terms: [
+                    'betaseries.com/film',
+                    'betaseries.com/en/movie'
+                ]
             },
             icon: {
                 containerSelector: 'h1[class^="blockInformations__title"]',
@@ -808,7 +814,7 @@
                 }
             ],
             match: {
-                term: 'www.primevideo.com/detail'
+                terms: ['www.primevideo.com/detail']
             },
             icon: {
                 containerSelector: 'h1',
@@ -841,7 +847,7 @@
                 }
             ],
             match: {
-                term: 'www.primevideo.com/detail'
+                terms: ['www.primevideo.com/detail']
             },
             icon: {
                 containerSelector: 'h1',
@@ -867,7 +873,7 @@
                 }
             ],
             match: {
-                term: 'myanimelist.net/anime'
+                terms: ['myanimelist.net/anime']
             },
             icon: {
                 containerSelector: 'h1',
@@ -893,7 +899,7 @@
                 }
             ],
             match: {
-                term: 'myanimelist.net/anime'
+                terms: ['myanimelist.net/anime']
             },
             icon: {
                 containerSelector: 'h1',
@@ -918,7 +924,7 @@
         //         ]
         //     },
         //     match: {
-        //         term: 'next-episode.net/movies'
+        //         terms: ['next-episode.net/movies']
         //     },
         //     icon: {
         //         containerSelector: 'div[id^="title_"]',
@@ -951,7 +957,7 @@
         //         ]
         //     },
         //     match: {
-        //         term: 'next-episode.net',
+        //         terms: ['next-episode.net'],
         //         containerSelector: 'body',
         //         selectorType: 'itemType'
         //     },
@@ -1180,7 +1186,7 @@ async function init() {
     $.each(settings.sites,
         function (i, site) {
             // remove user and password from domain for urls looking like https://user:password@domain/path
-            let domain = site.domain.replace(/^(https?:\/\/)(.+):(.+)@/, '$1');
+            let domain = site.domain.replace(/^([http|https]?:\/\/)(.+):(.+)@/, '$1');
             if (window.location.href.includes(domain)) {
                 log(['servarr site match found: ', site]);
 
@@ -1221,8 +1227,11 @@ async function init() {
             $.each(integrations.filter(_i => { return _i.id == settingsIntegration.id; }),
                 function (ii, integration) {
                     /* test the integration should be used by matching against the url */
-                    if (window.location.href.includes(integration.match.term)) {
-                        log(['integration['+ii+'] '+integration.id+' matched to domain: ', integration]);
+                    if (integration.match.terms
+                            .map(t => window.location.href.includes(t))
+                            .includes(true)) {
+
+                        log([`integration[${ii}] ${integration.id} matched to domain: `, integration]);
 
                         var matchContainer = $(integration.match.containerSelector),
                             site = null;
@@ -1255,10 +1264,11 @@ async function init() {
                         }
 
                         if (site == null) {
-                            log(['integration '+integration.id+' site not found', 'integration', integration]);
+                            log([`integration ${integration.id} site not found`, 'integration', integration]);
                             return;
                         }
-                        log(['integration '+integration.id+' site found: '+site.id, 'site', site, 'integration', integration]);
+                        
+                        log([`integration ${integration.id} site found: ${site.id}`, 'site', site, 'integration', integration]);
 
                         // if the site integration has a where property, then the rules within the where must be evaluated
                         // and asserted to be correct before the integration is used
@@ -1266,19 +1276,21 @@ async function init() {
                             $.each(integration.where, function(i, rule) {
                                 switch (rule.operator){
                                     case 'eq':
-                                        log(['integration '+integration.id+' site '+site.id+' rule: '+rule.attribute+' '+rule.operator+' '+rule.value+', found: '+getElementValue($(rule.selector), rule.attribute)]);
+                                        log([`integration ${integration.id} site found: ${site.id} rule: ${rule.attribute} ${rule.operator} ${rule.value}, found: ${getElementValue($(rule.selector), rule.attribute)}`]);
+
                                         if (rule.value !== getElementValue($(rule.selector), rule.attribute)) {
                                             site = null;
-                                        }           
+                                        }                                                   
                                         break;  
                                 }
                             });
 
                             if (site == null) {
-                                log(['integration '+integration.id+' where rules failed']);
+                                log([`integration ${integration.id} where rules failed`]);
                                 return;
                             }
-                            log(['integration '+integration.id+' site '+site.id+' where rules successed']);
+
+                            log([`integration ${integration.id} site ${site.id} where rules succeeded`]);
                         }
 
                         // This is a bit janky, but some sites (looking at you trakt) load quite slowly and need the processing to be deferred otherwise the
@@ -1286,7 +1298,8 @@ async function init() {
                         // In the case of trakt, page refreshes and tab activations work fine, but page to page navigations don't   ¯\_(ツ)_/¯
                         let deferMs = integration.hasOwnProperty('deferMs') ? integration.deferMs : 0;
 
-                        log(['integration '+integration.id+' site '+site.id+', in '+deferMs+'ms, will look for '+integration.search.containerSelector, $(integration.search.containerSelector)]);
+                        log([`integration ${integration.id} site ${site.id}, in ${deferMs}ms, will look for ${integration.search.containerSelector}`, $(integration.search.containerSelector)]);
+
                         setTimeout(() => { 
                             /* iterate all the containers */
                             $.each($(integration.search.containerSelector), function(i_el, container) {

@@ -54,6 +54,41 @@ a, a:focus, a:hover {
     margin: 0 auto;
 }
 
+.card-warning {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    top: -30px;
+    right: -30px;
+    transform: rotate(45deg);
+    border: 30px solid transparent;
+    border-bottom-color: black;
+    z-index: 10;
+}
+
+.card-warning > div {
+    color: darkorange;
+    position: absolute;
+    top: 3px;
+    left: -10px;
+    transform: rotate(-45deg);
+    cursor: help;
+    z-index: 10;
+}
+
+.card-warning-tooltip {
+    display: none;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    left: 0px;
+    bottom: 0px;
+    padding: 5px;
+    background-color: rgba(0,0,0,0.9);
+    z-index: 5;
+    border-radius: 0.25rem;
+}
+
 .list-group-item {
     background-color: #212529!important;
     border: 1px solid rgba(255,255,255,0.5);

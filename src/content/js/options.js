@@ -402,17 +402,31 @@ var initialiseIntegrationsForm = function (settings) {
     let wrapper = $('<div class="row row-cols-2 row-cols-md-4 row-cols-xl-6"></div>');
 
     $.each(settings.integrations, function (i, integration) {
-        wrapper
-            .append(
-                $('<div class="col p-3"></div>')
-                    .append($('<div class="card text-white bg-dark mb-3"></div>')
-                        .append($(`<div class="card-img-top card-integration" style="background: url('content/assets/images/integrations/${integration.image}') center/100% no-repeat;"></div>`))
-                        .append($('<div class="card-body" style="text-align: center;"></div>')
-                            .append($(`<h5 class="card-title mb-4">${integration.name}</h5>`))
-                            .append($(`<input type="checkbox" id="toggle-${integration.id}">`).prop('checked', integration.enabled))
-                        )
-                    )
+        let card = $('<div class="card text-white bg-dark mb-3"></div>');
+
+        console.log(integration, 'integration.hasOwnProperty(warning):', integration.hasOwnProperty('warning'));
+
+        if (integration.hasOwnProperty('warning')) {
+            card
+                .append($(`<div class="card-warning"></div>`)
+                    .append($(`<div data-warning-id="${i}"><i class="fas fa-exclamation-triangle"></i></div>`)
+                        .on('mouseover', function () {
+                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).css('display', 'block');
+                        })
+                        .on('mouseout', function () {
+                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).css('display', 'none');
+                        })))
+                .append($(`<div id="card-warning-tooltip-${i}" class="card-warning-tooltip"></div>`).text(integration.warning));
+        }
+
+        card
+            .append($(`<div class="card-img-top card-integration" style="background: url('content/assets/images/integrations/${integration.image}') center/100% no-repeat;"></div>`))
+            .append($('<div class="card-body" style="text-align: center;"></div>')
+                .append($(`<h5 class="card-title mb-4">${integration.name}</h5>`))
+                .append($(`<input type="checkbox" id="toggle-${integration.id}">`).prop('checked', integration.enabled))
             );
+
+        wrapper.append($('<div class="col p-3"></div>').append(card));
     });
 
     $('#integrationsOptionsForm').prepend(wrapper);
