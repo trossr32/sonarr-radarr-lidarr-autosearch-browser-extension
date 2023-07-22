@@ -36,10 +36,10 @@ All support is very gratefully received, thank you :raised_hands: :sunglasses: :
 
 **New features (V2.8.0.0)**
 - New feature: Limit extension permissions to integration sites only (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/145">#145</a>)
-- New feature: Add release-group and release URLs for musicbrainz integration. **Thanks to <a href="https://github.com/Pompiedom">Pompiedom</a>**. (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/146">#146</a>).
-- Bug fix: Adding user:password syntax handling in site domain & fixing grunt release on linux. **Thanks to <a href="https://github.com/carsso">carsso</a>**.
-- New feature: Add betaseries.com integration. **Thanks to <a href="https://github.com/carsso">carsso</a>**.
-- New feature: Add primevideo.com integration. **Thanks to <a href="https://github.com/carsso">carsso</a>**.
+- New feature: Add release-group and release URLs for musicbrainz integration. Thanks to <a href="https://github.com/Pompiedom">Pompiedom</a>. (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/146">#146</a>).
+- Bug fix: Adding user:password syntax handling in site domain & fixing grunt release on linux. Thanks to <a href="https://github.com/carsso">carsso</a>.
+- New feature: Add betaseries.com integration. Thanks to <a href="https://github.com/carsso">carsso</a>.
+- New feature: Add primevideo.com integration. Thanks to <a href="https://github.com/carsso">carsso</a>.
 
 **Bug fixes (V2.7.1)**
 - Bug fix: TmdbId not parsed correctly from Trakt to Radarr search for some titles (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/131">#131</a>)
