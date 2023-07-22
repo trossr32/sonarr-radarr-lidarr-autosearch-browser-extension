@@ -396,6 +396,52 @@
                 imgStyles: 'width: 26px; margin: 0 5px -4px 0;'
             }
         },
+        { 
+            id: 'musicbrainz', 
+            defaultSite: 'lidarr', 
+            search: { 
+                containerSelector: '.rgheader > h1 > a', 
+                selectorType: 'href', 
+                modifiers: [ 
+                    { 
+                        type: 'replace', 
+                        from: '/release-group/', 
+                        to: 'lidarr:' 
+                    } 
+                ] 
+            }, 
+            match: { 
+                terms: ['musicbrainz.org/release-group']
+            }, 
+            icon: { 
+                containerSelector: '.rgheader > h1', 
+                locator: 'prepend', 
+                imgStyles: 'width: 26px; margin: 0 5px -4px 0;' 
+            } 
+        }, 
+        { 
+            id: 'musicbrainz', 
+            defaultSite: 'lidarr', 
+            search: { 
+                containerSelector: '.releaseheader > h1 > a', 
+                selectorType: 'href', 
+                modifiers: [ 
+                    { 
+                        type: 'replace', 
+                        from: '/release/', 
+                        to: 'lidarr:' 
+                    } 
+                ] 
+            }, 
+            match: { 
+                terms: ['musicbrainz.org/release'] 
+            }, 
+            icon: { 
+                containerSelector: '.releaseheader > h1', 
+                locator: 'prepend', 
+                imgStyles: 'width: 26px; margin: 0 5px -4px 0;' 
+            } 
+        },
         {
             id: 'letterboxd',
             defaultSite: 'radarr',
