@@ -48,17 +48,6 @@ All support is very gratefully received, thank you :raised_hands: :sunglasses: :
 **New features (V2.7)**
 - Readarr integration. Added as 2 separate configurations for ebooks and audiobooks. Works similarly to Lidarr, i.e. there are no site integrations so this only exposes new entries in the context menu.
 
-**Bug fix (V2.6.1)**
-- Bug fix: Lidarr test failing (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/111">#111</a>)
-
-**New features (V2.6)**
-- MyAnimeList integration (Thanks to <a href='https://github.com/dannyvink' target='_blank'>dannyvink</a> for making this contribution.)
-
-**New features & bug fix (V2.5)**
-- New feature to allow absolute positioning of the servarr icon either anchored to the side of the page or floating at a user defined position. Only works when one instance of the icon should be injected to the page, otherwise falls back to default positioning. Unsure if this is a feature anyone will actually want to use, but if you find it useful or have any suggestions for improvement please let me know.
-- Bug fix: IMDb was not correctly identifying TV shows and was falling back to everything being identified as a movie when viewing the German version of the site.
-- Remove 'tabs' permission for the extension as not required. Google took down the package because of this permission being included and not required, so this release should see the extension available on the Chrome Web Store soon.
-
 ## Getting started
 
 [Extension on the Chrome web store](https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc)
