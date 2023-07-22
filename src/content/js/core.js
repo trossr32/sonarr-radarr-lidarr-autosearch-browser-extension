@@ -224,7 +224,8 @@ let sessionId,
                 id: 'iptorrents',
                 name: 'IPTorrents',
                 image: 'iptorrents.png',
-                enabled: true
+                enabled: true,
+                warning: 'IPTorrents requires an account to be actively used or it is removed. The developer does not maintain an active account. This integration is entirely community supported.'
             },
             {
                 id: 'lastfm',
@@ -243,6 +244,19 @@ let sessionId,
                 name: 'SensCritique',
                 image: 'senscritique.png',
                 enabled: true
+            },
+            {
+                id: 'betaseries',
+                name: 'BetaSeries',
+                image: 'betaseries.png',
+                enabled: true
+            },
+            {
+                id: 'primevideo',
+                name: 'Prime Video',
+                image: 'primevideo.png',
+                enabled: true,
+                warning: 'This integration was created by a community member for the French version of the website and is not maintained by the developer.'
             },
             {
                 id: 'myanimelist',
@@ -524,6 +538,10 @@ async function getSettings() {
         
         // try to find the integration
         if (data.sonarrRadarrLidarrAutosearchSettings.integrations.some(integration => integration.id === defaultSettings.integrations[i].id)) {
+            if (defaultSettings.integrations[i].hasOwnProperty('warning')) {
+                data.sonarrRadarrLidarrAutosearchSettings.integrations[i].warning = defaultSettings.integrations[i].warning;
+            }
+
             continue;
         }
 

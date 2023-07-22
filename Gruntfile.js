@@ -105,7 +105,7 @@ module.exports = function (grunt) {
                 options: {
                     stdout: true
                 },
-                command: 'create-package_Grunt.sh'
+                command: './create_package_Grunt.sh'
             }
         }
     });
@@ -113,11 +113,13 @@ module.exports = function (grunt) {
     // debug group task
     grunt.registerTask('debug', ['jshint', 'clean:debug', 'sass', 'copy']);
     
-    // release group task
-    grunt.registerTask('release', ['jshint', 'clean:release', 'sass', 'copy:release', 'shell:ps']);
-    
-    // Runs the .sh package create. Possibly.
-    // grunt.registerTask('release', ['jshint', 'clean:release', 'sass', 'copy:release', 'shell:sh']);
+    if (process.platform === "win32") {
+        // release group task
+        grunt.registerTask('release', ['jshint', 'clean:release', 'sass', 'copy:release', 'shell:ps']);
+    } else {
+        // Runs the .sh package create. Possibly.
+        grunt.registerTask('release', ['jshint', 'clean:release', 'sass', 'copy:release', 'shell:sh']);
+    }
     
     // review group task
     grunt.registerTask('review', ['clean:release', 'copy:release']);
