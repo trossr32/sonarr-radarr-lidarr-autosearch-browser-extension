@@ -62,6 +62,7 @@
     "*://*.myanimelist.net/*",
     "*://*.betaseries.com/*",
     "*://*.primevideo.com/*",
+    "<all_urls>",
     "storage",
     "activeTab",
     "contextMenus"
