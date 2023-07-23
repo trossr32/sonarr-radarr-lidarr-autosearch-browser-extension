@@ -782,8 +782,8 @@
             id: 'betaseries',
             defaultSite: 'sonarr',
             search: {
-                containerSelector: 'meta[property="og:title"]',
-                selectorType: 'content',
+                containerSelector: 'h1[class^="blockInformations__title"]',
+                selectorType: 'text',
                 modifiers: []
             },
             where: [
@@ -811,8 +811,8 @@
             id: 'betaseries',
             defaultSite: 'radarr',
             search: {
-                containerSelector: 'meta[property="og:title"]',
-                selectorType: 'content',
+                containerSelector: 'h1[class^="blockInformations__title"]',
+                selectorType: 'text',
                 modifiers: []
             },
             where: [
