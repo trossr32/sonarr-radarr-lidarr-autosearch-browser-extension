@@ -391,7 +391,7 @@ let sessionId,
                     searchInputSelector: '.add-series-search .x-series-search'
                 },
                 {
-                    versionMatch: /^[3|4]/,
+                    versionMatch: /^[3|4|5|6]/,
                     searchPath: '/add/new/',
                     searchInputSelector: 'input[name="seriesLookup"]'
                 }
@@ -406,7 +406,7 @@ let sessionId,
                     searchInputSelector: '.add-movies-search .x-movies-search'
                 },
                 {
-                    versionMatch: /^[3|4]/,
+                    versionMatch: /^[3|4|5|6]/,
                     searchPath: '/add/new/',
                     searchInputSelector: 'input[name="movieLookup"]'
                 }

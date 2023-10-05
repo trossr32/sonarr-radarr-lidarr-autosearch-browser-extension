@@ -215,13 +215,13 @@
                 {
                     siteId: 'sonarr',
                     match: {
-                        pattern: /tv/i,
+                        pattern: /video\.tv_show/i,
                         operator: 'eq'
                     }
                 }
             ],
             search: {
-                containerSelector: 'a[href*="tvdb.com"]',
+                containerSelector: '.external > li > a[id="external-link-tvdb"]',
                 selectorType: 'href',
                 modifiers: [
                     {
@@ -234,12 +234,12 @@
                 ]
             },
             match: {
-                terms: ['trakt.tv'],
-                containerSelector: '#main-nav ul li a.selected',
-                attribute: 'text'
+                terms: ['trakt.tv/shows'],
+                containerSelector: 'meta[property="og:type"]',
+                attribute: 'content'
             },
             icon: {
-                containerSelector: 'h1',
+                containerSelector: '.container h1',
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
             }
@@ -248,27 +248,24 @@
         {
             id: 'trakt',
             deferMs: 3000,
-            rules: [
-                {
-                    siteId: 'sonarr',
-                    match: {
-                        pattern: /tv/i,
-                        operator: 'eq'
-                    }
-                }
-            ],
+            defaultSite: 'sonarr',
             search: {
-                containerSelector: '.titles > h3',
+                containerSelector: '.titles-link > h3',
                 selectorType: 'text',
                 modifiers: []
             },
             match: {
-                terms: ['trakt.tv'],
-                containerSelector: '#main-nav ul li a.selected',
-                attribute: 'text'
+                terms: [
+                    'trakt.tv/shows/trending',
+                    'trakt.tv/shows/popular',
+                    'trakt.tv/shows/favorited/weekly',
+                    'trakt.tv/shows/watched/weekly',
+                    'trakt.tv/shows/collected/weekly',
+                    'trakt.tv/shows/anticipated'
+                ],
             },
             icon: {
-                containerSelector: '.actions',
+                containerSelector: '.quick-icons > .actions',
                 locator: 'append',
                 imgStyles: 'width: 23px; margin: 0 0 2px 10px;'
             }
@@ -281,13 +278,13 @@
                 {
                     siteId: 'radarr',
                     match: {
-                        pattern: /movies/i,
+                        pattern: /video\.movie/i,
                         operator: 'eq'
                     }
                 }
             ],
             search: {
-                containerSelector: 'a[href*="moviedb.org"]',
+                containerSelector: '.external > li > a[id="external-link-tmdb"]',
                 selectorType: 'href',
                 modifiers: [
                     {
@@ -300,12 +297,12 @@
                 ]
             },
             match: {
-                terms: ['trakt.tv'],
-                containerSelector: '#main-nav ul li a.selected',
-                attribute: 'text'
+                terms: ['trakt.tv/movies'],
+                containerSelector: 'meta[property="og:type"]',
+                attribute: 'content'
             },
             icon: {
-                containerSelector: 'h1',
+                containerSelector: '.container h1',
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
             }
@@ -314,27 +311,25 @@
         {
             id: 'trakt',
             deferMs: 3000,
-            rules: [
-                {
-                    siteId: 'radarr',
-                    match: {
-                        pattern: /movies/i,
-                        operator: 'eq'
-                    }
-                }
-            ],
+            defaultSite: 'radarr',
             search: {
-                containerSelector: '.titles > h3',
+                containerSelector: '.titles-link > h3',
                 selectorType: 'text',
                 modifiers: []
             },
             match: {
-                terms: ['trakt.tv'],
-                containerSelector: '#main-nav ul li a.selected',
-                attribute: 'text'
+                terms: [
+                    'trakt.tv/movies/trending',
+                    'trakt.tv/movies/popular',
+                    'trakt.tv/movies/favorited/weekly',
+                    'trakt.tv/movies/watched/weekly',
+                    'trakt.tv/movies/collected/weekly',
+                    'trakt.tv/movies/anticipated',
+                    'trakt.tv/movies/boxoffice'
+                ]
             },
             icon: {
-                containerSelector: '.actions',
+                containerSelector: '.quick-icons > .actions',
                 locator: 'append',
                 imgStyles: 'width: 23px; margin: 0 0 2px 10px;'
             }
@@ -521,14 +516,14 @@
                 {
                     siteId: 'sonarr',
                     match: {
-                        pattern: /tv/i,
+                        pattern: /type=tv/i,
                         operator: 'eq'
                     }
                 },
                 {
                     siteId: 'radarr',
                     match: {
-                        pattern: /movie/i,
+                        pattern: /type=movie/i,
                         operator: 'eq'
                     }
                 }
@@ -540,13 +535,13 @@
             },
             match: {
                 terms: ['metacritic.com'],
-                containerSelector: 'meta[property="og:type"]',
+                containerSelector: 'meta[name="adtags"]',
                 attribute: 'content'
             },
             icon: {
-                containerSelector: 'h1',
+                containerSelector: 'div[class*="productHero_title"] > div',
                 locator: 'prepend',
-                imgStyles: 'width: 28px; margin: 0px 10px 0 0;'
+                imgStyles: 'width: 32px; margin: 0px 10px 0 0;'
             }
         },
         // simkl tv
