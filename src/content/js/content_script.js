@@ -488,7 +488,7 @@
                 terms: ['rottentomatoes.com/m']
             },
             icon: {
-                containerSelector: 'h1.scoreboard__title',
+                containerSelector: 'h1.title',
                 locator: 'prepend',
                 imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
             }
