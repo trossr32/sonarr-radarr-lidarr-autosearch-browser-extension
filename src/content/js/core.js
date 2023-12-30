@@ -416,7 +416,7 @@ let sessionId,
             id: 'lidarr',
             configs: [
                 {
-                    versionMatch: /^[0|1]/,
+                    versionMatch: /^[0|1|2]/,
                     searchPath: '/add/search/',
                     searchInputSelector: 'input[name="searchBox"]'
                 }
