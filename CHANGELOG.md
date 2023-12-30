@@ -1,4 +1,6 @@
-# outdated-packages-action
+# Servarr Auto Search (Sonarr, Radarr, Lidarr and Readarr)
+
+All notable changes to this project will be documented in this file.
 
 ## 2.8.4
 
