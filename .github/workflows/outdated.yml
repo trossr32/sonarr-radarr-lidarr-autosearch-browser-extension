@@ -18,5 +18,6 @@ jobs:
     steps:
       - uses: trossr32/outdated-packages-action@v0.0.5
         with:
+          use-dotnet-outdated: false
           use-npm-outdated: true
           npm-project-directory: ${{ env.PROJECT_DIR }}
