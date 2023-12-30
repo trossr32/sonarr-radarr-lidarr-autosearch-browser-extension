@@ -12,11 +12,15 @@
 name: "CodeQL"
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ master ]
+    paths:
+      - '.github/workflows/codeql-analysis.yml'
+      - 'src/**'
+      - 'Gruntfile.js'
+      - 'package.json'
+      - 'package-lock.json'
   schedule:
     - cron: '16 0 * * 5'
 
