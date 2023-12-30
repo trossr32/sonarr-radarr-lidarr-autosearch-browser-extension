@@ -103,4 +103,4 @@ Thanks to the following for helping with this project:
 
 Thanks to <a href='https://www.jetbrains.com' target='_blank'>JetBrains</a> for providing an open source license for their products to support this project. 
 
-![JetBrains logo](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/staging/src/content/assets/images/jetbrains.png)
+![JetBrains logo](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/src/content/assets/images/jetbrains.png)
