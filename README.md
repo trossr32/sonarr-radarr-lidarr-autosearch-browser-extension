@@ -34,8 +34,9 @@ All support is very gratefully received, thank you :raised_hands: :sunglasses: :
 
 ## Change log (just the most recent; see [releases](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/releases) for full history)
 
-**Bug fix (V2.8.4)**
+**Bug fixes (V2.8.4)**
 - Bug fix: Fix Rotten Tomatoes Radarr logo prepend. Thanks to <a href="https://github.com/3vanlock">3vanlock</a>.
+- Bug fix: Fix API testing for Lidarr v2.
 
 **Bug fixes (V2.8.3)**
 - Bug fix: Fix Metacritic integration following their site redesign.
