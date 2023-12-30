@@ -4,7 +4,7 @@ name: Outdated package checks
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [ main ]
+    branches: [ master ]
   
   workflow_dispatch:
 
