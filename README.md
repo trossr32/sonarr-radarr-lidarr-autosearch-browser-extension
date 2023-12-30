@@ -32,38 +32,6 @@ Leave a review:
 
 All support is very gratefully received, thank you :raised_hands: :sunglasses: :+1:
 
-## Change log (just the most recent; see [releases](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/releases) for full history)
-
-**Bug fixes (V2.8.4)**
-- Bug fix: Fix Rotten Tomatoes Radarr logo prepend. Thanks to <a href="https://github.com/3vanlock">3vanlock</a>.
-- Bug fix: Fix API testing for Lidarr v2.
-
-**Bug fixes (V2.8.3)**
-- Bug fix: Fix Metacritic integration following their site redesign.
-- Bug fix: Fix Trakt integration.
-- Bug fix: Radarr v5 now accounted for when testing API connection.
-
-**Bug fixes (V2.8.2)**
-- Bug fix: Fix regex for username/password removal in domain matching. Thanks to <a href="https://github.com/carsso">carsso</a>.
-
-**Bug fixes (V2.8.1)**
-- Bug fix: Fix Betaseries integration.  Thanks to <a href="https://github.com/carsso">carsso</a>.
-- Bug fix: Revert change to manifest to allow all URLs again. This is required as the extension performs the automated searching on servarr pages and v2.8.0 broke this. (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/145">#145</a>)
-
-**New features (V2.8.0.0)**
-- New feature: Limit extension permissions to integration sites only (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/145">#145</a>)
-- New feature: Add release-group and release URLs for musicbrainz integration. Thanks to <a href="https://github.com/Pompiedom">Pompiedom</a>. (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/146">#146</a>).
-- Bug fix: Adding user:password syntax handling in site domain & fixing grunt release on linux. Thanks to <a href="https://github.com/carsso">carsso</a>.
-- New feature: Add betaseries.com integration. Thanks to <a href="https://github.com/carsso">carsso</a>.
-- New feature: Add primevideo.com integration. Thanks to <a href="https://github.com/carsso">carsso</a>.
-
-**Bug fixes (V2.7.1)**
-- Bug fix: TmdbId not parsed correctly from Trakt to Radarr search for some titles (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/131">#131</a>)
-- Bug fix: Icon not showing on IMDB (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/134">#134</a>)
-
-**New features (V2.7)**
-- Readarr integration. Added as 2 separate configurations for ebooks and audiobooks. Works similarly to Lidarr, i.e. there are no site integrations so this only exposes new entries in the context menu.
-
 ## Getting started
 
 [Extension on the Chrome web store](https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc)
