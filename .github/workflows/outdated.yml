@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: trossr32/outdated-packages-action@v0.0.5
+      - uses: trossr32/outdated-packages-action@v0.0.6
         with:
           use-dotnet-outdated: false
           use-npm-outdated: true
