@@ -1,0 +1,22 @@
+name: Outdated package checks
+
+# Run workflow on pull request to the main branch
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [ main ]
+  
+  workflow_dispatch:
+
+env:
+  PROJECT_DIR: 'src/../'
+
+jobs:
+  outdated-packages-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: trossr32/outdated-packages-action@v0.0.5
+        with:
+          use-npm-outdated: true
+          npm-project-directory: ${{ env.PROJECT_DIR }}
