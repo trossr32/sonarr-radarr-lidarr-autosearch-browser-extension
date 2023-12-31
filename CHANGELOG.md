@@ -1,4 +1,6 @@
-# outdated-packages-action
+# Servarr Auto Search (Sonarr, Radarr, Lidarr and Readarr)
+
+All notable changes to this project will be documented in this file.
 
 ## 2.8.4
 
@@ -49,7 +51,7 @@
 ### Fixed
 
 - TmdbId not parsed correctly from Trakt to Radarr search for some titles (https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/131)
-- Icon not showing on IMDB (https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/134)
+- Icon not showing on IMDB <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/134">#134</a>
 
 ## 2.7.0
 
@@ -104,7 +106,7 @@
 
 ### Fixed
 
-- Context menu wasn't updating correctly when servarr integrations were enabled or disabled. (#86)
+- Context menu wasn't updating correctly when servarr integrations were enabled or disabled. (<a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/86">#86</a>)
 
 ## 2.3.2
 
@@ -201,7 +203,7 @@
 
 ### Changes
 
-- Optimise lidarr searching from the MusicBrainz integration to use id rather than artist name. Fixes #28
+- Optimise lidarr searching from the MusicBrainz integration to use id rather than artist name. Fixes <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/28">#28</a>
 
 ## 1.4.0
 
@@ -213,19 +215,19 @@
 
 ### Fixed
 
-- Fixes issue #21 where the search input was rendering after the extension had tried to find the field. Code added to watch for the element being available prior to referencing.
+- Fixes issue <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/21">#21</a> where the search input was rendering after the extension had tried to find the field. Code added to watch for the element being available prior to referencing.
 
 ## 1.3.1
 
 ### Fixed
 
-- Fixes bug #22 where context menu items were incorrectly displayed when certain integrations had been disabled.
+- Fixes bug <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/22">#22</a> where context menu items were incorrectly displayed when certain integrations had been disabled.
 
 ## 1.3.0
 
 ### Added
 
-- Add version documentation for v3 of Sonarr and Radarr following update in #1
+- Add version documentation for v3 of Sonarr and Radarr following update in <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/1">#1</a>
 
 ### Fixed
 
@@ -235,15 +237,15 @@
 
 ### Added
 
-- Add TVmaze as an integration, both on a show page and the countdown results page. Fixes #13.
+- Add TVmaze as an integration, both on a show page and the countdown results page. Fixes <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/13">#13</a>.
 
 ### Changed
 
-- Change the settings paypal page to a ko-fi integration, fixes #12
+- Change the settings paypal page to a ko-fi integration, fixes <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/12">#12</a>
 
 ### Fixed
 
-- Fix mini-series bug on IMDB; fixes #10
+- Fix mini-series bug on IMDB; fixes <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/10">#10</a>
 
 ## 1.1.0
 
