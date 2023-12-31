@@ -8,16 +8,11 @@ on:
   
   workflow_dispatch:
 
-# env:
-#   PROJECT_DIR: 'src/../'
-
 jobs:
   outdated-packages-check:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: trossr32/outdated-packages-action@v0.0.8
+      - uses: trossr32/outdated-packages-action@v1.0.0
         with:
-          # use-dotnet-outdated: false
           use-npm-outdated: true
-          # npm-project-directory: ${{ env.PROJECT_DIR }}
