@@ -91,7 +91,7 @@
 /**
  * Version configuration for a site version
  * @typedef {Object} InjectedIconConfig
- * @property {string} type - 'anchored' for lef tor right side anchoring, 'floating' for floating.
+ * @property {string} type - 'anchored' for left or right side anchoring, 'floating' for floating.
  * @property {string} side - 'left' or 'right'. for anchored this sets which side is anchored to, for floating this combined with the sideOffset sets the absolute horizontal position.
  * @property {string} sideOffset - for floating only. this combined with the side sets the absolute horizontal position.
  * @property {string} position - 'top' or 'bottom'. for anchored and floating this combined with the positionOffset sets the absolute vertical position.
