@@ -13,6 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: trossr32/outdated-packages-action@v1.0.0
+      - uses: trossr32/outdated-packages-action@v1.1.0
         with:
           use-npm-outdated: true

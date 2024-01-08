@@ -85,7 +85,10 @@ npm run test
 ## Contribute
 If you can make this extension better I'm happy for the help! Please create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug or want to suggest a new feature.
 
-**To contribute, please create your PR to merge into the staging branch.** Further changes will likely need to be made to update version in the manifest, readme, etc so this enables me to merge your PR and make associated changes before merging to master.
+> [!NOTE]
+> **To contribute, please create your PR to merge into the staging branch.**
+> 
+> Further changes will likely need to be made to update version in the manifest, README, CHANGELOG, etc so this enables me to merge your PR and make associated changes before merging to master.
 
 ## Thanks
 Thanks to the following for helping with this project:
