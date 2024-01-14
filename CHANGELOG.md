@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.8.5
+
+### Fixed
+
+- IMDB TV episode 
+
 ## 2.8.4
 
 ### Fixed

@@ -30,9 +30,17 @@
                 }
             ],
             search: {
-                containerSelector: 'h1',
-                selectorType: 'text',
-                modifiers: []
+                containerSelector: 'link[rel="canonical"]',
+                selectorType: 'href',
+                modifiers: [
+                    {
+                        type: 'regex-match',
+                        pattern: /(?<search>tt\d{5,10})/i
+                    }, {
+                        type: 'prepend',
+                        var: 'imdb:'
+                    }
+                ]
             },
             match: {
                 terms: ['imdb.com'],
