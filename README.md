@@ -83,7 +83,7 @@ npm run test
 ```
 
 ## Contribute
-If you can make this extension better I'm happy for the help! Please create a pull request and get in touch. Alternatively feel free to raise an issue if you've found a bug or want to suggest a new feature.
+If you can make this extension better I'm happy for the help! Please create a pull request and get in touch. Alternatively feel free to [raise an issue](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/new?assignees=trossr32&labels=bug&projects=&template=bug_report.md&title=) if you've found a bug or want to [suggest a new feature](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/new?assignees=trossr32&labels=enhancement&projects=&template=feature_request.md&title=%5BFEATURE%5D+It+would+be+good+if...).
 
 > [!NOTE]
 > **To contribute, please create your PR to merge into the staging branch.**
