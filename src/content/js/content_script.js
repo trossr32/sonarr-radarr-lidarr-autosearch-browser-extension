@@ -699,7 +699,44 @@
             search: {
                 containerSelector: 'meta[property="og:title"]',
                 selectorType: 'content',
-                modifiers: []
+                modifiers: 
+				[
+					{
+						type: 'replace',
+						from: 'critiques de la série ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'les saisons de ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'casting ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'actus de la série ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'vidéos ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: ' en streaming',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: ' en vod',
+						to: ''
+					}
+				]
             },
             where: [
                 {
@@ -725,7 +762,60 @@
             search: {
                 containerSelector: 'meta[property="og:title"]',
                 selectorType: 'content',
-                modifiers: []
+                modifiers: 
+				[
+					{
+						type: 'replace',
+						from: 'avis sur le film ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'séances ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'actus du film ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'bande-annonce vo ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'tout le casting du film ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'avis sur le film ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: ': les critiques presse',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'photos et affiches du film ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'les secrets de tournage du film ',
+						to: ''
+					},
+					{
+						type: 'replace',
+						from: 'les films similaires à ',
+						to: ''
+					}
+					
+				]
             },
             where: [
                 {
