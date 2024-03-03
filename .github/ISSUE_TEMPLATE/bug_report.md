@@ -20,7 +20,7 @@ Steps to reproduce the behaviour:
  - OS: [e.g. iOS]
  - Browser [e.g. chrome, safari]
  - Version [e.g. 22]
- - Extension version [This can be found in your browser extensions page, in the extension popup, or at the bottom of the extension settings page. e.g. 2.8.5]
+ - Extension version [This can be found in your browser extensions page, in the extension popup, or at the bottom of the extension settings page. e.g. 2.8.6]
 
 <!--**Smartphone (please complete the following information):**
  - Device: [e.g. iPhone6]
