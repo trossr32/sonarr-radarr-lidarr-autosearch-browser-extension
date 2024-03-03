@@ -4,7 +4,7 @@ name: Outdated package checks
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [ master ]
+    branches: [ master, main ]
   
   workflow_dispatch:
 
@@ -13,6 +13,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: trossr32/outdated-packages-action@v1.1.0
+      - uses: trossr32/outdated-packages-action@v1.6.0
         with:
           use-npm-outdated: true
