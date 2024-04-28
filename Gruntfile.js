@@ -112,6 +112,7 @@ module.exports = function (grunt) {
 
     // debug group task
     grunt.registerTask('debug', ['jshint', 'clean:debug', 'sass', 'copy']);
+    grunt.registerTask('playwright', ['clean:debug', 'sass', 'copy:release']);
     
     if (process.platform === "win32") {
         // release group task

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.8.8
+
+### Added
+
+- Add playwright tests for site integrations.
+
+### Fixed
+
+- Fix Trakt sonarr link.
+
 ## 2.8.7
 
 ### Fixed
