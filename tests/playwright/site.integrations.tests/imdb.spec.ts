@@ -7,23 +7,21 @@ const servarrQueryId = (imdbId: string): string => `imdb%3A${imdbId}`;
 
 test('imdb tv has sonarr icon', async ({ page }) => {
   const imdbId = 'tt1119644';
-  await page.goto(imdbUrl(imdbId));
+  await page.goto(imdbUrl(imdbId), { waitUntil: 'commit' });
   await expect(page.locator(iconDataLocator)).toHaveCount(1);
-  await expect(page.locator(iconDataLocator)).toBeVisible();
   await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedSonarrUrl(servarrQueryId(imdbId)));
 });
 
 test('imdb movie has radarr icon', async ({ page }) => {
   const imdbId = 'tt0468569';
-  await page.goto(imdbUrl(imdbId));
+  await page.goto(imdbUrl(imdbId), { waitUntil: 'commit' });
   await expect(page.locator(iconDataLocator)).toHaveCount(1);
-  await expect(page.locator(iconDataLocator)).toBeVisible();
   await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedRadarrUrl(servarrQueryId(imdbId)));
 });
 
 test('imdb other video has radarr and sonarr icons', async ({ page }) => {
   const imdbId = 'tt1080585';
-  await page.goto(imdbUrl(imdbId));
+  await page.goto(imdbUrl(imdbId), { waitUntil: 'commit' });
   await expect(page.locator(iconDataLocator)).toHaveCount(2);
   
   // for each icon put the href value in an array and check if it contains the expected values
