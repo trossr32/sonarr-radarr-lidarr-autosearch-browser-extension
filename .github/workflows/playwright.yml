@@ -10,12 +10,15 @@ on:
       - 'src/**'
       - 'tests/playwright/**'
       - 'package.json'
+      
+  schedule:
+    - cron: '0 6 1,11,21 * *'
 
   workflow_dispatch:
 
 jobs:
   test:
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
