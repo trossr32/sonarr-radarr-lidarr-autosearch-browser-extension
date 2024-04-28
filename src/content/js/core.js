@@ -127,7 +127,7 @@ let sessionId,
             }, {
                 id: 'lidarr',
                 domain: 'http://my.lidarr-url.domain:8686',
-                enabled: false,
+                enabled: true,
                 searchPath: '/add/search/',
                 searchInputSelector: 'input[name="searchBox"]',
                 menuText: 'Search Lidarr',

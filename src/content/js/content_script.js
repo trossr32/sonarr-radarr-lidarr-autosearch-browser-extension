@@ -17,7 +17,7 @@
         }
     ],
     integrations = [
-        /* sonarr version which doesn't work with id search */
+        /* sonarr imdb */
         {
             id: 'imdb',
             rules: [
@@ -53,7 +53,7 @@
                 imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
             }
         },
-        /* radarr version which works with id search */
+        /* radarr imdb */
         {
             id: 'imdb',
             rules: [
@@ -229,15 +229,15 @@
                 }
             ],
             search: {
-                containerSelector: '.external > li > a[id="external-link-tvdb"]',
+                containerSelector: '.external > li > a[id="external-link-imdb"]',
                 selectorType: 'href',
                 modifiers: [
                     {
                         type: 'regex-match',
-                        pattern: /\/(?<search>\d{2,10})/i
+                        pattern: /(?<search>tt\d{5,10})/i
                     }, {
                         type: 'prepend',
-                        var: 'tvdb:'
+                        var: 'imdb:'
                     }
                 ]
             },
