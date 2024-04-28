@@ -490,13 +490,19 @@
             search: {
                 containerSelector: 'meta[property="og:title"]',
                 selectorType: 'content',
-                modifiers: []
+                modifiers: [
+                    {
+                        type: 'replace',
+                        from: / \| Rotten Tomatoes/i,
+                        to: ''
+                    }
+                ]
             },
             match: {
                 terms: ['rottentomatoes.com/m']
             },
             icon: {
-                containerSelector: 'h1.title',
+                containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
             }
@@ -507,13 +513,19 @@
             search: {
                 containerSelector: 'meta[property="og:title"]',
                 selectorType: 'content',
-                modifiers: []
+                modifiers: [
+                    {
+                        type: 'replace',
+                        from: / \| Rotten Tomatoes/i,
+                        to: ''
+                    }
+                ]
             },
             match: {
                 terms: ['rottentomatoes.com/tv']
             },
             icon: {
-                containerSelector: 'h1.title',
+                containerSelector: 'h1',
                 locator: 'prepend',
                 imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
             }
@@ -547,7 +559,7 @@
                 attribute: 'content'
             },
             icon: {
-                containerSelector: 'div[class*="productHero_title"] > div',
+                containerSelector: 'div[class*="productHero_title"] > :last-child',
                 locator: 'prepend',
                 imgStyles: 'width: 32px; margin: 0px 10px 0 0;'
             }
@@ -1375,6 +1387,8 @@ async function init() {
                         var matchContainer = $(integration.match.containerSelector),
                             site = null;
 
+                        var matchValue = null;
+
                         if (integration.hasOwnProperty('defaultSite')) {
                             site = settings.sites
                                 .filter(s => { return s.enabled; })
@@ -1384,7 +1398,7 @@ async function init() {
 
                             $.each(integration.rules, 
                                 function (ir, r) {
-                                    var matchValue = getElementValue(matchContainer, integration.match.attribute);
+                                    matchValue = getElementValue(matchContainer, integration.match.attribute);
 
                                     var isMatch = r.match.pattern.test(matchValue);
 
@@ -1453,8 +1467,12 @@ async function init() {
                                     return;
                                 }
 
+                                // We always want to display only one icon except when the integration is imbd and the match was made on a
+                                // media type of 'other'. It's impossible to know whether these media types are movies or tv shows so show both icons.
+                                var iconCheckAttributeName = integration.id == 'imdb' && matchValue.indexOf('other') ? `data-${site.id}-ext-completed` : 'data-servarr-ext-completed';
+
                                 // Check if the container has already been processed and had an icon added.
-                                if (containerEl.attr('data-servarr-ext-completed')) {
+                                if (containerEl.attr(iconCheckAttributeName)) {
                                     log(`element '${container}' already has an icon attributed, so skipping`);
                                     
                                     return;
@@ -1515,7 +1533,7 @@ async function init() {
                                     addCustomIconMarkup(settings.injectedIconConfig, site.id, searchUrl);
                                 }
 
-                                containerEl.attr('data-servarr-ext-completed', true);
+                                containerEl.attr(iconCheckAttributeName, true);
                             });
                         }, deferMs);
                     }
