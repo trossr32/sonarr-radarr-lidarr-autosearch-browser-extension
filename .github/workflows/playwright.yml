@@ -27,19 +27,19 @@ jobs:
       run: |
            npm ci
            npm i grunt -g
-           grunt release
+           grunt playwright
 
     - name: Install test dependencies
       run: npm ci
-      working-directory: test/playwright
+      working-directory: tests/playwright
 
     - name: Install playwright browser(s)
       run: npx playwright install --with-deps
-      working-directory: test/playwright
+      working-directory: tests/playwright
 
     - name: Run playwright tests
       run: npx playwright test
-      working-directory: test/playwright
+      working-directory: tests/playwright
 
     - uses: actions/upload-artifact@v4
       if: always()
