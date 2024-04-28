@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.8.7
+
+### Fixed
+
+- Icon missing for metacritic show overview and movies - ([#184](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/184)).
+- Fixed broken Rotten Tomatoes integration due to site redesign - ([#185](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/185)).
+- Fix imdb integration for media types of _other_. Fix to display both Sonarr and Radarr icons - ([#186](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/186)).
+
 ## 2.8.6
 
 ### Changed
