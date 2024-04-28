@@ -6,11 +6,12 @@ export const test = base.extend<{
   extensionId: string;
 }>({
   context: async ({ }, use) => {
-    const pathToExtension = path.resolve(__dirname, '../../../dist');
+    const pathToExtension = path.resolve(__dirname, '../../dist');
     console.log('Loading extension from', pathToExtension);
     const context = await chromium.launchPersistentContext('', {
       headless: false,
       args: [
+        `--headless=new`,
         `--disable-extensions-except=${pathToExtension}`,
         `--load-extension=${pathToExtension}`,
       ],
