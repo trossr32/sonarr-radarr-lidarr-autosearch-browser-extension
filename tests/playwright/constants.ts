@@ -1,0 +1,1 @@
+export const iconDataLocator = 'a[data-servarr-icon="true"]';
