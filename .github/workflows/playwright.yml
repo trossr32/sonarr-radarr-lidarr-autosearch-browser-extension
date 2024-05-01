@@ -28,7 +28,7 @@ jobs:
     
     - name: Publish extension to dist folder
       run: |
-           npm cix
+           npm ci
            npm i grunt -g
            grunt playwright
 
