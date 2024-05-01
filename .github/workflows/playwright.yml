@@ -28,7 +28,7 @@ jobs:
     
     - name: Publish extension to dist folder
       run: |
-           npm ci
+           npm cix
            npm i grunt -g
            grunt playwright
 
@@ -43,10 +43,39 @@ jobs:
     - name: Run playwright tests
       run: npx playwright test
       working-directory: tests/playwright
-
+      
     - uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report
         path: tests/playwright/playwright-report/
         retention-days: 30
+
+  create-issue-if-tests-fail:
+    needs: test
+    runs-on: ubuntu-latest
+    if: always() && needs.test.result == 'failure'
+    steps:
+      - uses: actions/checkout@v4
+    
+      - name: Create issue
+        uses: dacbd/create-issue-action@main
+        with:
+          token: ${{ github.token }}
+          title: |
+            Playwright tests failed
+
+          assignees: ${{ github.repository_owner }}
+          labels: bug, failed-tests
+          body: |
+            ## Failure Report:
+            
+            > [!IMPORTANT]
+            > Details on failed run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    
+            - Author: trossr32
+            - Branch: `${{ github.ref }}`
+            - Commit: ${{ github.sha }}
+            - Workflow Path: `${{ github.workflow_ref }}`
+    
+            - [ ] **Task**: Review failed tests and fix the issue(s).
