@@ -1510,7 +1510,7 @@ async function init() {
 
                                 log(['search term: ', searchTerm]);
 
-                                let searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ');
+                                let searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ').replace(/%3A/g, ':');
 
                                 log(['search url: ', searchUrl]);
 
