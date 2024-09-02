@@ -119,7 +119,8 @@ Thanks to the following for helping with this project:
 <a href='https://github.com/carsso' target='_blank'>carsso</a> <br />
 <a href='https://github.com/3vanlock' target='_blank'>3vanlock</a> <br />
 <a href='https://github.com/cyberden' target='_blank'>cyberden</a> <br />
-<a href='https://github.com/MozPri' target='_blank'>MozPri</a>
+<a href='https://github.com/MozPri' target='_blank'>MozPri</a> <br />
+<a href='https://github.com/dynamiccookies' target='_blank'>dynamiccookies</a>
 
 <a href='https://ko-fi.com/K3K22CEIT' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://cdn.ko-fi.com/cdn/kofi4.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
