@@ -33,8 +33,8 @@ foreach ($config in $buildConfigs) {
     web-ext build -s $addon -a $publish -o --filename "sonarr_radarr_lidarr_autosearch-{version}.$($config.Extension)"
 }
 
-# Set-Location $publish
+Set-Location $publish
 
-# $zip = Get-Childitem -Include *zip* -File -Recurse -ErrorAction SilentlyContinue
+$xpi = Get-Childitem -Include *xpi* -File -Recurse -ErrorAction SilentlyContinue
 
-# Copy-Item -Path $zip -Destination ($zip.FullName -replace "zip", "xpi") -Force
+Copy-Item -Path $xpi -Destination ($xpi.FullName -replace ".xpi", "_edge.zip") -Force
