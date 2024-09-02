@@ -11,10 +11,8 @@ if (!(Test-path $publish)) {
 
 	Set-Location $root
 }
-
-# build Firefox add on
-$addon = Resolve-Path -LiteralPath "dist/"
 	
+# install web-ext if not already installed
 try {
 	if (-Not (Get-Command web-ext)) { 
 		npm i -g web-ext
@@ -23,10 +21,20 @@ try {
 	npm i -g web-ext
 }
 
-web-ext build -s $addon -a $publish -o --filename "sonarr_radarr_lidarr_autosearch-{version}.zip"
+# build Firefox add on
 
-Set-Location $publish
+$buildConfigs = @(
+    @{ Path = "firefox"; Extension = "xpi" },
+    @{ Path = "chromium"; Extension = "zip" }
+)
 
-$zip = Get-Childitem -Include *zip* -File -Recurse -ErrorAction SilentlyContinue
+foreach ($config in $buildConfigs) {
+    $addon = Resolve-Path -LiteralPath "dist/$($config.Path)"
+    web-ext build -s $addon -a $publish -o --filename "sonarr_radarr_lidarr_autosearch-{version}.$($config.Extension)"
+}
 
-Copy-Item -Path $zip -Destination ($zip.FullName -replace "zip", "xpi") -Force
+# Set-Location $publish
+
+# $zip = Get-Childitem -Include *zip* -File -Recurse -ErrorAction SilentlyContinue
+
+# Copy-Item -Path $zip -Destination ($zip.FullName -replace "zip", "xpi") -Force

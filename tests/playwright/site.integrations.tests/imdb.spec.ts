@@ -3,7 +3,7 @@ import { test, expect } from '../fixtures';
 import { getExpectedRadarrUrl, getExpectedSonarrUrl } from '../helpers';
 
 const imdbUrl = (imdbId: string): string => `https://www.imdb.com/title/${imdbId}/`;
-const servarrQueryId = (imdbId: string): string => `imdb%3A${imdbId}`;
+const servarrQueryId = (imdbId: string): string => `imdb:${imdbId}`;
 
 test('imdb tv has sonarr icon', async ({ page }) => {
   const imdbId = 'tt1119644';

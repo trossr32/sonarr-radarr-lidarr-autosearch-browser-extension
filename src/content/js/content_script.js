@@ -462,7 +462,7 @@
                 terms: ['letterboxd.com/film/']
             },
             icon: {
-                containerSelector: '#featured-film-header > h1',
+                containerSelector: '.details > h1',
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: 8px 10px 0 0; float: left;'
             }
@@ -1510,7 +1510,7 @@ async function init() {
 
                                 log(['search term: ', searchTerm]);
 
-                                let searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ');
+                                let searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ').replace(/%3A/g, ':');
 
                                 log(['search url: ', searchUrl]);
 

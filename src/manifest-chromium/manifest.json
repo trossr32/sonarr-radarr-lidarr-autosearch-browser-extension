@@ -1,21 +1,22 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Sonarr/Radarr/Lidarr autosearch",
   "description": "Exposes a context menu that enables direct searching for tv shows, movies and other text in Sonarr, Radarr, Lidarr and Readarr.",
-  "version": "2.8.8.0",
-  "browser_action": {
-    "default_icon": "content/assets/images/SonarrRadarrLidarr128.png",
-    "default_popup": "popup.html"
-  },
+  "version": "2.9.0.0",
   "browser_specific_settings": {
     "gecko": {
       "id": "sonarr-radarr-lidarr-autosearch@robgreen.me",
       "strict_min_version": "42.0"
     }
   },
+  "action": {
+    "default_icon": "content/assets/images/SonarrRadarrLidarr128.png",
+    "default_popup": "popup.html"
+  },
   "icons": {
     "16": "content/assets/images/SonarrRadarrLidarr16.png",
-    "48": "content/assets/images/SonarrRadarrLidarr48.png"
+    "48": "content/assets/images/SonarrRadarrLidarr48.png",
+    "128": "content/assets/images/SonarrRadarrLidarr128.png"
   },
   "options_ui": {
     "page": "options.html",
@@ -28,7 +29,7 @@
       "content/js/core.js",
       "eventPage.js"
     ],
-    "persistent": false
+    "service_worker": "eventPage.chrome.js"
   },
   "content_scripts": [
     {
@@ -41,10 +42,17 @@
         "content/js/browser-polyfill.min.js",
         "content/js/core.js",
         "content/js/sonarr_radarr_lidarr_autosearch.js"
-      ]
+      ],
+      "run_at": "document_end"
     }
   ],
   "permissions": [
+    "scripting", 
+    "storage",
+    "activeTab",
+    "contextMenus"
+  ],
+  "host_permissions": [
     "*://*.imdb.com/*",
     "*://*.themoviedb.org/*",
     "*://*.thetvdb.com/*",
@@ -62,9 +70,6 @@
     "*://*.myanimelist.net/*",
     "*://*.betaseries.com/*",
     "*://*.primevideo.com/*",
-    "<all_urls>",
-    "storage",
-    "activeTab",
-    "contextMenus"
+    "<all_urls>"
   ]
 }

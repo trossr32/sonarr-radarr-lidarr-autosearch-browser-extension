@@ -2,7 +2,7 @@ import { iconDataLocator } from '../constants';
 import { test, expect } from '../fixtures';
 import { getExpectedLidarrUrl } from '../helpers';
 
-const servarrQueryId = (lidarrId: string): string => `lidarr%3A${lidarrId}`;
+const servarrQueryId = (lidarrId: string): string => `lidarr:${lidarrId}`;
 
 test('musicbrainz artist has lidarr icon', async ({ page }) => {
   const lidarrId = 'a1ed5e33-22ff-4e7d-a457-42f4309e135f';
