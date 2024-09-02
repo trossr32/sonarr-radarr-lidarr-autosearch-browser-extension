@@ -13,5 +13,5 @@ test('tmdb tv has sonarr icon', async ({ page }) => {
 test('imdb movie has radarr icon', async ({ page }) => {
   await page.goto('https://www.themoviedb.org/movie/155-the-dark-knight', { waitUntil: 'commit' });
   await expect(page.locator(iconDataLocator)).toHaveCount(1);
-  await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedRadarrUrl('tmdb%3A155'));
+  await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedRadarrUrl('tmdb:155'));
 });
