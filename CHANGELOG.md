@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.9.0
+
+### Changed
+
+- Migrate to manifest v3 for chromium browsers (Firefox staying on manifest v2 for now - [more info](https://blog.mozilla.org/addons/2024/03/13/manifest-v3-manifest-v2-march-2024-update/)).
+
 ## 2.8.8
 
 ### Added

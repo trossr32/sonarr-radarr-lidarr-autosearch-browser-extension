@@ -462,7 +462,7 @@
                 terms: ['letterboxd.com/film/']
             },
             icon: {
-                containerSelector: '#featured-film-header > h1',
+                containerSelector: '#content h1',
                 locator: 'prepend',
                 imgStyles: 'width: 25px; margin: 8px 10px 0 0; float: left;'
             }

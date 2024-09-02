@@ -6,7 +6,7 @@ export const test = base.extend<{
   extensionId: string;
 }>({
   context: async ({ }, use) => {
-    const pathToExtension = path.resolve(__dirname, '../../dist');
+    const pathToExtension = path.resolve(__dirname, '../../dist/chromium');
     console.log('Loading extension from', pathToExtension);
     const context = await chromium.launchPersistentContext('', {
       headless: false,
@@ -21,16 +21,16 @@ export const test = base.extend<{
   },
   extensionId: async ({ context }, use) => {
     // for manifest v2:
+    /*
     let [background] = context.backgroundPages()
     if (!background)
       background = await context.waitForEvent('backgroundpage')
+    */
 
     // for manifest v3:
-    /*
     let [background] = context.serviceWorkers();
     if (!background)
       background = await context.waitForEvent('serviceworker');
-    */
 
     const extensionId = background.url().split('/')[2];
     await use(extensionId);
