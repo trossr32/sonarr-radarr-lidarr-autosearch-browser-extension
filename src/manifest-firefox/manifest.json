@@ -10,7 +10,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "sonarr-radarr-lidarr-autosearch@robgreen.me",
-      "strict_min_version": "42.0"
+      "strict_min_version": "58.0"
     }
   },
   "icons": {
