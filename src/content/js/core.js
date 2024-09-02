@@ -689,6 +689,56 @@ async function callApi(request) {
         };
     }
 
+    // /**
+    //  * Wrap the actual API call in a function so it can be called for multiple url options
+    //  * @param {string} url 
+    //  * @returns {ApiResponse}
+    //  */
+    // async function performCall(url) {
+    //     try {
+    //         const data = await $.getJSON(url);
+    //         const response = {
+    //             data: data,
+    //             request: request,
+    //             success: true,
+    //             error: null
+    //         };
+    
+    //         switch (request.endpoint) {
+    //             // if this is a 'Version' call try to update settings with version specific data
+    //             case 'Version':
+    //                 // if auto population is turned off the just return response
+    //                 if (!site.autoPopAdvancedFromApi && request.source != 'ApiAutoPopEnabled') {
+    //                     return response;
+    //                 }
+    
+    //                 // auto population is enabled, so get the config for this version and update settings
+    //                 let config = getVersionConfig(site.id, data.version);
+    
+    //                 for (let i = 0; i < settings.sites.length; i++) {
+    //                     if (settings.sites[i].id === site.id) {
+    //                         settings.sites[i].searchPath = config.searchPath;
+    //                         settings.sites[i].searchInputSelector = config.searchInputSelector;
+    //                     }
+    //                 }
+    
+    //                 await setSettings(settings);
+    
+    //                 return response;
+    
+    //             default:
+    //                 return response;
+    //         }
+    //     } catch (error) {
+    //         return {
+    //             data: null,
+    //             request: request,
+    //             success: false,
+    //             error: error
+    //         };
+    //     }
+    // }
+
     /**
      * Wrap the actual API call in a function so it can be called for multiple url options
      * @param {string} url 
@@ -696,38 +746,37 @@ async function callApi(request) {
      */
     async function performCall(url) {
         try {
-            const data = await $.getJSON(url);
-            const response = {
+            const response = await fetch(url);
+            const data = await response.json();
+
+            const apiResponse = {
                 data: data,
                 request: request,
                 success: true,
                 error: null
             };
-    
+
             switch (request.endpoint) {
-                // if this is a 'Version' call try to update settings with version specific data
                 case 'Version':
-                    // if auto population is turned off the just return response
                     if (!site.autoPopAdvancedFromApi && request.source != 'ApiAutoPopEnabled') {
-                        return response;
+                        return apiResponse;
                     }
-    
-                    // auto population is enabled, so get the config for this version and update settings
+
                     let config = getVersionConfig(site.id, data.version);
-    
+
                     for (let i = 0; i < settings.sites.length; i++) {
                         if (settings.sites[i].id === site.id) {
                             settings.sites[i].searchPath = config.searchPath;
                             settings.sites[i].searchInputSelector = config.searchInputSelector;
                         }
                     }
-    
+
                     await setSettings(settings);
-    
-                    return response;
-    
+
+                    return apiResponse;
+
                 default:
-                    return response;
+                    return apiResponse;
             }
         } catch (error) {
             return {
@@ -738,6 +787,7 @@ async function callApi(request) {
             };
         }
     }
+
 
     // try the explicit v3 api first
     let url = getApiUrl(site, request.endpoint);

@@ -6,7 +6,7 @@ import { getExpectedRadarrUrl, getExpectedSonarrUrl } from '../helpers';
 test('tvdb tv has sonarr icon', async ({ page }) => {
   await page.goto('https://www.thetvdb.com/series/fringe', { waitUntil: 'commit' });
   await expect(page.locator(iconDataLocator)).toHaveCount(1);
-  await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedSonarrUrl('tvdb%3A82066'));
+  await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedSonarrUrl('tvdb:82066'));
 });
 
 // tvdb id doesn't work with radarr

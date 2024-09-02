@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.9.0
+
+### Changed
+
+- Migrate to manifest v3 for chromium browsers (Firefox staying on manifest v2 for now - [more info](https://blog.mozilla.org/addons/2024/03/13/manifest-v3-manifest-v2-march-2024-update/)). - ([#143](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/143)). 
+- Fixed Letterboxd missing Radarr icon - ([#193](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/193)). Thanks to [MozPri](https://github.com/MozPri).
+- Fix bug where colon is replaced by "%3A". ([#196](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/196)). Thanks to [dynamiccookies](https://github.com/dynamiccookies).
+
 ## 2.8.8
 
 ### Added

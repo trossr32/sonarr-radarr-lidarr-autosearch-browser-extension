@@ -5,13 +5,13 @@ import { getExpectedRadarrUrl, getExpectedSonarrUrl } from '../helpers';
 test('trakt tv has sonarr icon', async ({ page }) => {
   await page.goto('https://trakt.tv/shows/fringe', { waitUntil: 'commit' });
   await expect(page.locator(iconDataLocator)).toHaveCount(1);
-  await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedSonarrUrl('imdb%3Att1119644'));
+  await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedSonarrUrl('imdb:tt1119644'));
 });
 
 test('trakt movie has radarr icon', async ({ page }) => {
   await page.goto('https://trakt.tv/movies/the-dark-knight-2008', { waitUntil: 'commit' });
   await expect(page.locator(iconDataLocator)).toHaveCount(1);
-  await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedRadarrUrl('tmdb%3A155'));
+  await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedRadarrUrl('tmdb:155'));
 });
 
 const tvShowViews = ['trending', 'popular', 'favorited/weekly', 'watched/weekly', 'collected/weekly', 'anticipated']
