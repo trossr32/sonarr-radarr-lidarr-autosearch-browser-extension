@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Migrate to manifest v3 for chromium browsers (Firefox staying on manifest v2 for now - [more info](https://blog.mozilla.org/addons/2024/03/13/manifest-v3-manifest-v2-march-2024-update/)).
+- Fixed Letterboxd missing Radarr icon - ([#193](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/193)). Thanks to [MozPri](https://github.com/MozPri).
 
 ## 2.8.8
 
