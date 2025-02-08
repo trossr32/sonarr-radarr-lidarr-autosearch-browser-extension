@@ -25,29 +25,28 @@ jobs:
       matrix: ${{ steps.discover.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-      - name: Discover test files
+      - name: Discover tests
         id: discover
         run: |
           # Find all *.spec.ts files and strip out the directory so that later
-          # when running in tests/playwright, the path is relative.
-          files=$(find -name '*.spec.ts' -exec basename {} \;)
-          # Build a JSON array with an object for each test file.
-          arr="["
-          first=1
-          for f in $files; do
-            if [ $first -eq 1 ]; then
-              first=0
-            else
-              arr+=","
-            fi
-            arr+="{\"testFile\":\"$f\"}"
+          tests=$(find tests/playwright/site.integrations.tests -name '*.spec.ts')
+
+          # Create JSON format for matrix
+          matrix="{\"tests\":["
+          for test in $tests; do
+            # Extract the test name by manipulating the project path (e.g., remove RestEasier.CoreApi/Tests/ and .csproj)
+            test_name=$(basename "$test" .spec.ts)
+            test_file=$(basename "$test")
+            # Append to matrix
+            matrix="$matrix{\"name\":\"$test_name\",\"file\":\"$test_file\"},"
           done
-          arr+="]"
-          echo "matrix=$arr" >> "$GITHUB_OUTPUT"
-        working-directory: tests/playwright/site.integrations.tests
+          # Remove the last comma and close the JSON
+          matrix="${matrix::-1}]}"
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
   
   # Second job: run tests in parallel – one per file – using the matrix.
   test:
+    name: ${{ matrix.tests.name }}
     needs: discover-tests
     timeout-minutes: 15
     strategy:
@@ -73,14 +72,14 @@ jobs:
         run: npx playwright install --with-deps chromium
         working-directory: tests/playwright
 
-      - name: Run Playwright test for file ${{ matrix.testFile }}
-        run: npx playwright test ${{ matrix.testFile }}
+      - name: Run Playwright test for ${{ matrix.tests.name }}
+        run: npx playwright test ${{ matrix.tests.file }}
         working-directory: tests/playwright
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report-${{ matrix.testFile }}
+          name: playwright-report-${{ matrix.tests.name }}
           path: tests/playwright/playwright-report/
           retention-days: 30
 
@@ -91,7 +90,7 @@ jobs:
         with:
           token: ${{ github.token }}
           title: |
-            Playwright test failed: ${{ matrix.testFile }}
+            Playwright test failed: ${{ matrix.tests.name }}
           assignees: ${{ github.repository_owner }}
           labels: bug, failed-tests
           body: |
@@ -100,7 +99,7 @@ jobs:
             > [!IMPORTANT]
             > Details on failed run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     
-            - **Test File:** `${{ matrix.testFile }}`
+            - **Test File:** `${{ matrix.tests.file }}`
             - **Author:** trossr32
             - **Branch:** `${{ github.ref }}`
             - **Commit:** ${{ github.sha }}
