@@ -551,7 +551,13 @@
             search: {
                 containerSelector: 'meta[property="og:title"]',
                 selectorType: 'content',
-                modifiers: []
+                modifiers: [
+                    {
+                        type: 'replace',
+                        from: ' Reviews',
+                        to: ''
+                    }
+                ]
             },
             match: {
                 terms: ['metacritic.com'],
