@@ -21,6 +21,7 @@
  * @property {Integration[]} integrations - all integrations
  * @property {InjectedIconConfig} injectedIconConfig - injected icon type and position configuration
  * @property {bool} enabled - is enabled
+ * @property {bool} contextMenu - whether to show context menu
  * @property {bool} debug - log to console
  * @property {int} searchInputWaitForMs - jQuery selector for the search input on the search page
  * @property {int} searchInputMaxAttempts - text that is shown for this site's entry in the context menu
@@ -282,7 +283,8 @@ let sessionId,
         }, 
         config: {
             enabled: true,
-            debug: false,        
+            contextMenu: true,
+            debug: false,
             searchInputWaitForMs: 300,
             searchInputMaxAttempts: 20,
             customIconPosition: false
@@ -581,6 +583,11 @@ async function getSettings() {
         data.sonarrRadarrLidarrAutosearchSettings.config.customIconPosition = defaultSettings.config.customIconPosition;
     }
 
+    // check config contextMenu property
+    if (!data.sonarrRadarrLidarrAutosearchSettings.config.hasOwnProperty('contextMenu')) {
+        data.sonarrRadarrLidarrAutosearchSettings.config.contextMenu = defaultSettings.config.contextMenu;
+    }
+
     return data.sonarrRadarrLidarrAutosearchSettings;
 }
 
@@ -593,6 +600,10 @@ async function getSettings() {
 async function setSettings(data) {
     if (!data.hasOwnProperty('enabled')) {
         data.enabled = true;
+    }
+
+    if (!data.hasOwnProperty('contextMenu')) {
+        data.contextMenu = true;
     }
 
     if (!data.hasOwnProperty('debug')) {

@@ -32,7 +32,7 @@ browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 browser.runtime.onConnect.addListener(function(port) {
     switch (port.name) {
         case 'init':
-            port.onMessage.addListener(async function (request) {
+            port.onMessage.addListener(async function () {
                 await initRun('onConnect');
             });
             break;
@@ -54,8 +54,8 @@ browser.runtime.onConnect.addListener(function(port) {
 async function buildMenus(settings) {
     await browser.contextMenus.removeAll();
 
-    // if extension is disabled gtfo
-    if (!settings.config.enabled) {
+    // if extension is disabled or context menu option is disabled gtfo
+    if (!settings.config.enabled || !settings.config.contextMenu) {
         return;
     }
 
