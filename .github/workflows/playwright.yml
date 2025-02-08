@@ -1,4 +1,5 @@
 name: Playwright tests
+
 on:
   pull_request:
     branches: [ staging, main, master ]
@@ -12,59 +13,84 @@ on:
       - 'package.json'
       
   schedule:
-    - cron: '0 6 1,11,21 * *'
+    - cron: '0 6 1,16 * *'
 
   workflow_dispatch:
 
 jobs:
-  test:
-    timeout-minutes: 15
+  # First job: discover all the *.spec.ts files and output a JSON matrix.
+  discover-tests:
     runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    
-    - name: Publish extension to dist folder
-      run: |
-           npm ci
-           npm i grunt -g
-           grunt playwright
-
-    - name: Install test dependencies
-      run: npm ci
-      working-directory: tests/playwright
-
-    - name: Install playwright browser (chromium)
-      run: npx playwright install --with-deps chromium
-      working-directory: tests/playwright
-
-    - name: Run playwright tests
-      run: npx playwright test
-      working-directory: tests/playwright
-      
-    - uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: playwright-report
-        path: tests/playwright/playwright-report/
-        retention-days: 30
-
-  create-issue-if-tests-fail:
-    needs: test
-    runs-on: ubuntu-latest
-    if: always() && needs.test.result == 'failure'
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
     steps:
       - uses: actions/checkout@v4
-    
-      - name: Create issue
+      - name: Discover tests
+        id: discover
+        run: |
+          # Find all *.spec.ts files and strip out the directory so that later
+          tests=$(find tests/playwright/site.integrations.tests -name '*.spec.ts')
+
+          # Create JSON format for matrix
+          matrix="{\"tests\":["
+          for test in $tests; do
+            # Extract the test name by manipulating the project path (e.g., remove RestEasier.CoreApi/Tests/ and .csproj)
+            test_name=$(basename "$test" .spec.ts)
+            test_file=$(basename "$test")
+            # Append to matrix
+            matrix="$matrix{\"name\":\"$test_name\",\"file\":\"$test_file\"},"
+          done
+          # Remove the last comma and close the JSON
+          matrix="${matrix::-1}]}"
+          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+  
+  # Second job: run tests in parallel – one per file – using the matrix.
+  test:
+    name: ${{ matrix.tests.name }}
+    needs: discover-tests
+    timeout-minutes: 15
+    strategy:
+      matrix: ${{ fromJson(needs.discover-tests.outputs.matrix) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          
+      - name: Publish extension to dist folder
+        run: |
+          npm ci
+          npm i grunt -g
+          grunt playwright
+
+      - name: Install test dependencies
+        run: npm ci
+        working-directory: tests/playwright
+
+      - name: Install Playwright browser (chromium)
+        run: npx playwright install --with-deps chromium
+        working-directory: tests/playwright
+
+      - name: Run Playwright test for ${{ matrix.tests.name }}
+        run: npx playwright test ${{ matrix.tests.file }}
+        working-directory: tests/playwright
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.tests.name }}
+          path: tests/playwright/playwright-report/
+          retention-days: 30
+
+      # If the test step fails, create an issue using the same method as before.
+      - name: Create issue if test fails
+        if: failure()
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}
           title: |
-            Playwright tests failed
-
+            Playwright test failed: ${{ matrix.tests.name }}
           assignees: ${{ github.repository_owner }}
           labels: bug, failed-tests
           body: |
@@ -73,9 +99,8 @@ jobs:
             > [!IMPORTANT]
             > Details on failed run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     
-            - Author: trossr32
-            - Branch: `${{ github.ref }}`
-            - Commit: ${{ github.sha }}
-            - Workflow Path: `${{ github.workflow_ref }}`
-    
-            - [ ] **Task**: Review failed tests and fix the issue(s).
+            - **Test File:** `${{ matrix.tests.file }}`
+            - **Author:** trossr32
+            - **Branch:** `${{ github.ref }}`
+            - **Commit:** ${{ github.sha }}
+            - **Workflow:** `${{ github.workflow_ref }}`

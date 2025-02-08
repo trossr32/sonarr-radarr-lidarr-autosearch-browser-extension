@@ -619,6 +619,35 @@ var initialiseCustomIconForm = function (settings) {
 };
 
 /**
+ * Build the context menu tab
+ */
+var initialiseContextMenuForm = function (settings) {
+    let wrapper = $('<div></div>')
+        .append($('<h5 class="mb-4">Context menu</h5>'))
+        .append($('<div class="row"></div>')
+            .append($('<label for="toggle-context-menu" class="col-4" style=margin-top: 2px;">Enable context menu</label>'))
+            .append($('<div class="col"></div>')
+                .append($('<input type="checkbox" id="toggle-context-menu">').prop('checked', settings.config.contextMenu))
+            )
+        );
+
+    $('#contextMenuOptionsForm').prepend(wrapper);
+
+    // enable toggle
+    $('#toggle-context-menu').bootstrapToggle({
+        on: 'Enabled',
+        off: 'Disabled',
+        onstyle: 'success',
+        offstyle: 'danger',
+        width: '90px',
+        size: 'small'
+    });
+
+    // site enabled/disabled toggle change event
+    $('#toggle-context-menu').on('change', setSettingsPropertiesFromContextMenuForm);
+};
+
+/**
  * Build the debug tab
  */
 var initialiseDebugForm = function (settings) {
@@ -776,6 +805,17 @@ async function setSettingsPropertiesFromCustomIconForm() {
 }
 
 /**
+ * Update settings from the context menu form fields
+ */
+async function setSettingsPropertiesFromContextMenuForm() {
+    const settings = await getSettings();
+
+    settings.config.contextMenu = $('#toggle-context-menu').prop('checked');
+
+    await setSettings(settings);
+}
+
+/**
  * Update settings from the debug tab form fields
  */
 async function setSettingsPropertiesFromDebugForm() {
@@ -841,6 +881,7 @@ $(async function () {
     initialiseAdvancedForm(settings);
     initialiseIntegrationsForm(settings);
     initialiseCustomIconForm(settings);
+    initialiseContextMenuForm(settings);
     initialiseDebugForm(settings);
 
     // deactivate all other tabs on click. this shouldn't be required, but bootstrap 5 beta seems a bit buggy with tab deactivation.

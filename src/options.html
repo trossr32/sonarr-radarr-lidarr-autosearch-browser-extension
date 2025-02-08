@@ -51,6 +51,11 @@
             </a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" id="context-menu-tab" data-bs-toggle="tab" href="#context-menu" role="tab" aria-controls="context-menu" aria-selected="false">
+                <i class="fa fa-bars"></i>&nbsp;&nbsp;&nbsp;Context menu
+            </a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" id="debug-tab" data-bs-toggle="tab" href="#debug" role="tab" aria-controls="debug" aria-selected="false">
                 <i class="fa fa-bug"></i>&nbsp;&nbsp;&nbsp;Debug
             </a>
@@ -156,6 +161,9 @@
 
             <form id="customIconOptionsForm"></form>
         </div>
+        <div class="tab-pane fade" id="context-menu" role="tabpanel" aria-labelledby="context-menu-tab">
+            <form id="contextMenuOptionsForm"></form>
+        </div>
         <div class="tab-pane fade" id="debug" role="tabpanel" aria-labelledby="debug-tab">
             <form id="debugOptionsForm"></form>
         </div>
@@ -193,7 +201,7 @@
     <div class="row justify-content-center">
         <div class="col-12" style="text-align: center">
             <div class="my-3">
-                <i>Version 2.9.0</i>
+                <i>Version 2.10.0</i>
             </div>
         </div>
     </div>

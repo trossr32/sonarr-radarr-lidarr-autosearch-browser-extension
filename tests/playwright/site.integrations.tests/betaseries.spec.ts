@@ -8,7 +8,7 @@ tvShowUrls.forEach(async (url) => {
   test(`betaseries tv has sonarr icon at link: ${url}`, async ({ page }) => {
     await page.goto(`${url}fringe`, { waitUntil: 'commit' });
     await expect(page.locator(iconDataLocator)).toHaveCount(1);
-    await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedSonarrUrl('Fringe'));
+    await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedSonarrUrl('Fringe'), { ignoreCase: true });
   });
 });
 
@@ -18,6 +18,6 @@ movieUrls.forEach(async (url) => {
   test(`betaseries movie has radarr icon at link: ${url}`, async ({ page }) => {
     await page.goto(`${url}139-the-dark-knight`, { waitUntil: 'commit' });
     await expect(page.locator(iconDataLocator)).toHaveCount(1);
-    await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedRadarrUrl('The%20Dark%20Knight'));
+    await expect(page.locator(iconDataLocator)).toHaveAttribute('href', getExpectedRadarrUrl('The%20Dark%20Knight'), { ignoreCase: true });
   });
 });

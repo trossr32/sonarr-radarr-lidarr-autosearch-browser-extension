@@ -502,9 +502,9 @@
                 terms: ['rottentomatoes.com/m']
             },
             icon: {
-                containerSelector: 'h1',
+                containerSelector: '#hero-wrap [context="heading"]',
                 locator: 'prepend',
-                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
+                imgStyles: 'width: 30px; margin: -4px 10px 0 0;'
             }
         },
         {
@@ -525,9 +525,9 @@
                 terms: ['rottentomatoes.com/tv']
             },
             icon: {
-                containerSelector: 'h1',
+                containerSelector: '#hero-wrap [context="heading"]',
                 locator: 'prepend',
-                imgStyles: 'width: 35px; margin: -8px 10px 0 0;'
+                imgStyles: 'width: 30px; margin: -4px 10px 0 0;'
             }
         },
         {
@@ -551,7 +551,13 @@
             search: {
                 containerSelector: 'meta[property="og:title"]',
                 selectorType: 'content',
-                modifiers: []
+                modifiers: [
+                    {
+                        type: 'replace',
+                        from: ' reviews',
+                        to: ''
+                    }
+                ]
             },
             match: {
                 terms: ['metacritic.com'],
