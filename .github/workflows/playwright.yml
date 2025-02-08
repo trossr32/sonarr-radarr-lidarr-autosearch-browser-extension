@@ -30,7 +30,7 @@ jobs:
         run: |
           # Find all *.spec.ts files and strip out the directory so that later
           # when running in tests/playwright, the path is relative.
-          files=$(find tests/playwright -maxdepth 1 -name "*.spec.ts" -exec basename {} \;)
+          files=$(find -name '*.spec.ts' -exec basename {} \;)
           # Build a JSON array with an object for each test file.
           arr="["
           first=1
@@ -44,6 +44,7 @@ jobs:
           done
           arr+="]"
           echo "matrix=$arr" >> "$GITHUB_OUTPUT"
+        working-directory: tests/playwright/site.integrations.tests
   
   # Second job: run tests in parallel – one per file – using the matrix.
   test:
