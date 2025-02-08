@@ -1,6 +1,20 @@
 importScripts("./content/js/browser-polyfill.min.js");
 importScripts("./content/js/core.js");
 
+async function getCurrentTab() {
+    try {
+        let queryOptions = { active: true, lastFocusedWindow: true };
+    
+        let [tab] = await chrome.tabs.query(queryOptions);
+    
+        return tab;
+    } catch (error) {
+        console.warn('Error getting current tab', error);
+
+        return null;
+    }
+}
+
 /**
  * Get settings, set the extension icon and execute the content script
  */
@@ -29,7 +43,7 @@ async function initRun(tabId, evt) {
     }
 }
 
-browser.tabs.onActivated.addListener(function (activeInfo) {
+browser.tabs.onActivated.addListener(async function (activeInfo) {
     initRun(activeInfo.tabId, 'onActivated')
 });
 
@@ -44,9 +58,10 @@ browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 browser.runtime.onConnect.addListener(function(port) {
     switch (port.name) {
         case 'init':
-            port.onMessage.addListener(async function (request) {
-                // TODO: get tab id
-                await initRun(request.tabId, 'onConnect');
+            port.onMessage.addListener(async function () {
+                let tabId = await getCurrentTab();
+    
+                await initRun(tabId, 'onConnect');
             });
             break;
 
@@ -67,8 +82,8 @@ browser.runtime.onConnect.addListener(function(port) {
 async function buildMenus(settings) {
     await browser.contextMenus.removeAll();
 
-    // if extension is disabled gtfo
-    if (!settings.config.enabled) {
+    // if extension is disabled or context menu option is disabled gtfo
+    if (!settings.config.enabled || !settings.config.contextMenu) {
         return;
     }
 
