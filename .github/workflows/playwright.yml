@@ -84,23 +84,23 @@ jobs:
           retention-days: 30
 
       # If the test step fails, create an issue using the same method as before.
-      - name: Create issue if test fails
-        if: failure()
-        uses: dacbd/create-issue-action@main
-        with:
-          token: ${{ github.token }}
-          title: |
-            Playwright test failed: ${{ matrix.tests.name }}
-          assignees: ${{ github.repository_owner }}
-          labels: bug, failed-tests
-          body: |
-            ## Failure Report:
+      # - name: Create issue if test fails
+      #   if: failure()
+      #   uses: dacbd/create-issue-action@main
+      #   with:
+      #     token: ${{ github.token }}
+      #     title: |
+      #       Playwright test failed: ${{ matrix.tests.name }}
+      #     assignees: ${{ github.repository_owner }}
+      #     labels: bug, failed-tests
+      #     body: |
+      #       ## Failure Report:
             
-            > [!IMPORTANT]
-            > Details on failed run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      #       > [!IMPORTANT]
+      #       > Details on failed run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
     
-            - **Test File:** `${{ matrix.tests.file }}`
-            - **Author:** trossr32
-            - **Branch:** `${{ github.ref }}`
-            - **Commit:** ${{ github.sha }}
-            - **Workflow:** `${{ github.workflow_ref }}`
+      #       - **Test File:** `${{ matrix.tests.file }}`
+      #       - **Author:** trossr32
+      #       - **Branch:** `${{ github.ref }}`
+      #       - **Commit:** ${{ github.sha }}
+      #       - **Workflow:** `${{ github.workflow_ref }}`
