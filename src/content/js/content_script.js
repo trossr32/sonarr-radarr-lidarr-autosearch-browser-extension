@@ -554,7 +554,7 @@
                 modifiers: [
                     {
                         type: 'replace',
-                        from: ' Reviews',
+                        from: ' reviews',
                         to: ''
                     }
                 ]
