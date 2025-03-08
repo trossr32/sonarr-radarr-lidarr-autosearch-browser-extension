@@ -403,7 +403,7 @@ let sessionId,
             id: 'radarr',
             configs: [
                 {
-                    versionMatch: /^0/,
+                    versionMatch: /^[0|2]/,
                     searchPath: '/addmovies/',
                     searchInputSelector: '.add-movies-search .x-movies-search'
                 },
