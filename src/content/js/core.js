@@ -409,7 +409,7 @@ let sessionId,
                 },
                 {
                     versionMatch: /^[3|4|5|6]/,
-                    searchPath: '/add/new/',
+                    searchPath: '/add/new/?term=',
                     searchInputSelector: 'input[name="movieLookup"]'
                 }
             ]
