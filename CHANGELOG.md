@@ -2,13 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.11.0
+
+### Fixed
+
+- Fixed Radarr/Sonarr `/add/new/{searchTerm}` fails to prefill search term - ([#255](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/255)). Thanks to [0xdevalias](https://github.com/0xdevalias).
+
 ## 2.10.0
 
 ### Fixed
 
 - Fixed Rotten Tomatoes icon location selectors - ([#229](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/229)).
 - Removed browser.tabs dependency in Firefox content script as it wasn't being used - ([#224](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/224)).
-- Remove "Reviews" from metacritic title - ([#218](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/218)).Thanks to [theotherp](https://github.com/theotherp).
+- Remove "Reviews" from metacritic title - ([#218](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/218)). Thanks to [theotherp](https://github.com/theotherp).
 
 ### Added
 
