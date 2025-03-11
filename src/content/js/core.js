@@ -394,7 +394,7 @@ let sessionId,
                 },
                 {
                     versionMatch: /^[3|4|5|6]/,
-                    searchPath: '/add/new/',
+                    searchPath: '/add/new/?term=',
                     searchInputSelector: 'input[name="seriesLookup"]'
                 }
             ]
@@ -403,13 +403,13 @@ let sessionId,
             id: 'radarr',
             configs: [
                 {
-                    versionMatch: /^0/,
+                    versionMatch: /^[0|2]/,
                     searchPath: '/addmovies/',
                     searchInputSelector: '.add-movies-search .x-movies-search'
                 },
                 {
                     versionMatch: /^[3|4|5|6]/,
-                    searchPath: '/add/new/',
+                    searchPath: '/add/new/?term=',
                     searchInputSelector: 'input[name="movieLookup"]'
                 }
             ]

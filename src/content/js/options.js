@@ -349,7 +349,7 @@ var initialiseAdvancedForm = function (settings) {
                     .append($('<li class="list-group-item pt-3 pb-5">' + 
                         '<h5 class="card-title pb-4">Radarr version config</h5>' + 
                         '<p class="card-text">These settings are defaulted to v4.<i>n</i>. For v0.<i>n</i> use:</p>' +
-                        '<p class="card-text">Search path url: <b>/addmmovies/</b></p>' +
+                        '<p class="card-text">Search path url: <b>/addmovies/</b></p>' +
                         '<p class="card-text">Search field selector: <b>.add-movies-search .x-movies-search</b></p>' +
                         '</li>'))
                 )
