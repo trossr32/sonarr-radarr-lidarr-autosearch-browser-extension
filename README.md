@@ -121,7 +121,7 @@ Thanks to the following for helping with this project:
 <a href='https://github.com/cyberden' target='_blank'>cyberden</a> <br />
 <a href='https://github.com/MozPri' target='_blank'>MozPri</a> <br />
 <a href='https://github.com/dynamiccookies' target='_blank'>dynamiccookies</a> <br />
-<a href='https://github.com/theotherp' target='_blank'>theotherp</a>
+<a href='https://github.com/theotherp' target='_blank'>theotherp</a> <br />
 <a href='https://github.com/0xdevalias)' target='_blank'>0xdevalias</a>
 
 <!--# Thanks to <a href='https://www.jetbrains.com' target='_blank'>JetBrains</a> for providing an open source license for their products to support this project. 
