@@ -18,3 +18,10 @@ export const getExpectedRadarrUrl = (query: string): string => `http://my.radarr
  * @returns expected Lidarr URL
  */
 export const getExpectedLidarrUrl = (query: string): string => `http://my.lidarr-url.domain:8686/add/search/${query}`;
+
+/**
+ * Get the expected Readarr URL for a given search query
+ * @param query
+ * @returns expected Readarr URL
+ */
+export const getExpectedReadarrUrl = (query: string): string => `http://my.readarr-url.domain:8787/add/search/${query}`;

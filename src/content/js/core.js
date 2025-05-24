@@ -138,7 +138,7 @@ let sessionId,
                 id: 'readarr_ebook',
                 domain: 'http://my.readarr-ebook-url.domain:8787',
                 enabled: false,
-                searchPath: '/add/search/',
+                searchPath: '/add/search/?term=',
                 searchInputSelector: 'input[name="searchBox"]',
                 menuText: 'Search Readarr (ebook)',
                 apiKey: '',
@@ -147,7 +147,7 @@ let sessionId,
                 id: 'readarr_audiobook',
                 domain: 'http://my.readarr-audiobook-url.domain:8788',
                 enabled: false,
-                searchPath: '/add/search/',
+                searchPath: '/add/search/?term=',
                 searchInputSelector: 'input[name="searchBox"]',
                 menuText: 'Search Readarr (audiobook)',
                 apiKey: '',
@@ -263,6 +263,12 @@ let sessionId,
                 id: 'myanimelist',
                 name: 'MyAnimeList',
                 image: 'myanimelist.png',
+                enabled: true
+            },
+            {
+                id: 'goodreads',
+                name: 'Goodreads',
+                image: 'goodreads.png',
                 enabled: true
             }
             // {
@@ -429,7 +435,7 @@ let sessionId,
             configs: [
                 {
                     versionMatch: /^[0|1]/,
-                    searchPath: '/add/search/',
+                    searchPath: '/add/search/?term=',
                     searchInputSelector: 'input[name="searchBox"]'
                 }
             ]
@@ -439,7 +445,7 @@ let sessionId,
             configs: [
                 {
                     versionMatch: /^[0|1]/,
-                    searchPath: '/add/search/',
+                    searchPath: '/add/search/?term=',
                     searchInputSelector: 'input[name="searchBox"]'
                 }
             ]
@@ -463,7 +469,7 @@ async function log(content, logLevel = 'info') {
 
     const identifier = `[ServarrExt ${new Date().toISOString()}]`;
 
-    // concat identifier if it's a string
+    // concat identifier if it's a stringF
     if (typeof content === "string" || content instanceof String) {
         content = `${identifier} ${content}`;
     } 
