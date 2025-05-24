@@ -469,7 +469,7 @@ async function log(content, logLevel = 'info') {
 
     const identifier = `[ServarrExt ${new Date().toISOString()}]`;
 
-    // concat identifier if it's a stringF
+    // concat identifier if it's a string
     if (typeof content === "string" || content instanceof String) {
         content = `${identifier} ${content}`;
     } 

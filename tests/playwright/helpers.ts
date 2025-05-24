@@ -24,4 +24,4 @@ export const getExpectedLidarrUrl = (query: string): string => `http://my.lidarr
  * @param query
  * @returns expected Readarr URL
  */
-export const getExpectedReadarrUrl = (query: string): string => `http://my.readarr-url.domain:8787/add/search/${query}`;
+export const getExpectedReadarrAudiobookUrl = (query: string): string => `http://my.readarr-audiobook-url.domain:8788/add/search/?term=${query}`;
