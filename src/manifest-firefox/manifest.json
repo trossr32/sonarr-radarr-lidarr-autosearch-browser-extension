@@ -63,6 +63,7 @@
     // "*://*.betaseries.com/*",
     // "*://*.primevideo.com/*",
     // "*://*.goodreads.com/*",
+    // "*://*.audible.com/*",
     "<all_urls>",
     "storage",
     "activeTab",

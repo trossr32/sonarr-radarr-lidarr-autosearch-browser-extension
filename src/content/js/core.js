@@ -270,6 +270,12 @@ let sessionId,
                 name: 'Goodreads',
                 image: 'goodreads.png',
                 enabled: true
+            },
+            {
+                id: 'audible',
+                name: 'Audible',
+                image: 'audible.png',
+                enabled: true
             }
             // {
             //     id: 'nextepisode',

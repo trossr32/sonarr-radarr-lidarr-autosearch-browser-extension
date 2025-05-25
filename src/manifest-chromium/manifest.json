@@ -64,6 +64,7 @@
     "*://*.rottentomatoes.com/*",
     "*://*.metacritic.com/*",
     "*://*.goodreads.com/*",
+    "*://*.audible.com/*",
     "*://*.simkl.com/*",
     "*://*.iptorrents*",
     "*://*.last.fm/*",

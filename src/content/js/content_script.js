@@ -1097,6 +1097,32 @@
                 locator: 'prepend',
                 imgStyles: 'width: 28px; margin: 0 10px 0 0; vertical-align: middle;'
             }
+        },
+        {
+            id: 'audible',
+            defaultSite: 'readarr_audiobook',
+            rules: [
+                {
+                    siteId: 'readarr_audiobook',
+                    match: {
+                        pattern: /.*/i,
+                        operator: 'eq'
+                    }
+                }
+            ],
+            search: {
+                containerSelector: 'adbl-title-lockup h1, adbl-metadata-group adbl-metadata[slot="title"]',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                terms: ['audible.com'],
+            },
+            icon: {
+                containerSelector: 'adbl-title-lockup h1[slot="title"], adbl-metadata-group adbl-metadata[slot="title"]',
+                locator: 'prepend',
+                imgStyles: 'width: 28px; margin: 0 10px 0 0; vertical-align: middle;'
+            }
         }
         // {
         //     id: 'nextepisode',
