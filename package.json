@@ -27,7 +27,9 @@
         "gem": "^2.4.3"
     },
     "scripts": {
-        "test": "jest"
+        "test": "jest",
+        "release": "grunt release",
+        "firefox:android": "web-ext run -s dist/firefox -t firefox-android"
     },
     "jest": {
         "verbose": true

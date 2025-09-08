@@ -52,7 +52,7 @@ browser.runtime.onConnect.addListener(function(port) {
  * @param {Settings} settings 
  */
 async function buildMenus(settings) {
-    await browser.contextMenus.removeAll();
+    await browser.contextMenus?.removeAll();
 
     // if extension is disabled or context menu option is disabled gtfo
     if (!settings.config.enabled || !settings.config.contextMenu) {
@@ -67,11 +67,11 @@ async function buildMenus(settings) {
     }
 
     // create parent menu
-    browser.contextMenus.create({ "title": "Search Servarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
+    browser.contextMenus?.create({ "title": "Search Servarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
 
     // create child menus from enabled sites array
     for (let i = 0; i < enabledSites.length; i++) {
-        browser.contextMenus.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": `${enabledSites[i].id}Menu`, "contexts": ["selection"] });
+        browser.contextMenus?.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": `${enabledSites[i].id}Menu`, "contexts": ["selection"] });
     }
 }
 
@@ -92,7 +92,7 @@ async function onClickHandler(info, tab) {
     }
 };
 
-browser.contextMenus.onClicked.addListener(onClickHandler);
+browser.contextMenus?.onClicked.addListener(onClickHandler);
 
 /**
  * set up context menu tree at install time.
