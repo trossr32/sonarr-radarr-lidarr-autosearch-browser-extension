@@ -28,7 +28,10 @@
     },
     "scripts": {
         "test": "jest",
+        "debug": "grunt debug",
+        "playwright": "grunt playwright",
         "release": "grunt release",
+        "review": "grunt review",
         "firefox:android": "web-ext run -s dist/firefox -t firefox-android"
     },
     "jest": {

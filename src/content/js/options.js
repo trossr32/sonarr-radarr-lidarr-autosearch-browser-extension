@@ -627,24 +627,26 @@ var initialiseContextMenuForm = function (settings) {
         .append($('<div class="row"></div>')
             .append($('<label for="toggle-context-menu" class="col-4" style=margin-top: 2px;">Enable context menu</label>'))
             .append($('<div class="col"></div>')
-                .append($('<input type="checkbox" id="toggle-context-menu">').prop('checked', settings.config.contextMenu))
+                .append(browser.contextMenu ? $('<input type="checkbox" id="toggle-context-menu">').prop('checked', settings.config.contextMenu) : $('<span>Not supported in your browser.</span>'))
             )
         );
 
     $('#contextMenuOptionsForm').prepend(wrapper);
 
-    // enable toggle
-    $('#toggle-context-menu').bootstrapToggle({
-        on: 'Enabled',
-        off: 'Disabled',
-        onstyle: 'success',
-        offstyle: 'danger',
-        width: '90px',
-        size: 'small'
-    });
+    if (browser.contextMenu) {
+        // enable toggle
+        $('#toggle-context-menu').bootstrapToggle({
+            on: 'Enabled',
+            off: 'Disabled',
+            onstyle: 'success',
+            offstyle: 'danger',
+            width: '90px',
+            size: 'small'
+        });
 
-    // site enabled/disabled toggle change event
-    $('#toggle-context-menu').on('change', setSettingsPropertiesFromContextMenuForm);
+        // site enabled/disabled toggle change event
+        $('#toggle-context-menu').on('change', setSettingsPropertiesFromContextMenuForm);
+    }
 };
 
 /**
@@ -810,7 +812,8 @@ async function setSettingsPropertiesFromCustomIconForm() {
 async function setSettingsPropertiesFromContextMenuForm() {
     const settings = await getSettings();
 
-    settings.config.contextMenu = $('#toggle-context-menu').prop('checked');
+    const menu = $('#toggle-context-menu');
+    settings.config.contextMenu = menu != null ? menu.prop('checked') : false;
 
     await setSettings(settings);
 }

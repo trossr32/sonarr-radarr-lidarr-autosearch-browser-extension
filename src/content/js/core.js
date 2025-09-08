@@ -283,7 +283,7 @@ let sessionId,
         }, 
         config: {
             enabled: true,
-            contextMenu: true,
+            contextMenu: browser.contextMenus != null,
             debug: false,
             searchInputWaitForMs: 300,
             searchInputMaxAttempts: 20,
