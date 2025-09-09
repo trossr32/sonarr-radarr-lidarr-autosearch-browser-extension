@@ -2,9 +2,3 @@ body {
     background-color: #1d1e22;
     color: #fff
 }
-
-.firefox-only { display: none; }
-
-@-moz-document url-prefix() {
-    .firefox-only { display: block; }
-}

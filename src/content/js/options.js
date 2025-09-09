@@ -1,3 +1,5 @@
+var iconPort = browser.runtime.connect({ name: 'icon' });
+
 var entityMap = {
         '&': '&amp;',
         '<': '&lt;',
@@ -143,6 +145,18 @@ var setTestButtonIcon = (siteId, suffix) => {
         $(`#${siteId}ApiKeyIcon${x}`).css('display', (x === suffix ? 'block' : 'none'));
     });
 };
+
+
+/**
+ * Build the toggle button
+ */
+var initialiseEnabledDisabledButton = function(settings) {
+    $('#toggleActive').removeClass('btn-success btn-danger').addClass(`btn-${(settings.config.enabled ? 'danger' : 'success')}`);
+    $('#toggleActive').html(`<i class="fas fa-power-off"></i>&nbsp;&nbsp;&nbsp;&nbsp;${(settings.config.enabled ? 'Disable' : '&nbsp;Enable')}`);
+    iconPort.postMessage({ x: "y" });
+};
+
+
 
 /**
  * Build the settings tab
@@ -410,11 +424,12 @@ var initialiseIntegrationsForm = function (settings) {
             card
                 .append($(`<div class="card-warning"></div>`)
                     .append($(`<div data-warning-id="${i}"><i class="fas fa-exclamation-triangle"></i></div>`)
-                        .on('mouseover', function () {
-                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).css('display', 'block');
+                        .on('mouseover click', function (e) {
+                            e.stopPropagation();
+                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).show();
                         })
                         .on('mouseout', function () {
-                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).css('display', 'none');
+                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).hide();
                         })))
                 .append($(`<div id="card-warning-tooltip-${i}" class="card-warning-tooltip"></div>`).text(integration.warning));
         }
@@ -427,6 +442,10 @@ var initialiseIntegrationsForm = function (settings) {
             );
 
         wrapper.append($('<div class="col p-3"></div>').append(card));
+    });
+    
+    $(document).on('click', function() {
+        $('.card-warning-tooltip').hide();
     });
 
     $('#integrationsOptionsForm').prepend(wrapper);
@@ -627,7 +646,7 @@ var initialiseContextMenuForm = function (settings) {
         .append($('<div class="row"></div>')
             .append($('<label for="toggle-context-menu" class="col-4" style=margin-top: 2px;">Enable context menu</label>'))
             .append($('<div class="col"></div>')
-                .append(browser.contextMenu ? $('<input type="checkbox" id="toggle-context-menu">').prop('checked', settings.config.contextMenu) : $('<span>Not supported in your browser.</span>'))
+                .append(browser.contextMenus ? $('<input type="checkbox" id="toggle-context-menu">').prop('checked', settings.config.contextMenu) : $('<span>Not supported in your browser.</span>'))
             )
         );
 
@@ -842,6 +861,8 @@ browser.storage.onChanged.addListener(async function(changes, area) {
             continue;
         }
 
+        initialiseEnabledDisabledButton(changes[item].newValue);
+
         /**
          * call API version type endpoint if the auto populate from API setting is true and:
          * . on the Settings tab the domain or api key for any site has been changed, or the site has been set to enabled
@@ -880,12 +901,19 @@ $(async function () {
     // initialise page on load
     const settings = await getSettings();
 
+    initialiseEnabledDisabledButton(settings);
     initialiseBasicForm(settings);
     initialiseAdvancedForm(settings);
     initialiseIntegrationsForm(settings);
     initialiseCustomIconForm(settings);
     initialiseContextMenuForm(settings);
     initialiseDebugForm(settings);
+
+    $('#toggleActive').on('click', async function(e) {
+        const settings = await getSettings();
+        settings.config.enabled = !settings.config.enabled;
+        await setSettings(settings);
+    });
 
     // deactivate all other tabs on click. this shouldn't be required, but bootstrap 5 beta seems a bit buggy with tab deactivation.
     $('.nav-link').on('click', function() {
