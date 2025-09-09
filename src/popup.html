@@ -5,7 +5,6 @@
     <title>Servarr autosearch options</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="content/css/bootstrap.min.css">
-    <link rel="stylesheet" href="content/css/popup.css" />
     <script src="content/js/jquery.min.js"></script>
     <script src="content/js/browser-polyfill.min.js"></script>
     <script src="content/js/bootstrap.bundle.min.js"></script>
@@ -14,9 +13,11 @@
     <script src="content/js/all.min.js"></script>
     
     <style type="text/css">
+        body { background-color: #1d1e22; color: #fff }
         .popupRow { width: 100%; margin-bottom: 10px; }
         .popupBtn { width: 70%; margin-bottom: 5px; }
-        .popupContainer { max-width: 35em; text-align: center; padding-top: 10px; }
+        .popupContainer { width: 35em; max-width: 35em; text-align: center; padding-top: 10px; }
+        @-moz-document url-prefix() { .popupContainer { width: auto; } }
     </style>
 </head>
 <body>
