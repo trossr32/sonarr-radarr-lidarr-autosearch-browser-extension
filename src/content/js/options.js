@@ -182,10 +182,10 @@ var initialiseBasicForm = function (settings) {
                                 .append($('<label class="col-form-label">API key</label>'))
                             )
                             .append($('<div class="row"></div>')
-                                .append($('<div class="col-lg-7 col-8"></div>')
+                                .append($('<div class="col-7"></div>')
                                     .append($(`<input type="text" class="form-control" id="${site.id}ApiKey" data-site-id="${site.id}">`).val(site.apiKey))
                                 )
-                                .append($('<div class="col-lg-5 col-4"></div>')
+                                .append($('<div class="col-5"></div>')
                                     .append($(`<button id="${site.id}ApiKeyTest" type="button" class="btn btn-primary" data-site-id="${site.id}">` + 
                                         '<div style="float: left; margin-right: 10px;">Test</div>' + 
                                         `<div id="${site.id}ApiKeyIcon" style="float: left;"><i class="fab fa-cloudscale"></i></div>` + 
