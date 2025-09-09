@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Servarr autosearch options</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="content/css/bootstrap.min.css">
     <link rel="stylesheet" href="content/css/bootstrap4-toggle.min.css">
     <link rel="stylesheet" href="content/css/bootstrap-slider.min.css">
@@ -21,48 +22,48 @@
 <body>
 <div class="container">
     <div class="row" style="margin: 20px 0 35px 0;">
-        <div class="col-1">
-            <img src="content/assets/images/SonarrRadarrLidarr48.png" style="margin-right: 10px;" />
+        <div class="col-2 col-sm-1 d-flex align-items-center justify-content-center">
+            <img src="content/assets/images/SonarrRadarrLidarr48.png" class="img-fluid" style="max-width: 48px;" />
         </div>
-        <div class="col">
-            <h2>Servarr autosearch options</h2>
+        <div class="col-12 col-md-10 col-sm-11 d-flex align-items-center">
+            <h2 class="mb-0">Servarr autosearch options</h2>
         </div>
     </div>
 
-    <ul class="nav nav-tabs" id="settingsTabs" role="tablist">
+    <ul class="nav nav-tabs" id="settingsTabs" role="tablist" style="flex-wrap: wrap;">
         <li class="nav-item">
             <a class="nav-link active" id="basic-tab" data-bs-toggle="tab" href="#basic" role="tab" aria-controls="basic" aria-selected="true">
-                <i class="fas fa-cog"></i>&nbsp;&nbsp;&nbsp;Settings
+                <i class="fas fa-cog d-none d-sm-inline"></i><span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp;</span>Settings
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="advanced-tab" data-bs-toggle="tab" href="#advanced" role="tab" aria-controls="advanced" aria-selected="false">
-                <i class="fas fa-exclamation-triangle"></i>&nbsp;&nbsp;&nbsp;Advanced
+                <i class="fas fa-exclamation-triangle d-none d-sm-inline"></i><span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp;</span>Advanced
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="integrations-tab" data-bs-toggle="tab" href="#integrations" role="tab" aria-controls="integrations" aria-selected="false">
-                <i class="fas fa-link"></i>&nbsp;&nbsp;&nbsp;Integrations
+                <i class="fas fa-link d-none d-sm-inline"></i><span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp;</span>Integrations
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="custom-icon-tab" data-bs-toggle="tab" href="#custom-icon" role="tab" aria-controls="custom-icon" aria-selected="false">
-                <i class="fas fa-arrows-alt"></i>&nbsp;&nbsp;&nbsp;Custom icons
+                <i class="fas fa-arrows-alt d-none d-sm-inline"></i><span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp;</span>Custom icons
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="context-menu-tab" data-bs-toggle="tab" href="#context-menu" role="tab" aria-controls="context-menu" aria-selected="false">
-                <i class="fa fa-bars"></i>&nbsp;&nbsp;&nbsp;Context menu
+                <i class="fa fa-bars d-none d-sm-inline"></i><span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp;</span>Context menu
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="debug-tab" data-bs-toggle="tab" href="#debug" role="tab" aria-controls="debug" aria-selected="false">
-                <i class="fa fa-bug"></i>&nbsp;&nbsp;&nbsp;Debug
+                <i class="fa fa-bug d-none d-sm-inline"></i><span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp;</span>Debug
             </a>
         </li>
         <li class="nav-item">
             <a class="nav-link" id="github-tab" data-bs-toggle="tab" href="#github" role="tab" aria-controls="github" aria-selected="false">
-                <i class="fab fa-github"></i>&nbsp;&nbsp;&nbsp;Github
+                <i class="fab fa-github d-none d-sm-inline"></i><span class="d-none d-sm-inline">&nbsp;&nbsp;&nbsp;</span>Github
             </a>
         </li>
         <li class="nav-item">
@@ -71,10 +72,10 @@
                 &nbsp;&nbsp;Keep me caffeinated
             </a>
         </li>
-    </ul>
+        </ul>
         
-    <div class="tab-content">
-        <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
             <form id="generalOptionsForm"></form>
         </div>
         <div class="tab-pane fade" id="advanced" role="tabpanel" aria-labelledby="advanced-tab">
@@ -169,7 +170,7 @@
         </div>
         <div class="tab-pane fade" id="github" role="tabpanel" aria-labelledby="github-tab">
             <div class="row justify-content-md-center">
-                <div class="col-10" style="text-align: center">
+                <div class="col-12 col-md-10" style="text-align: center">
                     <h2 style="margin-bottom: 45px;">Contribute on GitHub</h2>
                     <h5 style="margin-bottom: 45px;">
                         This project is open source on Github: <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch">github.com/trossr32/sonarr-radarr-lidarr-autosearch</a>
@@ -182,7 +183,7 @@
         </div>
         <div class="tab-pane fade" id="donate" role="tabpanel" aria-labelledby="donate-tab">
             <div class="row justify-content-md-center">
-                <div class="col-10" style="text-align: center">
+                <div class="col-12 col-md-10" style="text-align: center">
                     <h2 style="margin-bottom: 45px;">Buy me a coffee</h2>
                     <h5 style="margin-bottom: 15px;">
                         If you found this extension useful and would like to buy me a coffee please click the link below
