@@ -32,7 +32,8 @@
         "playwright": "grunt playwright",
         "release": "grunt release",
         "review": "grunt review",
-        "firefox": "web-ext run -s dist/firefox -t firefox-desktop --devtools",
+        "chromium": "web-ext run -s dist/chromium -t chromium",
+        "firefox": "web-ext run -s dist/firefox -t firefox-desktop",
         "firefox:android": "web-ext run -s dist/firefox -t firefox-android"
     },
     "jest": {
