@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.12.0
+
+### Added
+
+- Changes to allow the extension to run on Firefox Android - ([#113](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/113)). Thanks to [StormPooper](https://github.com/StormPooper).
+- Add RateYouMusic integration - ([PR#269](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/pull/269)). Thanks to [Xeldarflo](https://github.com/Xeldarflo)
+
 ## 2.11.0
 
 ### Fixed

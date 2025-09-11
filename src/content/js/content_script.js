@@ -1063,6 +1063,42 @@
                 locator: 'prepend',
                 imgStyles: 'width: 16px; margin-right: 5px;'
             }
+        },
+        // rateyourmusic lidarr album page
+        {
+            id: 'rateyourmusic',
+            defaultSite: 'lidarr',
+            search: {
+                containerSelector: '.album_title',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                terms: ['https://rateyourmusic.com/release/album']
+            },
+            icon: {
+                containerSelector: '.album_title',
+                locator: 'prepend',
+                imgStyles: 'width: 20px; margin-right: 5px;'
+            }
+        },
+        // rateyourmusic lidarr artist page
+        {
+            id: 'rateyourmusic',
+            defaultSite: 'lidarr',
+            search: {
+                containerSelector: '.artist_name_hdr',
+                selectorType: 'text',
+                modifiers: []
+            },
+            match: {
+                terms: ['https://rateyourmusic.com/artist']
+            },
+            icon: {
+                containerSelector: '.artist_name_hdr',
+                locator: 'prepend',
+                imgStyles: 'width: 20px; margin-right: 5px;'
+            }
         }
         // {
         //     id: 'nextepisode',

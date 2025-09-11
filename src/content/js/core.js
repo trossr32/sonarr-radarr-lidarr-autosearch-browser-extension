@@ -264,6 +264,12 @@ let sessionId,
                 name: 'MyAnimeList',
                 image: 'myanimelist.png',
                 enabled: true
+            },
+            {
+                id: 'rateyourmusic',
+                name: 'Rate Your Music',
+                image: 'rateyourmusic.jpg',
+                enabled: true
             }
             // {
             //     id: 'nextepisode',
