@@ -112,21 +112,21 @@ If you can make this extension better I'm happy for the help! Please create a pu
 
 Thanks to the following for helping with this project:
 
-<a href='https://github.com/banterboy' target='_blank'>banterboy</a> <br />
-<a href='https://github.com/aommm' target='_blank'>aommm</a> <br />
-<a href='https://github.com/ledge74' target='_blank'>Flo</a> <br />
-<a href='https://github.com/almottier' target='_blank'>almottier</a> <br />
-<a href='https://github.com/dannyvink' target='_blank'>dannyvink</a> <br />
-<a href='https://github.com/Pompiedom' target='_blank'>Pompiedom</a> <br />
-<a href='https://github.com/carsso' target='_blank'>carsso</a> <br />
-<a href='https://github.com/3vanlock' target='_blank'>3vanlock</a> <br />
-<a href='https://github.com/cyberden' target='_blank'>cyberden</a> <br />
-<a href='https://github.com/MozPri' target='_blank'>MozPri</a> <br />
-<a href='https://github.com/dynamiccookies' target='_blank'>dynamiccookies</a> <br />
-<a href='https://github.com/theotherp' target='_blank'>theotherp</a> <br />
-<a href='https://github.com/0xdevalias)' target='_blank'>0xdevalias</a> <br />
-<a href='https://github.com/StormPooper)' target='_blank'>StormPooper</a> <br />
-<a href='https://github.com/Xeldarflo)' target='_blank'>Xeldarflo</a>
+<a href='https://github.com/banterboy' target='_blank'><picture><img src="https://github.com/banterboy.png" alt="banterboy" title="banterboy" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/aommm' target='_blank'><picture><img src="https://github.com/aommm.png" alt="aommm" title="aommm" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/ledge74' target='_blank'><picture><img src="https://github.com/ledge74.png" alt="ledge74" title="ledge74" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/almottier' target='_blank'><picture><img src="https://github.com/almottier.png" alt="almottier" title="almottier" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/dannyvink' target='_blank'><picture><img src="https://github.com/dannyvink.png" alt="dannyvink" title="dannyvink" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/Pompiedom' target='_blank'><picture><img src="https://github.com/Pompiedom.png" alt="Pompiedom" title="Pompiedom" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/carsso' target='_blank'><picture><img src="https://github.com/carsso.png" alt="carsso" title="carsso" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/3vanlock' target='_blank'><picture><img src="https://github.com/3vanlock.png" alt="3vanlock" title="3vanlock" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/cyberden' target='_blank'><picture><img src="https://github.com/cyberden.png" alt="cyberden" title="cyberden" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/MozPri' target='_blank'><picture><img src="https://github.com/MozPri.png" alt="MozPri" title="MozPri" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/dynamiccookies' target='_blank'><picture><img src="https://github.com/dynamiccookies.png" alt="dynamiccookies" title="dynamiccookies" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/theotherp' target='_blank'><picture><img src="https://github.com/theotherp.png" alt="theotherp" title="theotherp" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/0xdevalias)' target='_blank'><picture><img src="https://github.com/0xdevalias.png" alt="0xdevalias" title="0xdevalias" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/StormPooper)' target='_blank'><picture><img src="https://github.com/StormPooper.png" alt="StormPooper" title="StormPooper" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/Xeldarflo)' target='_blank'><picture><img src="https://github.com/Xeldarflo.png" alt="Xeldarflo" title="Xeldarflo" style="width:80px;border-radius: 50%;"></picture></a>
 
 <!--# Thanks to <a href='https://www.jetbrains.com' target='_blank'>JetBrains</a> for providing an open source license for their products to support this project. 
 
