@@ -41,6 +41,12 @@ a, a:focus, a:hover {
 
 .card-header {
     background-color: rgba(255,255,255,0.05);
+    
+    h4 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }
 
 .card-integration {

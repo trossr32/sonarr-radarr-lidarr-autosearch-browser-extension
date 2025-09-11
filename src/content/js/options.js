@@ -1,3 +1,5 @@
+var iconPort = browser.runtime.connect({ name: 'icon' });
+
 var entityMap = {
         '&': '&amp;',
         '<': '&lt;',
@@ -144,6 +146,18 @@ var setTestButtonIcon = (siteId, suffix) => {
     });
 };
 
+
+/**
+ * Build the toggle button
+ */
+var initialiseEnabledDisabledButton = function(settings) {
+    $('#toggleActive').removeClass('btn-success btn-danger').addClass(`btn-${(settings.config.enabled ? 'danger' : 'success')}`);
+    $('#toggleActive').html(`<i class="fas fa-power-off"></i>&nbsp;&nbsp;&nbsp;&nbsp;${(settings.config.enabled ? 'Disable' : '&nbsp;Enable')}`);
+    iconPort.postMessage({ x: "y" });
+};
+
+
+
 /**
  * Build the settings tab
  */
@@ -182,10 +196,10 @@ var initialiseBasicForm = function (settings) {
                                 .append($('<label class="col-form-label">API key</label>'))
                             )
                             .append($('<div class="row"></div>')
-                                .append($('<div class="col-lg-7 col-8"></div>')
+                                .append($('<div class="col-7"></div>')
                                     .append($(`<input type="text" class="form-control" id="${site.id}ApiKey" data-site-id="${site.id}">`).val(site.apiKey))
                                 )
-                                .append($('<div class="col-lg-5 col-4"></div>')
+                                .append($('<div class="col-5"></div>')
                                     .append($(`<button id="${site.id}ApiKeyTest" type="button" class="btn btn-primary" data-site-id="${site.id}">` + 
                                         '<div style="float: left; margin-right: 10px;">Test</div>' + 
                                         `<div id="${site.id}ApiKeyIcon" style="float: left;"><i class="fab fa-cloudscale"></i></div>` + 
@@ -410,11 +424,12 @@ var initialiseIntegrationsForm = function (settings) {
             card
                 .append($(`<div class="card-warning"></div>`)
                     .append($(`<div data-warning-id="${i}"><i class="fas fa-exclamation-triangle"></i></div>`)
-                        .on('mouseover', function () {
-                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).css('display', 'block');
+                        .on('mouseover click', function (e) {
+                            e.stopPropagation();
+                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).show();
                         })
                         .on('mouseout', function () {
-                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).css('display', 'none');
+                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).hide();
                         })))
                 .append($(`<div id="card-warning-tooltip-${i}" class="card-warning-tooltip"></div>`).text(integration.warning));
         }
@@ -427,6 +442,10 @@ var initialiseIntegrationsForm = function (settings) {
             );
 
         wrapper.append($('<div class="col p-3"></div>').append(card));
+    });
+    
+    $(document).on('click', function() {
+        $('.card-warning-tooltip').hide();
     });
 
     $('#integrationsOptionsForm').prepend(wrapper);
@@ -627,24 +646,26 @@ var initialiseContextMenuForm = function (settings) {
         .append($('<div class="row"></div>')
             .append($('<label for="toggle-context-menu" class="col-4" style=margin-top: 2px;">Enable context menu</label>'))
             .append($('<div class="col"></div>')
-                .append($('<input type="checkbox" id="toggle-context-menu">').prop('checked', settings.config.contextMenu))
+                .append(browser.contextMenus ? $('<input type="checkbox" id="toggle-context-menu">').prop('checked', settings.config.contextMenu) : $('<span>Not supported in your browser.</span>'))
             )
         );
 
     $('#contextMenuOptionsForm').prepend(wrapper);
 
-    // enable toggle
-    $('#toggle-context-menu').bootstrapToggle({
-        on: 'Enabled',
-        off: 'Disabled',
-        onstyle: 'success',
-        offstyle: 'danger',
-        width: '90px',
-        size: 'small'
-    });
+    if (browser.contextMenu) {
+        // enable toggle
+        $('#toggle-context-menu').bootstrapToggle({
+            on: 'Enabled',
+            off: 'Disabled',
+            onstyle: 'success',
+            offstyle: 'danger',
+            width: '90px',
+            size: 'small'
+        });
 
-    // site enabled/disabled toggle change event
-    $('#toggle-context-menu').on('change', setSettingsPropertiesFromContextMenuForm);
+        // site enabled/disabled toggle change event
+        $('#toggle-context-menu').on('change', setSettingsPropertiesFromContextMenuForm);
+    }
 };
 
 /**
@@ -810,7 +831,8 @@ async function setSettingsPropertiesFromCustomIconForm() {
 async function setSettingsPropertiesFromContextMenuForm() {
     const settings = await getSettings();
 
-    settings.config.contextMenu = $('#toggle-context-menu').prop('checked');
+    const menu = $('#toggle-context-menu');
+    settings.config.contextMenu = menu != null ? menu.prop('checked') : false;
 
     await setSettings(settings);
 }
@@ -838,6 +860,8 @@ browser.storage.onChanged.addListener(async function(changes, area) {
         if (item !== 'sonarrRadarrLidarrAutosearchSettings') {
             continue;
         }
+
+        initialiseEnabledDisabledButton(changes[item].newValue);
 
         /**
          * call API version type endpoint if the auto populate from API setting is true and:
@@ -877,12 +901,19 @@ $(async function () {
     // initialise page on load
     const settings = await getSettings();
 
+    initialiseEnabledDisabledButton(settings);
     initialiseBasicForm(settings);
     initialiseAdvancedForm(settings);
     initialiseIntegrationsForm(settings);
     initialiseCustomIconForm(settings);
     initialiseContextMenuForm(settings);
     initialiseDebugForm(settings);
+
+    $('#toggleActive').on('click', async function(e) {
+        const settings = await getSettings();
+        settings.config.enabled = !settings.config.enabled;
+        await setSettings(settings);
+    });
 
     // deactivate all other tabs on click. this shouldn't be required, but bootstrap 5 beta seems a bit buggy with tab deactivation.
     $('.nav-link').on('click', function() {
