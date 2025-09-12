@@ -2,8 +2,6 @@
 
 /// <binding BeforeBuild='default' />
 module.exports = function (grunt) {
-    const sass = require('sass');
-    
     require('load-grunt-tasks')(grunt);
 
     grunt.initConfig({
