@@ -41,25 +41,28 @@
 
         <!-- Tabs -->
         <div id="settingsTabs" role="tablist" aria-label="Settings sections" class="flex flex-wrap gap-2 border-b border-slate-700 pb-2 mb-6">
-            <button id="tab-basic" data-panel="panel-basic" role="tab" aria-selected="true" class="tab-trigger is-active inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-white/10 text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+            <button type="button" id="tab-basic" data-panel="panel-basic" role="tab" aria-selected="true" class="tab-trigger is-active inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-white/10 text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-cog"></i><span class="hidden sm:inline">Settings</span>
             </button>
-            <button id="tab-advanced" data-panel="panel-advanced" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+            <button type="button" id="tab-advanced" data-panel="panel-advanced" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-exclamation-triangle"></i><span class="hidden sm:inline">Advanced</span>
             </button>
-            <button id="tab-integrations" data-panel="panel-integrations" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+            <button type="button" id="tab-integrations" data-panel="panel-integrations" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-link"></i><span class="hidden sm:inline">Integrations</span>
             </button>
-            <button id="tab-custom-icon" data-panel="panel-custom-icon" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+            <button type="button" id="tab-custom-icon" data-panel="panel-custom-icon" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-arrows-alt"></i><span class="hidden sm:inline">Custom icons</span>
             </button>
-            <button id="tab-context-menu" data-panel="panel-context-menu" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+            <button type="button" id="tab-context-menu" data-panel="panel-context-menu" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-bars"></i><span class="hidden sm:inline">Context menu</span>
             </button>
-            <button id="tab-debug" data-panel="panel-debug" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+            <button type="button" id="tab-debug" data-panel="panel-debug" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-bug"></i><span class="hidden sm:inline">Debug</span>
             </button>
-            <button id="tab-support" data-panel="panel-support" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+            <button type="button" id="tab-backup" data-panel="panel-backup" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+                <i class="fa-solid fa-file-export"></i><span class="hidden sm:inline">Backup & restore</span>
+            </button>
+            <button type="button" id="tab-support" data-panel="panel-support" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-heart text-rose-500"></i><span class="hidden sm:inline">Support</span>
             </button>
         </div>
@@ -132,6 +135,20 @@
         </section>
         <section id="panel-debug" role="tabpanel" aria-labelledby="tab-debug" class="panel hidden" hidden>
             <form id="debugOptionsForm" class="space-y-6"></form>
+        </section>
+        <section id="panel-backup" role="tabpanel" aria-labelledby="tab-backup" class="panel hidden" hidden>
+            <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6">
+                <div class="px-4 py-3 flex items-start gap-4 border-b border-slate-700">
+                    <i class="fa-solid fa-question-circle fa-lg text-indigo-400 mt-1"></i>
+                    <div>
+                        <h2 class="font-semibold mb-2">Backup and restore</h2>
+                        <p class="text-sm text-slate-300 mb-2">Export your current settings to a JSON file, or restore them from a previously saved backup.</p>
+                        <p class="text-sm text-slate-300">Restoring merges settings over the top of your current configuration. You'll be asked to confirm before applying changes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="backupOptionsForm" class="space-y-6"></form>
         </section>
         <section id="panel-support" role="tabpanel" aria-labelledby="tab-support" class="panel hidden" hidden>
             <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-8 overflow-hidden">

@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - UI update to use Font Awesome 7 icons and tailwindcss v4, removing Bootstrap dependency
 - Add reviewer guide documentation
 - Preload Servarr API status on options page load (shows version or error immediately)
+- Backup & restore of settings from Options → Backup & restore tab (export to JSON; import with validation; merge or replace modes)
 
 ## 2.12.0
 

@@ -14,6 +14,10 @@ This extension streamlines searching across user‑hosted *Servarr* applications
 - Adding context menu items to search selected text directly in any configured Servarr instance.
 - Injecting small Servarr search icons/links into supported third‑party media sites (IMDb, TMDb, TVDb, Trakt, TVmaze, MusicBrainz, Letterboxd, TV Calendar, Rotten Tomatoes, Metacritic, Simkl, IPTorrents, Last.fm, Allociné, SensCritique, Betaseries, Prime Video, Rate Your Music, MyAnimeList, etc.).
 - Providing an options UI where users configure base URLs + API keys (optional) for automatic advanced selector configuration.
+- Backup & restore of user settings via a dedicated Options tab:
+  - Exports a JSON file using a schema‑versioned envelope.
+  - Imports either new envelope or legacy plain JSON with validation.
+  - Supports merge or replace modes and a preview‑changes diff.
 
 The extension does **not** collect analytics, ship remote code, or exfiltrate user data. All API calls target only the user’s own Servarr instances explicitly configured in settings.
 
@@ -138,6 +142,7 @@ All logic is synchronous or simple async with `fetch` only to user‑supplied Se
 | Network calls | Only to user Servarr instances (optional) when API key present—to detect version for auto configuration. |
 | Telemetry | None. |
 | Tracking / Ads | None. |
+| Backup/restore | Export produces a local JSON download only; import reads a local JSON file chosen by the user. No data is transmitted externally. |
 
 ---
 
@@ -156,9 +161,12 @@ All logic is synchronous or simple async with `fetch` only to user‑supplied Se
 All libraries are installed via `npm ci` and bundled transparently (no CDN runtime fetches). Unminified sources remain in `node_modules/`.
 
 ---
+
 ## 8. How to Functionally Test
 
+
 ### 8.1 Load the Extension (Chromium)
+
 1. Build: `npm ci && grunt release`.
 
 2. Open `chrome://extensions` → Enable Developer Mode.
@@ -212,6 +220,35 @@ await browser.storage.sync.get();
 Review structure (only configuration JSON under a single key).
 
 ---
+
+### 8.6 Backup & Restore
+
+1) Options → “Backup & restore” tab.
+
+Backup
+
+- Click “Download backup” → a pretty‑printed JSON file is downloaded using an envelope format:
+
+  - `type`: `"servarr-autosearch-settings"`
+  - `schemaVersion`: `1`
+  - `exportedAt`: ISO timestamp
+  - `appVersion`: Extension version (from manifest)
+  - `data`: sanitized settings payload (internal fields prefixed with `_` or `__` are stripped)
+
+Restore
+
+- Choose a previously saved JSON file (envelope or legacy plain JSON). Legacy files are accepted with an informational note.
+- Optional: Check “Replace existing settings instead of merging” to overwrite fully; otherwise, defaults to a deep merge (arrays replaced; objects merged).
+- Click “Preview changes” to inspect a diff (added/removed/changed paths) before applying.
+- Click “Restore” → the file is parsed and minimally validated (`config` object, `sites[]`, `integrations[]`).
+- If the backup’s `schemaVersion` is newer than the extension supports, a warning appears in the confirmation prompt; older schemas are normalized on import.
+- On confirmation, settings are applied via the WebExtension storage API. A success/failure message is displayed in the UI.
+
+Notes
+
+- No network transmission occurs during backup or restore; files are handled locally in the browser context.
+- Merge mode is safer for forward compatibility; replace mode is provided for deterministic snapshots.
+- Enveloped backups are preferred for forward compatibility; legacy JSON remains supported for reviewers and existing users.
 
 ## 9. Security Review Checklist
 
