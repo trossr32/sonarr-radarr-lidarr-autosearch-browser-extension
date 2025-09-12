@@ -34,6 +34,7 @@ async function initRun(tabId, evt) {
             },
             files: [
                 'content/js/browser-polyfill.min.js',
+                'content/js/icons.js',
                 'content/js/content_script.js'
             ] 
         });

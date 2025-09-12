@@ -10,6 +10,7 @@ async function initRun(evt) {
         await setIcon(settings);
         await buildMenus(settings);
         await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
+        await browser.tabs.executeScript({ file: 'content/js/icons.js' });
         await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
     }
     catch(e) {

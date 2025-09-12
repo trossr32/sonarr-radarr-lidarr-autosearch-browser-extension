@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.13.0
+
+### Added
+
+- UI update to use Font Awesome 7 icons and tailwindcss
+
 ## 2.12.0
 
 ### Added
