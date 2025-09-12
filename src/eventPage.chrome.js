@@ -132,6 +132,17 @@ browser.runtime.onInstalled.addListener(async function () {
     buildMenus(settings);
 });
 
+// Listen for storage changes affecting context menu so updates apply immediately without requiring tab events.
+browser.storage.onChanged.addListener(async (changes, area) => {
+    if (!changes.hasOwnProperty('sonarrRadarrLidarrAutosearchSettings')) return;
+    try {
+        const newSettings = changes.sonarrRadarrLidarrAutosearchSettings.newValue;
+        await buildMenus(newSettings);
+    } catch (e) {
+        await log(['Failed rebuilding context menus from storage change', e], 'error');
+    }
+});
+
 /**
  * Set the extension icon
  * @param {Settings} settings 

@@ -104,6 +104,38 @@
 /**
  * Global variables
  */
+// Minimal browser API shim for non-extension (file://) contexts used in Playwright tests.
+if (typeof browser === 'undefined') {
+    // eslint-disable-next-line no-var
+    var browser = {};
+    browser._listeners = { storage: [] };
+    browser.storage = {
+        _data: {},
+        sync: {
+            get: async (keys) => {
+                if (typeof keys === 'object') {
+                    const result = {};
+                    for (const k in keys) {
+                        result[k] = browser.storage._data[k] || keys[k];
+                    }
+                    return result;
+                }
+                return browser.storage._data;
+            },
+            set: async (obj) => {
+                const changes = {};
+                for (const k in obj) {
+                    changes[k] = { oldValue: browser.storage._data[k], newValue: obj[k] };
+                }
+                Object.assign(browser.storage._data, obj);
+                browser._listeners.storage.forEach(fn => fn(changes, 'sync'));
+            }
+        }
+    };
+    browser.storage.onChanged = { addListener: (fn) => browser._listeners.storage.push(fn) };
+    browser.runtime = { connect: () => ({ postMessage: () => {}, onMessage: { addListener: () => {} } }) };
+    browser.contextMenus = null;
+}
 let sessionId,
     defaultSettings = {
         sites: [
@@ -613,7 +645,8 @@ async function setSettings(data) {
     }
 
     if (!data.hasOwnProperty('debug')) {
-        data.enabled = false;
+        // Correctly default debug flag without mutating enabled state
+        data.debug = false;
     }
 
     if (!data.hasOwnProperty('integrations')) {

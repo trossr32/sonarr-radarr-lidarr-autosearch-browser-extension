@@ -1,5 +1,274 @@
 var iconPort = browser.runtime.connect({ name: 'icon' });
 
+// Lazy loader promise for Coloris (color picker). Only loaded when custom icon tab is first opened.
+let colorisLoadPromise = null;
+function ensureColoris() {
+    if (colorisLoadPromise) return colorisLoadPromise;
+    colorisLoadPromise = new Promise((resolve, reject) => {
+        // If Coloris already present (user navigated back) just resolve.
+        if (window.Coloris) { resolve(); return; }
+        const script = document.createElement('script');
+        script.src = 'content/js/coloris.min.js';
+        script.async = true;
+        script.onload = () => {
+            // Small defer to allow script to register global
+            setTimeout(() => resolve(), 0);
+        };
+        script.onerror = (e) => { console.error('Failed to load Coloris', e); reject(e); };
+        document.head.appendChild(script);
+    });
+    return colorisLoadPromise;
+}
+
+/**
+ * Small shim replicating the bootstrapToggle API.
+ * Supported features:
+ *  - Initialisation via $(el).bootstrapToggle({ on, off, onstyle, offstyle, width })
+ *  - Methods: 'enable', 'disable'
+ *  - Keeping the underlying checkbox in sync & firing its native 'change' events
+ */
+(function ($) {
+    $.fn.bootstrapToggle = function (arg) {
+        this.each(function () {
+            const $checkbox = $(this);
+
+            // If already initialised and we have a command
+            if (typeof arg === 'string') {
+                const cmd = arg.toLowerCase();
+                const $btn = $checkbox.data('twToggleButton');
+                if (!$btn) return; // not initialised yet
+                if (cmd === 'enable') {
+                    $btn.removeClass('opacity-50 pointer-events-none');
+                } else if (cmd === 'disable') {
+                    $btn.addClass('opacity-50 pointer-events-none');
+                }
+                return;
+            }
+
+            // Only initialise once
+            if ($checkbox.data('twToggleInitialised')) return;
+            const opts = $.extend({
+                on: 'On',
+                off: 'Off',
+                onstyle: 'success',
+                offstyle: 'danger',
+                width: '100%',
+                size: 'small'
+            }, (typeof arg === 'object' ? arg : {}));
+
+            $checkbox.hide();
+
+            const styleMap = (style, active) => {
+                const base = 'inline-flex items-center justify-center rounded-md text-xs font-medium px-2 py-1 transition-colors transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 w-full select-none cursor-pointer active:scale-[.97]';
+                const palette = style === 'success' ? (active ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-green-700/30 text-green-400') : (style === 'danger' ? (active ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-red-700/30 text-red-400') : (active ? 'bg-slate-600 hover:bg-slate-500 text-white' : 'bg-slate-600/20 text-slate-300'));
+                return base + ' ' + palette;
+            };
+
+            const makeLabel = () => $checkbox.prop('checked') ? opts.on : opts.off;
+            const computeClass = () => styleMap($checkbox.prop('checked') ? opts.onstyle : opts.offstyle, true);
+
+            const $btn = $('<button type="button"></button>')
+                .attr('aria-pressed', $checkbox.prop('checked'))
+                .attr('data-test', 'toggle-btn')
+                .addClass(computeClass())
+                .css('width', opts.width)
+                .text(makeLabel())
+                .on('click', function () {
+                    if ($btn.hasClass('opacity-50')) return; // disabled
+                    $checkbox.prop('checked', !$checkbox.prop('checked'));
+                    $btn.attr('aria-pressed', $checkbox.prop('checked'))
+                        .removeClass()
+                        .addClass(computeClass())
+                        .text(makeLabel());
+                    $checkbox.trigger('change');
+                });
+
+            $checkbox.after($btn);
+            $checkbox.data('twToggleButton', $btn).data('twToggleInitialised', true);
+        });
+        return this;
+    };
+})(jQuery);
+
+// Centralised helper to initialise a toggle with common defaults & attach change handler.
+// Usage: initToggle('#selector', { on:'Enabled', off:'Disabled' }, handlerFn)
+function initToggle(selector, opts, onChange) {
+    const $el = (selector instanceof jQuery) ? selector : $(selector);
+    if (!$el.length) return $el;
+    const base = {
+        on: 'Enabled',
+        off: 'Disabled',
+        onstyle: 'success',
+        offstyle: 'danger',
+        width: '100%',
+        size: 'small'
+    };
+    $el.bootstrapToggle($.extend({}, base, opts || {}));
+    if (onChange) { $el.on('change', onChange); }
+    return $el;
+}
+
+// =====================
+// Shared enable/disable helpers
+// =====================
+const DISABLED_CLASSES = 'opacity-50 cursor-not-allowed';
+
+function setBasicSiteEnabledState(siteId, enabled) {
+    const disabled = !enabled;
+    const $domain = $(`#${siteId}Domain`);
+    const $apiKey = $(`#${siteId}ApiKey`);
+    const $test = $(`#${siteId}ApiKeyTest`);
+    const hintId = `${siteId}BasicDisabledHint`;
+    // Manage aria-describedby for inputs when disabled
+    [$domain, $apiKey].forEach($el => {
+        if (!$el.length) return;
+        if (disabled) {
+            const existing = ($el.attr('aria-describedby') || '').split(/\s+/).filter(x=>x);
+            if (!existing.includes(hintId)) existing.push(hintId);
+            $el.attr('aria-describedby', existing.join(' '));
+        } else {
+            const existing = ($el.attr('aria-describedby') || '').split(/\s+/).filter(x=>x && x!==hintId);
+            if (existing.length) $el.attr('aria-describedby', existing.join(' ')); else $el.removeAttr('aria-describedby');
+        }
+    });
+    [$domain, $apiKey].forEach($el => { if ($el.length){ $el.prop('disabled', disabled); $el.toggleClass(DISABLED_CLASSES, disabled); }});
+    if ($test.length) { $test.prop('disabled', disabled).attr('aria-disabled', disabled ? 'true' : null).toggleClass(DISABLED_CLASSES, disabled); }
+    if (disabled) { $(`#${siteId}ApiTestMessage`).addClass('hidden'); }
+}
+
+function setAdvancedAutoPopulateState(siteId, autoPopulateActive) {
+    // When autoPopulateActive == true we DISABLE manual editing
+    const disabled = autoPopulateActive;
+    const $path = $(`#${siteId}SearchPath`);
+    const $sel = $(`#${siteId}SearchInputSelector`);
+    const hintId = `${siteId}AdvancedDisabledHint`;
+    [$path, $sel].forEach($el => {
+        if (!$el.length) return;
+        if (disabled) {
+            const existing = ($el.attr('aria-describedby') || '').split(/\s+/).filter(x=>x);
+            if (!existing.includes(hintId)) existing.push(hintId);
+            $el.attr('aria-describedby', existing.join(' '));
+        } else {
+            const existing = ($el.attr('aria-describedby') || '').split(/\s+/).filter(x=>x && x!==hintId);
+            if (existing.length) $el.attr('aria-describedby', existing.join(' ')); else $el.removeAttr('aria-describedby');
+        }
+    });
+    [$path, $sel].forEach($el => { if ($el.length){ $el.prop('disabled', disabled); $el.toggleClass(DISABLED_CLASSES, disabled); }});
+}
+
+// Accessible tab system (independent of Bootstrap nav-tabs)
+function initTabs() {
+    const tabTriggers = Array.from(document.querySelectorAll('.tab-trigger'));
+    const panels = Array.from(document.querySelectorAll('[role="tabpanel"].panel'));
+    if (!tabTriggers.length) return;
+
+    function activate(id) {
+        tabTriggers.forEach(btn => {
+            const isActive = btn.id === id;
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            if (isActive) {
+                btn.classList.add('is-active', 'bg-white/10');
+            } else {
+                btn.classList.remove('is-active', 'bg-white/10');
+            }
+        });
+        panels.forEach(panel => {
+            const match = 'panel-' + id.replace('tab-', '');
+            const show = panel.id === match;
+            if (show) {
+                panel.removeAttribute('hidden');
+                panel.classList.remove('hidden');
+            } else {
+                panel.setAttribute('hidden', '');
+                panel.classList.add('hidden');
+            }
+        });
+
+        // Custom icon preview injection logic previously tied to Bootstrap tab activation
+        if (id === 'tab-custom-icon') {
+            // Ensure Coloris loaded then show preview (and re-init field if needed)
+            ensureColoris().then(() => {
+                if (window.Coloris) {
+                    Coloris({
+                        el: 'input[data-coloris]',   // (optional) selector to auto bind
+                        theme: 'large',              // or 'default', 'pill', etc.
+                        themeMode: 'dark',
+                        alpha: false,
+                        format: 'hex',               // 'hex' | 'rgb' | 'hsl' | 'auto'
+                        closeButton: true,
+                        clearButton: true,
+                    });
+                }
+
+                maybeShowCustomIconPreview();
+            }).catch(() => {
+                // Fallback: still attempt preview even if picker failed
+                maybeShowCustomIconPreview();
+            });
+        } else {
+            removeCustomIconPreview();
+        }
+    }
+
+    tabTriggers.forEach(btn => {
+        btn.addEventListener('click', () => activate(btn.id));
+        btn.addEventListener('keydown', e => {
+            const idx = tabTriggers.indexOf(btn);
+            if (['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) {
+                e.preventDefault();
+                let nextIndex = idx;
+                if (e.key === 'ArrowRight') nextIndex = (idx + 1) % tabTriggers.length;
+                if (e.key === 'ArrowLeft') nextIndex = (idx - 1 + tabTriggers.length) % tabTriggers.length;
+                if (e.key === 'Home') nextIndex = 0;
+                if (e.key === 'End') nextIndex = tabTriggers.length - 1;
+                tabTriggers[nextIndex].focus();
+                activate(tabTriggers[nextIndex].id);
+            }
+        });
+    });
+
+    // Ensure initial active state is correct
+    const initiallyActive = tabTriggers.find(b => b.getAttribute('aria-selected') === 'true') || tabTriggers[0];
+    activate(initiallyActive.id);
+}
+
+function removeCustomIconPreview() {
+    $("#servarr-ext_custom-icon-wrapper, #servarr-ext_custom-icon-style").remove();
+}
+
+async function maybeShowCustomIconPreview() {
+    const settings = await getSettings();
+    if (settings.config.customIconPosition) {
+        removeCustomIconPreview();
+        $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
+    }
+}
+
+// Passive background status probe state
+let backgroundProbeRan = false;
+async function runInitialBackgroundProbe() {
+    if (backgroundProbeRan) return; // safeguard
+    backgroundProbeRan = true;
+    const settings = await getSettings();
+    // Stagger requests slightly to avoid burst (50ms increments)
+    const enabledSites = settings.sites.filter(s => s.enabled && s.domain && s.apiKey);
+    enabledSites.forEach((site, idx) => {
+        updateStatusBadge(site.id, 'loading');
+        setTimeout(async () => {
+            try {
+                const response = await callApi({ siteId: site.id, endpoint: 'Version' });
+                if (response.success) {
+                    updateStatusBadge(site.id, 'ok', response.data.version);
+                } else {
+                    updateStatusBadge(site.id, 'fail');
+                }
+            } catch (e) {
+                updateStatusBadge(site.id, 'fail');
+            }
+        }, 50 * idx);
+    });
+}
+
 var entityMap = {
         '&': '&amp;',
         '<': '&lt;',
@@ -132,248 +401,211 @@ var setTestButtonIcon = (siteId, suffix) => {
  * Build the toggle button
  */
 var initialiseEnabledDisabledButton = function(settings) {
-    $('#toggleActive').removeClass('btn-success btn-danger').addClass(`btn-${(settings.config.enabled ? 'danger' : 'success')}`);
-    $('#toggleActive').html(`<i class="fas fa-power-off"></i>&nbsp;&nbsp;&nbsp;&nbsp;${(settings.config.enabled ? 'Disable' : '&nbsp;Enable')}`);
-    iconPort.postMessage({ x: "y" });
+    const $btn = $('#toggleActive');
+    const enabled = settings.config.enabled;
+    $btn.removeClass('bg-green-600 hover:bg-green-500 bg-red-600 hover:bg-red-500');
+    if (enabled) {
+        $btn.addClass('bg-red-600 hover:bg-red-500');
+        $('#toggleActiveLabel').text('Disable');
+    } else {
+        $btn.addClass('bg-green-600 hover:bg-green-500');
+        $('#toggleActiveLabel').text('Enable');
+    }
+    try { if (iconPort && iconPort.postMessage) iconPort.postMessage({ x: "y" }); } catch(e) { /* ignore disconnected port */ }
 };
 
 /**
  * Build the settings tab
  */
 var initialiseBasicForm = function (settings) {
-    var wrapper = $('<div class="row"></div>');
+    const wrapper = $('<div class="grid gap-6 md:grid-cols-2"></div>');
 
     $.each(settings.sites, function (i, site) {
-        wrapper
-            .append($('<div class="col-md-6 col-12"></div>')
-                .append($('<div class="card text-white bg-dark mb-3"></div>')
-                    .append($('<div class="card-header"></div>')
-                        .append($('<div style="float: left; margin: 0 10px 0 0;"></div>')
-                            .append($(`<img src="content/assets/images/${site.id}/${title(site.id, false)}48.png" style="width: 30px; margin-right: 10px;" />`))
-                        )
-                        .append($(`<h4 style="float: left; margin-bottom: 0;">${title(site.id, true)}</h4>`))
-                        .append($('<div style="float: right; width: 80px;"></div>')
-                            .append($(`<input type="checkbox" id="toggle-${site.id}" data-site-id="${site.id}">`)
-                                .prop('checked', site.enabled)
-                            )
-                        )
-                    )
-                    .append($('<div class="card-body" style="position: relative;"></div>')
-                        .append($(`<div id="${site.id}Disabled" class="site-disabled" style="display: ${(site.enabled ? 'none': 'block')};"></div>`))
-                        .append($('<div class="mb-3"></div>')
-                            .append($(`<div for="${site.id}Domain" class="col-12"></div>`)
-                                .append($('<label class="col-form-label">Protocol, domain and port</label>'))
-                            )
-                            .append($('<div class="row"></div>')
-                                .append($('<div class="col-lg-7 col-12"></div>')
-                                    .append($(`<input type="text" class="form-control" id="${site.id}Domain" placeholder="http://192.168.0.1:7357" data-site-id="${site.id}">`).val(site.domain))
-                                )
-                            )
-                        )
-                        .append($('<div class="mb-3"></div>')
-                            .append($(`<div for="${site.id}ApiKey" class="col-12"></div>`)
-                                .append($('<label class="col-form-label">API key</label>'))
-                            )
-                            .append($('<div class="row"></div>')
-                                .append($('<div class="col-7"></div>')
-                                    .append($(`<input type="text" class="form-control" id="${site.id}ApiKey" data-site-id="${site.id}">`).val(site.apiKey))
-                                )
-                                .append($('<div class="col-5"></div>')
-                                    .append($(`<button id="${site.id}ApiKeyTest" type="button" class="btn btn-primary" data-site-id="${site.id}">` + 
-                                        '<div style="float: left; margin-right: 10px;">Test</div>' + 
-                                        `<div id="${site.id}ApiKeyIcon" style="float: left;"><i class="fab fa-cloudscale"></i></div>` + 
-                                        `<div id="${site.id}ApiKeyIconWorked" style="float: left; display: none;"><i class="fas fa-check" style="color: lawngreen;"></i></div>` + 
-                                        `<div id="${site.id}ApiKeyIconFailed" style="float: left; display: none;"><i class="fas fa-times" style="color: #dc3545;"></i></div>` + 
-                                        `<div id="${site.id}ApiKeyIconProgress" class="spinner-grow text-light" role="status" style="height:1em; width: 1em; margin-top: 4px; float: left; display: none;"></div>` + 
-                                        '</button>'))
-                                )
-                            )
-                        )
-                        .append($(`<div id="${site.id}ApiTestMessage" class="badge bg-success badge-notify" style="display: none;"></div>`))
-                    )
-                )
-            );
-    });
+        const card = $('<div class="rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden flex flex-col"></div>');
+        const header = $('<div class="flex items-center justify-between gap-4 px-4 py-3 border-b border-slate-700"></div>');
+        const left = $('<div class="flex items-center gap-3"></div>')
+            .append($(`<img src="content/assets/images/${site.id}/${title(site.id, false)}48.png" class="h-8 w-8" alt="${title(site.id, false)} icon" />`))
+            .append($(`<h3 class="text-base font-semibold m-0">${title(site.id, true)}</h3>`));
+            const badge = $('<span id="'+site.id+'StatusBadge" class="ml-auto mr-3 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide bg-slate-600 text-white select-none">Unknown</span>');
+            const toggleContainer = $('<div class="w-32 flex items-center gap-2 justify-end"></div>')
+                .append(badge)
+            .append($(`<input type="checkbox" id="toggle-${site.id}" data-site-id="${site.id}" class="hidden">`).prop('checked', site.enabled));
+        header.append(left, toggleContainer);
 
-    wrapper
-        .append($('<div class="col-md-6 col-12"></div>')
-            .append($('<div class="card text-white bg-dark mb-3"></div>')
-                .append($('<div class="card-header"></div>')
-                    .append($('<div style="float: left; margin: 0 20px 0 0;"></div>')
-                        .append($('<i class="fas fa-question-circle fa-2x" style=" width: 30px;"></i>'))
-                    )
-                    .append($('<h4 style="float: left; margin: 1px 0 0 0;">Info</h4>'))
-                )
-                .append($('<div class="card-body">' + 
-                    '<p class="card-text">These settings configure how this extension will connect to your Servarr instances.</p>' +
-                    '<p class="card-text">If an API key is entered and the \'Auto populate from API\' version is enabled on the advanced settings page then the advanced settings will be configured automatically. Auto population will only work if the API call works, otherwise default values will be used.</p>' + 
-                    '</div>'))
-            )
+        const body = $(`<div class="relative p-4 space-y-5"></div>`);
+
+        // Domain field
+        body.append(
+            $('<div class="space-y-1"></div>')
+                .append($('<label class="text-sm font-medium">Protocol, domain and port</label>'))
+                .append($(`<input type="text" id="${site.id}Domain" placeholder="http://192.168.0.1:7357" data-site-id="${site.id}" class="w-full rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />`).val(site.domain))
         );
 
-    $('#generalOptionsForm').prepend(wrapper);
+        // API key field + test button
+        const apiRow = $('<div class="space-y-1"></div>')
+            .append($('<label class="text-sm font-medium">API key</label>'));
+        const apiFlex = $('<div class="flex gap-2 items-start"></div>')
+            .append($(`<input type="text" id="${site.id}ApiKey" data-site-id="${site.id}" class="flex-1 rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />`).val(site.apiKey))
+            .append($(`<button id="${site.id}ApiKeyTest" type="button" data-site-id="${site.id}" class="inline-flex items-center gap-2 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-3 py-2 shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">` +
+                '<span>Test</span>' +
+                `<span id="${site.id}ApiKeyIcon"><i class="fa-solid fa-vial"></i></span>` +
+                `<span id="${site.id}ApiKeyIconWorked" class="hidden text-green-400"><i class="fa-solid fa-check"></i></span>` +
+                `<span id="${site.id}ApiKeyIconFailed" class="hidden text-red-400"><i class="fa-solid fa-xmark"></i></span>` +
+                `<span id="${site.id}ApiKeyIconProgress" class="hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>` +
+                '</button>'));
+      apiRow.append(apiFlex)
+          .append($(`<p id="${site.id}BasicDisabledHint" class="text-[11px] text-amber-400 mt-1 ${(site.enabled ? 'hidden' : '')}">Enable this site to edit connection details.</p>`));
+        body.append(apiRow);
 
+        // API test message
+        body.append($(`<div id="${site.id}ApiTestMessage" class="hidden w-fit text-xs font-medium px-2 py-1 rounded-full" role="status" aria-live="polite"></div>`));
+
+        card.append(header, body);
+        wrapper.append(card);
+    });
+
+    $('#generalOptionsForm').empty().prepend(wrapper);
+
+    // Initialise toggles & events
     $.each(settings.sites, function (is, site) {
-        // initialise toggles
-        $(`#toggle-${site.id}`).bootstrapToggle({
-            on: 'Enabled',
-            off: 'Disabled',
-            onstyle: 'success',
-            offstyle: 'danger',
-            width: '100%',
-            size: 'small'
-        });
-
-        // site enabled/disabled toggle change event
-        $(`#toggle-${site.id}`).on('change', function() {
-            $(`#${$(this).attr('data-site-id')}Disabled`).css('display', ($(this).prop('checked') ? 'none' : 'block'));
-
+        const $toggle = $(`#toggle-${site.id}`);
+        initToggle($toggle, {}, function () {
+            const sid = $(this).attr('data-site-id');
+            const enabled = $(this).prop('checked');
+            setBasicSiteEnabledState(sid, enabled);
+            $(`#${sid}BasicDisabledHint`).toggleClass('hidden', enabled);
             setSettingsPropertiesFromForm();
         });
+        // Initial sync using shared helper
+        setBasicSiteEnabledState(site.id, site.enabled);
+        $(`#${site.id}BasicDisabledHint`).toggleClass('hidden', site.enabled);
 
-        // site form input events
+        // Input events
         $.each(['Domain', 'ApiKey'], function (iv, v) {
             $(`#${site.id}${v}`).on('input', setSettingsPropertiesFromForm);
         });
-    
-        // api key test buttons
+
+        // API key test
         $(`#${site.id}ApiKeyTest`).on('click', async function () {
-            var siteId = $(this).attr('data-site-id');
-    
+            const siteId = $(this).attr('data-site-id');
             setTestButtonIcon(siteId, 'Progress');
-
-            $(`#${site.id}ApiTestMessage`).hide();
-
+            const $msg = $(`#${site.id}ApiTestMessage`).addClass('hidden');
             const response = await callApi({ siteId: siteId, endpoint: 'Version' });
-            
             if (response.success) {
-                setTestButtonIcon(siteId, "Worked");
-
-                $(`#${site.id}ApiTestMessage`)
-                    .removeClass('bg-danger')
-                    .addClass('bg-success')
-                    .html(`Success! Detected version ${response.data.version}`)
-                    .show();
-
+                setTestButtonIcon(siteId, 'Worked');
+                $msg.removeClass('hidden bg-red-600').addClass('bg-green-600 text-white').html(`Success! Detected version ${response.data.version}`).removeClass('hidden');
+                updateStatusBadge(siteId, 'ok', response.data.version);
                 const settings = await getSettings();
-                
                 updateAdvancedForm(settings);
             } else {
-                setTestButtonIcon(siteId, "Failed");
-                
-                $(`#${site.id}ApiTestMessage`)
-                    .removeClass('bg-success')
-                    .addClass('bg-danger')
-                    .html('Failed, please double check the domain and API key')
-                    .show();
+                setTestButtonIcon(siteId, 'Failed');
+                $msg.removeClass('hidden bg-green-600').addClass('bg-red-600 text-white').html('Failed, please double check the domain and API key').removeClass('hidden');
+                updateStatusBadge(siteId, 'fail');
             }
-
-            // alert?
         });
-    }); 
+    });
 };
+
+// Update or create API status badge states
+function updateStatusBadge(siteId, state, version) {
+    const badge = $('#'+siteId+'StatusBadge');
+    if (!badge.length) return;
+    badge.removeClass('bg-slate-600 bg-amber-500 bg-green-600 bg-red-600 animate-pulse').text('');
+    switch(state) {
+        case 'loading':
+            badge.addClass('bg-amber-500 animate-pulse').text('Testing');
+            break;
+        case 'ok':
+            badge.addClass('bg-green-600').text(version ? 'v'+version : 'OK');
+            break;
+        case 'fail':
+            badge.addClass('bg-red-600').text('Fail');
+            break;
+        default:
+            badge.addClass('bg-slate-600').text('Unknown');
+    }
+}
 
 /**
  * Build the advanced settings tab
  */
 var initialiseAdvancedForm = function (settings) {
-    var wrapper = $('<div class="row"></div>');
+    const wrapper = $('<div class="grid gap-6 md:grid-cols-2"></div>');
 
     $.each(settings.sites, function (i, site) {
-        wrapper
-            .append($('<div class="col-md-6 col-12"></div>')
-                .append($('<div class="card text-white bg-dark mb-3"></div>')
-                    .append($('<div class="card-header"></div>')
-                        .append($('<div style="float: left; margin: 0 10px 0 0;"></div>')
-                            .append($(`<img src="content/assets/images/${site.id}/${title(site.id, false)}48.png" style="width: 30px; margin-right: 10px;" />`))
-                        )
-                        .append($(`<h4 style="float: left; margin-bottom: 0;">${title(site.id, true)}</h4>`))
-                        .append($('<div style="float: right; width: 180px;"></div>')
-                            .append($(`<input type="checkbox" id="toggle-${site.id}-advanced" data-site-id="${site.id}">`)
-                                .prop('checked', site.autoPopAdvancedFromApi)
-                            )
-                        )
-                    )
-                    .append($('<div class="card-body" style="position: relative;"></div>')
-                    .append($(`<div id="${site.id}DisabledAdvanced" class="site-disabled" style="display: ${(site.autoPopAdvancedFromApi ? 'block': 'none')};"></div>`))
-                        .append($('<div class="mb-3"></div>')
-                            .append($(`<div for="${site.id}SearchPath" class="col-12"></div>`)
-                                .append($('<label class="col-form-label">Search path URL</label>'))
-                            )
-                            .append($('<div class="row"></div>')
-                                .append($('<div class="col-lg-7 col-12"></div>')
-                                    .append($(`<input type="text" class="form-control" id="${site.id}SearchPath" aria-describedby="${site.id}SearchPathHelp" data-site-id="${site.id}">`).val(site.searchPath))
-                                )
-                                .append($(`<div class="col-12 form-text" id="${site.id}SearchPathHelp">This is the search path used to search for add new content in this instance, following your instance url/ip.</div>`))
-                            )
-                        )
-                        .append($('<div class="mb-3"></div>')
-                            .append($(`<div for="${site.id}SearchInputSelector" class="col-12"></div>`)
-                                .append($('<label class="col-form-label">Search field selector</label>'))
-                            )
-                            .append($('<div class="row"></div>')
-                                .append($('<div class="col-lg-7 col-12"></div>')
-                                    .append($(`<input type="text" class="form-control" id="${site.id}SearchInputSelector" aria-describedby="${site.id}SearchInputSelectorHelp" data-site-id="${site.id}">`).val(site.searchInputSelector))
-                                )
-                                .append($(`<div class="col-12 form-text" id="${site.id}SearchInputSelectorHelp">This is the jquery selector used to find the search input form field for this instance.</div>`))
-                            )
-                        )
-                    )
-                )
-            );
-    });
+        const card = $('<div class="rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden flex flex-col"></div>');
+        const header = $('<div class="flex items-center justify-between gap-4 px-4 py-3 border-b border-slate-700"></div>');
+        const left = $('<div class="flex items-center gap-3"></div>')
+            .append($(`<img src="content/assets/images/${site.id}/${title(site.id, false)}48.png" class="h-8 w-8" alt="${title(site.id, false)} icon" />`))
+            .append($(`<h3 class="text-base font-semibold m-0">${title(site.id, true)}</h3>`));
+        const toggleContainer = $('<div class="w-44"></div>')
+            .append($(`<input type="checkbox" id="toggle-${site.id}-advanced" data-site-id="${site.id}" class="hidden">`).prop('checked', site.autoPopAdvancedFromApi));
+        header.append(left, toggleContainer);
 
-    wrapper
-        .append($('<div class="col-md-6 col-12"></div>')
-            .append($('<div class="card text-white bg-dark mb-3"></div>')
-                .append($('<div class="card-header"></div>')
-                    .append($('<div style="float: left; margin: 0 20px 0 0;"></div>')
-                        .append($('<i class="fas fa-project-diagram fa-2x" style=" width: 30px;"></i>'))
-                    )
-                    .append($('<h4 style="float: left; margin: 1px 0 0 0;">Version config</h4>'))
-                )
-                .append($('<ul class="list-group list-group-flush"></ul>')
-                    .append($('<li class="list-group-item pt-3 pb-5">' + 
-                        '<h5 class="card-title pb-4">Sonarr version config</h5>' + 
-                        '<p class="card-text">These settings are defaulted to v4.<i>n</i>. For v2.<i>n</i> use:</p>' +
-                        '<p class="card-text">Search path url: <b>/addseries/</b></p>' +
-                        '<p class="card-text">Search field selector: <b>.add-series-search .x-series-search</b></p>' +
-                        '</li>'))
-                    .append($('<li class="list-group-item pt-3 pb-5">' + 
-                        '<h5 class="card-title pb-4">Radarr version config</h5>' + 
-                        '<p class="card-text">These settings are defaulted to v4.<i>n</i>. For v0.<i>n</i> use:</p>' +
-                        '<p class="card-text">Search path url: <b>/addmovies/</b></p>' +
-                        '<p class="card-text">Search field selector: <b>.add-movies-search .x-movies-search</b></p>' +
-                        '</li>'))
-                )
-            )
+    const body = $(`<div class="relative p-4 space-y-6"></div>`);
+
+        // Search path
+        body.append(
+            $('<div class="space-y-1"></div>')
+                .append($('<label class="text-sm font-medium">Search path URL</label>'))
+                .append($(`<input type="text" id="${site.id}SearchPath" aria-describedby="${site.id}SearchPathHelp" data-site-id="${site.id}" class="w-full rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">`).val(site.searchPath))
+                .append($(`<p id="${site.id}SearchPathHelp" class="text-xs text-slate-400">Path appended to your instance base used for adding new content.</p>`))
         );
 
-    $('#advancedOptionsForm').append(wrapper);
+        // Search input selector
+        body.append(
+            $('<div class="space-y-1"></div>')
+                .append($('<label class="text-sm font-medium">Search field selector</label>'))
+                .append($(`<input type="text" id="${site.id}SearchInputSelector" aria-describedby="${site.id}SearchInputSelectorHelp" data-site-id="${site.id}" class="w-full rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">`).val(site.searchInputSelector))
+                .append($(`<p id="${site.id}SearchInputSelectorHelp" class="text-xs text-slate-400">jQuery selector used to find the search input element.</p>`))
+        );
+
+        // Hint (appears when auto-pop ON because inputs disabled)
+        body.append($(`<p id="${site.id}AdvancedDisabledHint" class="text-[11px] text-amber-400 ${(site.autoPopAdvancedFromApi ? '' : 'hidden')}">Disable auto population to edit these values manually.</p>`));
+
+        card.append(header, body);
+        wrapper.append(card);
+    });
+
+    // Version config card
+    const versionCard = $('<div class="rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden flex flex-col"></div>')
+        .append($('<div class="flex items-start gap-4 px-4 py-3 border-b border-slate-700"></div>')
+            .append($('<i class="fa-solid fa-project-diagram fa-lg text-indigo-400"></i>'))
+            .append($('<h3 class="font-semibold text-base m-0">Version config</h3>'))
+        )
+        .append($('<div class="p-4 space-y-8 text-sm text-slate-300"></div>')
+            .append($('<div class="space-y-2"></div>')
+                .append($('<h4 class="font-semibold">Sonarr version config</h4>'))
+                .append($('<p>Defaults assume v4.<i>n</i>. For v2.<i>n</i> use:</p>'))
+                .append($('<p>Search path url: <b>/addseries/</b></p>'))
+                .append($('<p>Search field selector: <b>.add-series-search .x-series-search</b></p>'))
+            )
+            .append($('<div class="space-y-2"></div>')
+                .append($('<h4 class="font-semibold">Radarr version config</h4>'))
+                .append($('<p>Defaults assume v4.<i>n</i>. For v0.<i>n</i> use:</p>'))
+                .append($('<p>Search path url: <b>/addmovies/</b></p>'))
+                .append($('<p>Search field selector: <b>.add-movies-search .x-movies-search</b></p>'))
+            )
+        );
+    wrapper.append(versionCard);
+
+    $('#advancedOptionsForm').empty().append(wrapper);
 
     $.each(settings.sites, function (is, site) {
-        // initialise toggles
-        $(`#toggle-${site.id}-advanced`).bootstrapToggle({
-            on: 'Auto populate from API',
-            off: 'Prevent auto populate',
-            onstyle: 'success',
-            offstyle: 'danger',
-            width: '100%',
-            size: 'small'
-        });
-
-        // site enabled/disabled toggle change event
-        $(`#toggle-${site.id}-advanced`).on('change', function() {
-            $(`#${$(this).attr('data-site-id')}DisabledAdvanced`).css('display', ($(this).prop('checked') ? 'block' : 'none'));
-
+        const $toggle = $(`#toggle-${site.id}-advanced`);
+        initToggle($toggle, { on: 'Auto populate from API', off: 'Prevent auto populate' }, function () {
+            const sid = $(this).attr('data-site-id');
+            const auto = $(this).prop('checked');
+            setAdvancedAutoPopulateState(sid, auto);
+            $(`#${sid}AdvancedDisabledHint`).toggleClass('hidden', !auto);
             setSettingsPropertiesFromAdvancedForm();
         });
-
-        // site form input events
+        setAdvancedAutoPopulateState(site.id, site.autoPopAdvancedFromApi);
+        $(`#${site.id}AdvancedDisabledHint`).toggleClass('hidden', !site.autoPopAdvancedFromApi);
         $.each(['SearchPath', 'SearchInputSelector'], function (iv, v) {
             $(`#${site.id}${v}`).on('input', setSettingsPropertiesFromAdvancedForm);
         });
-    }); 
+    });
 };
 
 /**
@@ -381,10 +613,13 @@ var initialiseAdvancedForm = function (settings) {
  */
 var updateAdvancedForm = function (settings) {
     $.each(settings.sites, function (is, site) {
-        if ($(`#toggle-${site.id}-advanced`).prop('checked')) {
+        const auto = $(`#toggle-${site.id}-advanced`).prop('checked');
+        if (auto) {
             $(`#${site.id}SearchPath`).val(site.searchPath);
             $(`#${site.id}SearchInputSelector`).val(site.searchInputSelector);
         }
+        setAdvancedAutoPopulateState(site.id, auto);
+        $(`#${site.id}AdvancedDisabledHint`).toggleClass('hidden', !auto);
     }); 
 };
 
@@ -392,58 +627,44 @@ var updateAdvancedForm = function (settings) {
  * Build the integrations tab
  */
 var initialiseIntegrationsForm = function (settings) {
-    let wrapper = $('<div class="row row-cols-2 row-cols-md-4 row-cols-xl-6"></div>');
+    const wrapper = $('<div class="grid gap-4 grid-cols-2 md:grid-cols-4 xl:grid-cols-6"></div>');
 
     $.each(settings.integrations, function (i, integration) {
-        let card = $('<div class="card text-white bg-dark mb-3"></div>');
-
-        if (settings.debug) {
-            console.log([integration, 'integration.hasOwnProperty(warning):', integration.hasOwnProperty('warning')]);
-        }
+        const card = $('<div class="relative rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden flex flex-col pt-2 px-2"></div>');
 
         if (integration.hasOwnProperty('warning')) {
-            card
-                .append($(`<div class="card-warning"></div>`)
-                    .append($(`<div data-warning-id="${i}"><i class="fas fa-exclamation-triangle"></i></div>`)
-                        .on('mouseover click', function (e) {
-                            e.stopPropagation();
-                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).show();
-                        })
-                        .on('mouseout', function () {
-                            $(`#card-warning-tooltip-${$(this).attr('data-warning-id')}`).hide();
-                        })))
-                .append($(`<div id="card-warning-tooltip-${i}" class="card-warning-tooltip"></div>`).text(integration.warning));
+            // Unified notice element: icon + label; icon/button triggers tooltip
+            const notice = $(
+                `<div class="absolute top-1 left-1 right-1">
+                    <div class="relative flex items-center gap-1 bg-amber-600/20 border border-amber-500/40 text-amber-400 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide select-none">
+                        <button type="button" class="flex items-center gap-1 focus:outline-none" aria-describedby="card-warning-tooltip-${i}" aria-label="Integration notice warning">
+                            <i class="fa-solid fa-exclamation-triangle"></i>
+                            <span>NOTICE</span>
+                        </button>
+                        <div id="card-warning-tooltip-${i}" role="tooltip" class="hidden absolute z-20 top-full left-0 right-0 mt-1 w-full text-xs rounded-md bg-amber-600 text-white px-2 py-1 shadow-lg">${escapeHtml(integration.warning)}</div>
+                    </div>
+                </div>`
+            );
+            const btn = notice.find('button');
+            const tip = notice.find(`#card-warning-tooltip-${i}`);
+            btn.on('mouseover focus', () => tip.removeClass('hidden'))
+               .on('mouseout blur', () => tip.addClass('hidden'));
+            card.append(notice);
         }
 
-        card
-            .append($(`<div class="card-img-top card-integration" style="background: url('content/assets/images/integrations/${integration.image}') center/100% no-repeat;"></div>`))
-            .append($('<div class="card-body" style="text-align: center;"></div>')
-                .append($(`<h5 class="card-title mb-4">${integration.name}</h5>`))
-                .append($(`<input type="checkbox" id="toggle-${integration.id}">`).prop('checked', integration.enabled))
-            );
-
-        wrapper.append($('<div class="col p-3"></div>').append(card));
-    });
-    
-    $(document).on('click', function() {
-        $('.card-warning-tooltip').hide();
+        card.append($(`<div class="h-24 w-full bg-center bg-no-repeat bg-contain" style="background-image: url('content/assets/images/integrations/${integration.image}');"></div>`));
+        const body = $('<div class="p-3 flex flex-col items-center gap-3 text-center"></div>')
+            .append($(`<h4 class="text-sm font-semibold leading-tight">${integration.name}</h4>`))
+            .append($(`<input type="checkbox" id="toggle-${integration.id}" class="hidden">`).prop('checked', integration.enabled));
+        card.append(body);
+        wrapper.append(card);
     });
 
-    $('#integrationsOptionsForm').prepend(wrapper);
+    $('#integrationsOptionsForm').empty().prepend(wrapper);
 
-    // enable toggles
     $.each(settings.integrations, function (i, integration) {
-        $(`#toggle-${integration.id}`).bootstrapToggle({
-            on: 'Enabled',
-            off: 'Disabled',
-            onstyle: 'success',
-            offstyle: 'danger',
-            width: '100%',
-            size: 'small'
-        });
-
-        // site enabled/disabled toggle change event
-        $(`#toggle-${integration.id}`).on('change', setSettingsPropertiesFromIntegrationsForm);
+        const $toggle = $(`#toggle-${integration.id}`);
+        initToggle($toggle, {}, setSettingsPropertiesFromIntegrationsForm);
     });
 };
 
@@ -455,193 +676,154 @@ var getAmountFromOffset = (offset) => offset.match(/(?<amount>[\d|\.]+)(?<unit>.
  * Build the custom icon settings tab
  */
 var initialiseCustomIconForm = function (settings) {
-    log([settings.injectedIconConfig]);
-    let wrapper = $('<div></div>')
-        // .append($('<h5 class="mb-4">Logging</h5>'))
-        .append($('<div class="row my-5"></div>')
-            .append($('<label for="toggle-use-custom-icon" class="col-4" style=margin-top: 2px;">Use custom icon</label>'))
-            .append($('<div class="col"></div>')
-                .append($('<input type="checkbox" id="toggle-use-custom-icon">').prop('checked', settings.config.customIconPosition))
-            )
-        )
-        //.append($('<hr class="my-5" />'))
-        // .append($('<h5 class="mb-4">Search input element wait configuration</h5>'))
-        .append($('<div class="row mb-3"></div>')
-            .append($('<label for="toggle-icon-type" class="col-4" style=margin-top: 2px;">Icon type</label>'))
-            .append($('<div class="col"></div>')
-                .append($('<input type="checkbox" id="toggle-icon-type">').prop('checked', settings.injectedIconConfig.type == 'anchored'))
-            )
-        )
-        .append($('<div class="row mb-3"></div>')
-            .append($('<label for="toggle-side" class="col-4" style=margin-top: 2px;">Window side</label>'))
-            .append($('<div class="col"></div>')
-                .append($('<input type="checkbox" id="toggle-side">').prop('checked', settings.injectedIconConfig.side == 'left'))
-            )
-        )
-        .append($('<div class="row mb-3"></div>')
-            .append($('<label for="toggle-side-offset" class="col-4" style=margin-top: 2px;">Horizontal offset</label>'))
-            .append($('<div class="col"></div>')
-                .append($(`<input type="text" class="form-control form-control-sm" id="side-offset" aria-describedby="side-offset-help" style="width: 50px; float: left; margin-right:10px;">`).val(getAmountFromOffset(settings.injectedIconConfig.sideOffset)))
-                .append($('<input type="checkbox" id="toggle-side-offset" style="float: left;">').prop('checked', getUnitFromOffset(settings.injectedIconConfig.sideOffset) == 'px'))
-            )
-        )
-        .append($('<div class="row mb-3"></div>')
-            .append($('<label for="toggle-position" class="col-4" style=margin-top: 2px;">Window position</label>'))
-            .append($('<div class="col"></div>')
-                .append($('<input type="checkbox" id="toggle-position">').prop('checked', settings.injectedIconConfig.position == 'top'))
-            )
-        )
-        .append($('<div class="row mb-3"></div>')
-            .append($('<label for="toggle-position-offset" class="col-4" style=margin-top: 2px;">Vertical offset</label>'))
-            .append($('<div class="col"></div>')
-                .append($(`<input type="text" class="form-control form-control-sm" id="position-offset" aria-describedby="position-offset-help" style="width: 50px; float: left; margin-right:10px;">`).val(getAmountFromOffset(settings.injectedIconConfig.positionOffset)))
-                .append($('<input type="checkbox" id="toggle-position-offset" style="float: left;">').prop('checked', getUnitFromOffset(settings.injectedIconConfig.positionOffset) == 'px'))
-            )
-        )
-        .append($('<div class="row mb-3"></div>')
-            .append($('<label for="icon-background-color" class="col-4" style=margin-top: 2px;">Icon background colour</label>'))
-            .append($('<div class="col"></div>')
-                .append($(`<input type="text" class="form-control form-control-sm" id="icon-background-color" aria-describedby="icon-background-color-help" style="width: 150px;" data-coloris>`).val(settings.injectedIconConfig.backgroundColor))
-            )
+    const grid = $('<div class="grid gap-6 md:grid-cols-2"></div>');
+
+    // Primary configuration card
+    const mainCard = $('<div class="rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden flex flex-col"></div>');
+    const header = $('<div class="flex items-center gap-3 px-4 py-3 border-b border-slate-700"></div>')
+        .append($('<i class="fa-solid fa-icons text-indigo-400"></i>'))
+        .append($('<h3 class="font-semibold text-base m-0">Custom icon</h3>'));
+    const body = $('<div class="p-4 space-y-6 text-sm"></div>');
+
+    // Use custom icon toggle
+    const useRow = $('<div class="flex items-start justify-between gap-4"></div>')
+        .append($('<div class="flex-1">' +
+            '<label for="toggle-use-custom-icon" class="font-medium">Use custom icon</label>' +
+            '<p class="mt-1 text-xs text-slate-400">Enable injecting a floating or anchored quick-search icon on supported sites.</p>' +
+            '</div>'))
+        .append($('<div class="w-28 flex-shrink-0"></div>')
+            .append($('<input type="checkbox" id="toggle-use-custom-icon" class="hidden">').prop('checked', settings.config.customIconPosition))
         );
-        // .append($('<div class="row mb-5"></div>')
-        //     .append($('<label for="icon-font-color" class="col-4" style=margin-top: 2px;">Icon font colour</label>'))
-        //     .append($('<div class="col"></div>')
-        //         .append($(`<input type="text" class="form-control" id="icon-font-color" aria-describedby="icon-font-color-help" style="width: 150px;" data-coloris>`).val(settings.injectedIconConfig.fontColor))
-        //     )
-        // );
+    body.append(useRow);
 
-    $('#customIconOptionsForm').prepend(wrapper);
+    // Icon type toggle
+    const typeRow = $('<div class="flex items-start justify-between gap-4"></div>')
+        .append($('<div class="flex-1">' +
+            '<label for="toggle-icon-type" class="font-medium">Icon type</label>' +
+            '<p class="mt-1 text-xs text-slate-400">Anchored icons hug a screen edge; floating icons sit freely.</p>' +
+            '</div>'))
+        .append($('<div class="w-32 flex-shrink-0"></div>')
+            .append($('<input type="checkbox" id="toggle-icon-type" class="hidden">').prop('checked', settings.injectedIconConfig.type === 'anchored')));
+    body.append(typeRow);
 
-    // use custom icon toggle
-    $('#toggle-use-custom-icon').bootstrapToggle({
-        on: 'Enabled',
-        off: 'Disabled',
-        onstyle: 'success',
-        offstyle: 'danger',
-        width: '90px',
-        size: 'small'
-    });
-    
-    $('#toggle-use-custom-icon').on('change', function() {
-        $('#toggle-icon-type, #toggle-side, #toggle-position, #toggle-side-offset, #toggle-position-offset')
-            .bootstrapToggle($(this).prop('checked') ? 'enable' : 'disable');
+    // Side + offset (horizontal)
+    const sideGroup = $('<div class="grid gap-4 sm:grid-cols-2"></div>');
+    const sideCol = $('<div class="space-y-2"></div>')
+        .append($('<label for="toggle-side" class="font-medium">Window side</label>'))
+        .append($('<input type="checkbox" id="toggle-side" class="hidden">').prop('checked', settings.injectedIconConfig.side === 'left'));
+    const sideOffsetCol = $('<div class="space-y-2"></div>')
+        .append($('<label for="side-offset" class="font-medium">Horizontal offset</label>'))
+        .append($('<div class="flex items-center gap-2"></div>')
+            .append($(`<input type="text" id="side-offset" class="w-20 rounded-md border border-slate-600 bg-slate-800 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="4">`).val(getAmountFromOffset(settings.injectedIconConfig.sideOffset)))
+            .append($('<input type="checkbox" id="toggle-side-offset" class="hidden">').prop('checked', getUnitFromOffset(settings.injectedIconConfig.sideOffset) === 'px'))
+            .append($('<span class="text-xs text-slate-400">Units</span>'))
+        );
+    sideGroup.append(sideCol, sideOffsetCol);
+    body.append(sideGroup);
 
-        $('#side-offset, #position-offset, #icon-background-color, #icon-font-color')
-            .prop("disabled", !$(this).prop('checked'));
+    // Position + offset (vertical)
+    const posGroup = $('<div class="grid gap-4 sm:grid-cols-2"></div>');
+    const posCol = $('<div class="space-y-2"></div>')
+        .append($('<label for="toggle-position" class="font-medium">Window position</label>'))
+        .append($('<input type="checkbox" id="toggle-position" class="hidden">').prop('checked', settings.injectedIconConfig.position === 'top'));
+    const posOffsetCol = $('<div class="space-y-2"></div>')
+        .append($('<label for="position-offset" class="font-medium">Vertical offset</label>'))
+        .append($('<div class="flex items-center gap-2"></div>')
+            .append($(`<input type="text" id="position-offset" class="w-20 rounded-md border border-slate-600 bg-slate-800 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="4">`).val(getAmountFromOffset(settings.injectedIconConfig.positionOffset)))
+            .append($('<input type="checkbox" id="toggle-position-offset" class="hidden">').prop('checked', getUnitFromOffset(settings.injectedIconConfig.positionOffset) === 'px'))
+            .append($('<span class="text-xs text-slate-400">Units</span>'))
+        );
+    posGroup.append(posCol, posOffsetCol);
+    body.append(posGroup);
 
-        setSettingsPropertiesFromCustomIconForm();
-    });
+    // Background colour
+    const bgRow = $('<div class="space-y-2 flex gap-4"></div>')
+        .append($('<div><label for="icon-background-color" class="font-medium pt-1">Icon background colour</label></div>'))
+        .append($(`<input type="text" id="icon-background-color" data-coloris class=" text-white w-40 rounded-md border border-slate-600 bg-slate-800 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />`).val(settings.injectedIconConfig.backgroundColor));
+    body.append(bgRow);
 
-    // icon type toggle
-    $('#toggle-icon-type').bootstrapToggle({
-        on: 'Anchored',
-        off: 'Floating',
-        onstyle: 'success',
-        offstyle: 'success',
-        width: '90px',
-        size: 'small'
-    });
-    
-    $('#toggle-icon-type').on('change', function() {
-        if ($(this).prop('checked')) {            
-            $('#toggle-side, #toggle-position, #toggle-position-offset').bootstrapToggle('enable');
-            
-            //$('#position-offset, #icon-background-color, #icon-font-color').prop("disabled", false);
-            $('#position-offset, #icon-background-color').prop("disabled", false);
-                
+    mainCard.append(header, body);
+    grid.append(mainCard);
+
+    $('#customIconOptionsForm').empty().append(grid);
+
+    // Initialise toggles with shim
+    initToggle('#toggle-use-custom-icon', {}, null);
+    initToggle('#toggle-icon-type', { on: 'Anchored', off: 'Floating', offstyle: 'success' }, null);
+    initToggle('#toggle-side', { on: 'Left', off: 'Right', offstyle: 'success' }, null);
+    initToggle('#toggle-side-offset', { on: 'px', off: '%', offstyle: 'success' }, null);
+    initToggle('#toggle-position', { on: 'Top', off: 'Bottom', offstyle: 'success' }, null);
+    initToggle('#toggle-position-offset', { on: 'px', off: '%', offstyle: 'success' }, null);
+
+    function syncEnabledDisabled() {
+        const using = $('#toggle-use-custom-icon').prop('checked');
+        const anchored = $('#toggle-icon-type').prop('checked');
+
+        const enableAll = (sel, en) => {
+            $(sel).each(function () { $(this).bootstrapToggle(en ? 'enable' : 'disable'); });
+        };
+
+        enableAll('#toggle-icon-type, #toggle-side, #toggle-position, #toggle-side-offset, #toggle-position-offset', using);
+        $('#side-offset, #position-offset, #icon-background-color').prop('disabled', !using);
+
+        if (!using) return;
+
+        if (anchored) {
             $('#toggle-side-offset').bootstrapToggle('disable');
-                
-            $('#side-offset').prop("disabled", true);
+            $('#side-offset').prop('disabled', true);
+            $('#toggle-side, #toggle-position, #toggle-position-offset').bootstrapToggle('enable');
+            $('#position-offset').prop('disabled', false);
         } else {
-            $('#toggle-side, #toggle-side-offset, #toggle-position, #toggle-position-offset').bootstrapToggle('enable');
-            
-            $('#side-offset, #position-offset, #icon-background-color').prop( "disabled", false );
-        
-            //$('#icon-font-color').prop("disabled", true);
+            $('#toggle-side-offset').bootstrapToggle('enable');
+            $('#side-offset').prop('disabled', false);
+            $('#toggle-side, #toggle-position, #toggle-position-offset').bootstrapToggle('enable');
+            $('#position-offset').prop('disabled', false);
         }
-        
-        setSettingsPropertiesFromCustomIconForm();
-    });
-
-    $.each(['side', 'position'], function(i, v) {
-        $(`#toggle-${v}`).bootstrapToggle({
-            on: v == 'side' ? 'Left' : 'Top',
-            off: v == 'side' ? 'Right' : 'Bottom',
-            onstyle: 'success',
-            offstyle: 'success',
-            width: '90px',
-            size: 'small'
-        });
-
-        $(`#toggle-${v}-offset`).bootstrapToggle({
-            on: 'px',
-            off: '%',
-            onstyle: 'success',
-            offstyle: 'success',
-            width: '30px',
-            size: 'small'
-        });
-    });
-
-    $('#toggle-side, #toggle-position, #toggle-side-offset, #toggle-position-offset').on('change', setSettingsPropertiesFromCustomIconForm);
-    
-    $('#side-offset, #position-offset').on('keypress', setSettingsPropertiesFromCustomIconForm);
-
-    // initialise fields as disabled if required
-    if (settings.injectedIconConfig.type == 'anchored') {
-        $('#toggle-side, #toggle-position, #toggle-position-offset').bootstrapToggle('enable');
-            
-        $('#position-offset, #icon-background-color').prop("disabled", false);
-            
-        $('#toggle-side-offset').bootstrapToggle('disable');
-            
-        $('#side-offset').prop("disabled", true);
-    } else {
-        $('#toggle-side, #toggle-side-offset, #toggle-position, #toggle-position-offset').bootstrapToggle('enable');
-        
-        $('#side-offset, #position-offset, #icon-background-color').prop( "disabled", false );
     }
 
-    $('#toggle-icon-type, #toggle-side, #toggle-position, #toggle-side-offset, #toggle-position-offset')
-        .bootstrapToggle(settings.config.customIconPosition ? 'enable' : 'disable');
-
-    $('#side-offset, #position-offset, #icon-background-color')
-        .prop("disabled", !settings.config.customIconPosition);
-
-    document.addEventListener('coloris:pick', event => {
+    // Event wiring
+    $('#toggle-use-custom-icon').on('change', function () {
+        syncEnabledDisabled();
         setSettingsPropertiesFromCustomIconForm();
     });
+    $('#toggle-icon-type, #toggle-side, #toggle-position, #toggle-side-offset, #toggle-position-offset')
+        .on('change', function () { syncEnabledDisabled(); setSettingsPropertiesFromCustomIconForm(); });
+    $('#side-offset, #position-offset, #icon-background-color').on('input', setSettingsPropertiesFromCustomIconForm);
+
+    document.addEventListener('coloris:pick', () => setSettingsPropertiesFromCustomIconForm());
+
+    // Initial state sync
+    syncEnabledDisabled();
 };
 
 /**
  * Build the context menu tab
  */
 var initialiseContextMenuForm = function (settings) {
-    let wrapper = $('<div></div>')
-        .append($('<h5 class="mb-4">Context menu</h5>'))
-        .append($('<div class="row"></div>')
-            .append($('<label for="toggle-context-menu" class="col-4" style=margin-top: 2px;">Enable context menu</label>'))
-            .append($('<div class="col"></div>')
-                .append(browser.contextMenus ? $('<input type="checkbox" id="toggle-context-menu">').prop('checked', settings.config.contextMenu) : $('<span>Not supported in your browser.</span>'))
-            )
-        );
+    const card = $('<div class="rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden"></div>');
+    const header = $('<div class="flex items-center gap-3 px-4 py-3 border-b border-slate-700"></div>')
+        .append($('<i class="fa-solid fa-mouse-pointer text-indigo-400"></i>'))
+        .append($('<h3 class="font-semibold text-base m-0">Context menu</h3>'));
+    const body = $('<div class="p-4 space-y-4 text-sm"></div>');
 
-    $('#contextMenuOptionsForm').prepend(wrapper);
+    if (browser.contextMenus) {
+        const row = $('<div class="flex items-start justify-between gap-4"></div>')
+            .append($('<div class="flex-1"></div>')
+                .append($('<label for="toggle-context-menu" class="font-medium">Enable context menu</label>'))
+                .append($('<p class="mt-1 text-xs text-slate-400">Adds a right-click option to send highlighted text directly to your configured Servarr instance search.</p>')))
+            .append($('<div class="w-28 flex-shrink-0"></div>')
+                .append($('<input type="checkbox" id="toggle-context-menu" class="hidden">').prop('checked', settings.config.contextMenu))
+            );
+        body.append(row);
+    } else {
+        body.append($('<p class="text-xs text-red-400">Context menus are not supported in this browser.</p>'));
+    }
 
-    if (browser.contextMenu) {
-        // enable toggle
-        $('#toggle-context-menu').bootstrapToggle({
-            on: 'Enabled',
-            off: 'Disabled',
-            onstyle: 'success',
-            offstyle: 'danger',
-            width: '90px',
-            size: 'small'
-        });
+    card.append(header, body);
+    $('#contextMenuOptionsForm').empty().append(card);
 
-        // site enabled/disabled toggle change event
-        $('#toggle-context-menu').on('change', setSettingsPropertiesFromContextMenuForm);
+    if (browser.contextMenus) {
+        initToggle('#toggle-context-menu', {}, setSettingsPropertiesFromContextMenuForm);
     }
 };
 
@@ -652,87 +834,68 @@ var initialiseDebugForm = function (settings) {
     const waitForElTicks = [100,200,300,400,500];
     const maxAttemptsTicks = [10,20,30,40,50];
 
-    let wrapper = $('<div></div>')
-        .append($('<h5 class="mb-4">Logging</h5>'))
-        .append($('<div class="row"></div>')
-            .append($('<label for="toggle-debug" class="col-4" style=margin-top: 2px;">Turn on console logging</label>'))
-            .append($('<div class="col"></div>')
-                .append($('<input type="checkbox" id="toggle-debug">').prop('checked', settings.config.debug))
-            )
-        )
-        .append($('<hr class="my-5" />'))
-        .append($('<h5 class="mb-4">Search input element wait configuration</h5>'))
-        .append($('<div class="row"></div>')
-            .append($('<label for="toggle-debug" class="col-4" style=margin-top: 2px;">Input search element wait time between attempts</label>'))
-            .append($('<div class="col"></div>')
-                .append($(`<input id="waitForEl" type="text" name="waitTime" 
-                    data-provide="slider" 
-                    data-slider-ticks="[${waitForElTicks.join()}]" 
-                    data-slider-min="${waitForElTicks[0]}" 
-                    data-slider-max="${waitForElTicks[waitForElTicks.length - 1]}" 
-                    data-slider-step="${waitForElTicks[0] - waitForElTicks[1]}"
-                    data-slider-value="${settings.config.searchInputWaitForMs}"
-                    data-slider-tooltip="show">`)
-                )
-                .append($(`<span>&nbsp;&nbsp;&nbsp;</span>`))
-                .append($(`<span id="waitForElSpan">${settings.config.searchInputWaitForMs}</span>`))
-            )
-        )        
-        .append($('<div class="row mt-4"></div>')
-            .append($('<label for="toggle-debug" class="col-4" style=margin-top: 2px;">Input search element max attempts</label>'))
-            .append($('<div class="col"></div>')
-                .append($(`<input id="maxAttempts" type="text" name="searchMaxAttempts" 
-                    data-provide="slider" 
-                    data-slider-ticks="[${maxAttemptsTicks.join()}]" 
-                    data-slider-min="${maxAttemptsTicks[0]}" 
-                    data-slider-max="${maxAttemptsTicks[maxAttemptsTicks.length - 1]}" 
-                    data-slider-step="${maxAttemptsTicks[0] - maxAttemptsTicks[1]}"
-                    data-slider-value="${settings.config.searchInputMaxAttempts}"
-                    data-slider-tooltip="show">`)
-                )
-                .append($(`<span>&nbsp;&nbsp;&nbsp;</span>`))
-                .append($(`<span id="maxAttemptsSpan">${settings.config.searchInputMaxAttempts}</span>`))
-            )
-        )
-        .append($('<div class="row mt-4"></div>')
-            .append($('<label for="toggle-debug" class="col-4" style=margin-top: 2px;">Total search input element lookup time</label>'))
-            .append($('<div class="col"></div>')
-                .append($(`<span id="totalTimeSpan">${settings.config.searchInputMaxAttempts * settings.config.searchInputWaitForMs} ms</span>`))
-            )
+    const card = $('<div class="rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden"></div>');
+    const header = $('<div class="flex items-center gap-3 px-4 py-3 border-b border-slate-700"></div>')
+        .append($('<i class="fa-solid fa-bug text-indigo-400"></i>'))
+        .append($('<h3 class="font-semibold text-base m-0">Debug & timing</h3>'));
+    const body = $('<div class="p-4 space-y-8 text-sm"></div>');
+
+    // Logging toggle
+    const loggingRow = $('<div class="flex items-start justify-between gap-4"></div>')
+        .append($('<div class="flex-1"></div>')
+            .append($('<label for="toggle-debug" class="font-medium">Turn on console logging</label>'))
+            .append($('<p class="mt-1 text-xs text-slate-400">Outputs verbose diagnostic information to the browser console.</p>')))
+        .append($('<div class="w-28 flex-shrink-0"></div>')
+            .append($('<input type="checkbox" id="toggle-debug" class="hidden">').prop('checked', settings.config.debug))
         );
+    body.append(loggingRow);
 
-    $('#debugOptionsForm').prepend(wrapper);
+    // Range control factory
+    function buildRange(id, label, ticks, value, min, max, step, unitHelp) {
+        const container = $('<div class="space-y-2"></div>');
+        container.append($(`<label for="${id}" class="font-medium">${label}</label>`));
+        const sliderWrap = $('<div class="space-y-1"></div>');
+        const input = $(`<input type="range" id="${id}" class="w-full accent-indigo-600" />`) // accent color for supported browsers
+            .attr({ min: min, max: max, step: step, value: value });
+        const valueLine = $(`<div class="flex justify-between text-[11px] font-mono text-slate-400"></div>`);
+        // tick labels
+        ticks.forEach(t => valueLine.append($(`<span>${t}</span>`)));
+        const liveValue = $(`<div id="${id}Live" class="text-xs font-medium text-indigo-400">${value}</div>`);
+        sliderWrap.append(input, valueLine, liveValue);
+        if (unitHelp) sliderWrap.append($(`<p class="text-[11px] text-slate-400">${unitHelp}</p>`));
+        container.append(sliderWrap);
+        return container;
+    }
 
-    // enable toggle
-    $('#toggle-debug').bootstrapToggle({
-        on: 'Enabled',
-        off: 'Disabled',
-        onstyle: 'success',
-        offstyle: 'danger',
-        width: '90px',
-        size: 'small'
-    });
+    const waitRange = buildRange('waitForEl', 'Input search element wait time between attempts (ms)', waitForElTicks, settings.config.searchInputWaitForMs, waitForElTicks[0], waitForElTicks[waitForElTicks.length-1], 100, 'Shorter times attempt DOM lookup more aggressively.');
+    const attemptsRange = buildRange('maxAttempts', 'Input search element max attempts', maxAttemptsTicks, settings.config.searchInputMaxAttempts, maxAttemptsTicks[0], maxAttemptsTicks[maxAttemptsTicks.length-1], 10, 'Controls how many times the search field will be queried.');
 
-    // site enabled/disabled toggle change event
-    $('#toggle-debug').on('change', setSettingsPropertiesFromDebugForm);
+    body.append($('<div class="space-y-6"></div>').append(waitRange, attemptsRange));
 
-    $('#waitForEl').slider()
-        .on('change', function() {
-            $('#waitForElSpan').html($('#waitForEl').val());
+    // Total time summary
+    const total = settings.config.searchInputMaxAttempts * settings.config.searchInputWaitForMs;
+    const totalSummary = $(`<div class="rounded-md bg-white/10 px-3 py-2 text-xs flex items-center justify-between">
+        <span>Total search input element lookup time</span>
+        <span id="totalTimeSpan" class="font-semibold">${total} ms</span>
+    </div>`);
+    body.append(totalSummary);
 
-            $('#totalTimeSpan').html(`${parseInt($('#waitForEl').val()) * parseInt($('#maxAttempts').val())} ms`);
+    card.append(header, body);
+    $('#debugOptionsForm').empty().append(card);
 
-            setSettingsPropertiesFromDebugForm();
-        });
+    // Toggle init
+    initToggle('#toggle-debug', {}, setSettingsPropertiesFromDebugForm);
 
-    $('#maxAttempts').slider()
-        .on('change', function() {
-            $('#maxAttemptsSpan').html($('#maxAttempts').val());
+    function recompute() {
+        const wait = parseInt($('#waitForEl').val(), 10);
+        const attempts = parseInt($('#maxAttempts').val(), 10);
+        $('#waitForElLive').text(wait);
+        $('#maxAttemptsLive').text(attempts);
+        $('#totalTimeSpan').text(`${wait * attempts} ms`);
+        setSettingsPropertiesFromDebugForm();
+    }
 
-            $('#totalTimeSpan').html(`${parseInt($('#waitForEl').val()) * parseInt($('#maxAttempts').val())} ms`);
-
-            setSettingsPropertiesFromDebugForm();
-        });
+    $('#waitForEl, #maxAttempts').on('input change', recompute);
 };
 
 /**
@@ -794,7 +957,9 @@ async function setSettingsPropertiesFromCustomIconForm() {
 
     $("#servarr-ext_custom-icon-wrapper, #servarr-ext_custom-icon-style").remove();
 
-    if (settings.config.customIconPosition && $('#custom-icon-tab').hasClass('active')) {
+    // Re-inject preview only if the custom icon tab is currently active (aria-selected)
+    const customIconTabActive = $('#tab-custom-icon[aria-selected="true"]').length > 0;
+    if (settings.config.customIconPosition && customIconTabActive) {
         $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
     }
 
@@ -807,8 +972,18 @@ async function setSettingsPropertiesFromCustomIconForm() {
 async function setSettingsPropertiesFromContextMenuForm() {
     const settings = await getSettings();
 
-    const menu = $('#toggle-context-menu');
-    settings.config.contextMenu = menu != null ? menu.prop('checked') : false;
+    const $menu = $('#toggle-context-menu');
+    // Only update if the element exists (Firefox MV2 vs MV3 differences or future conditional rendering)
+    if ($menu.length) {
+        const newVal = $menu.prop('checked');
+        if (settings.config.contextMenu !== newVal) {
+            console.log('[ServarrExt] Updating contextMenu setting ->', newVal);
+        }
+        settings.config.contextMenu = newVal;
+    } else {
+        // Fallback to false if toggle not present
+        settings.config.contextMenu = false;
+    }
 
     await setSettings(settings);
 }
@@ -874,9 +1049,10 @@ browser.storage.onChanged.addListener(async function(changes, area) {
 });
 
 $(async function () {
-    // initialise page on load
-    const settings = await getSettings();
+    // Initialise tab system first so panels exist with correct visibility.
+    initTabs();
 
+    const settings = await getSettings();
     initialiseEnabledDisabledButton(settings);
     initialiseBasicForm(settings);
     initialiseAdvancedForm(settings);
@@ -885,20 +1061,20 @@ $(async function () {
     initialiseContextMenuForm(settings);
     initialiseDebugForm(settings);
 
-    $('#toggleActive').on('click', async function(e) {
+    // After forms built (badges exist), kick off passive status probe
+    runInitialBackgroundProbe();
+
+    $('#toggleActive').on('click', async function () {
         const settings = await getSettings();
         settings.config.enabled = !settings.config.enabled;
         await setSettings(settings);
     });
 
-    // deactivate all other tabs on click. this shouldn't be required, but bootstrap 5 beta seems a bit buggy with tab deactivation.
-    $('.nav-link').on('click', function() {
-        let id = $(this).attr('id');
+    // If user reloads page while custom icon tab is initially active (e.g., deep link in future) ensure Coloris loads.
+    if (document.querySelector('#tab-custom-icon[aria-selected="true"]')) {
+        ensureColoris();
+    }
 
-        if (id == 'custom-icon-tab' && settings.config.customIconPosition) {
-            $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
-        } else {
-            $("#servarr-ext_custom-icon-wrapper, #servarr-ext_custom-icon-style").remove();
-        }
-    });
+    // Signal to tests that options initialisation finished.
+    window.__optionsReady = true;
 });

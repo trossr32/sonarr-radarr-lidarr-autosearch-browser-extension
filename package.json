@@ -2,11 +2,10 @@
     "name": "sonarr-radarr-autosearch-browser-extension",
     "version": "2.0.0",
     "devDependencies": {
-        "@fortawesome/fontawesome-free": "^6.7.2",
-        "@melloware/coloris": "^0.24.0",
-        "@popperjs/core": "^2.6.0",
-        "bootstrap": "^5.0.2",
-        "bootstrap4-toggle": "^3.6.1",
+        "@fortawesome/fontawesome-free": "^7.0.1",
+        "@melloware/coloris": "^0.25.0",
+        "@tailwindcss/cli": "^4.1.13",
+        "@tailwindcss/forms": "^0.5.10",
         "grunt": "^1.6.1",
         "grunt-contrib-clean": "^2.0.0",
         "grunt-contrib-concat": "^2.1.0",
@@ -20,10 +19,10 @@
         "jquery": "^3.5.1",
         "load-grunt-tasks": "^5.1.0",
         "sass": "^1.32.5",
+        "tailwindcss": "^4.1.13",
         "webextension-polyfill": "^0.12.0"
     },
     "dependencies": {
-        "bootstrap-slider": "^11.0.2",
         "gem": "^2.4.3"
     },
     "scripts": {

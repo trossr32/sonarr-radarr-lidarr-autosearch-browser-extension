@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@config "../../../tailwind.config.js";
+
+@source "../**/*.{js,html}";
+
+@base {
+    input[type=range] {
+        @apply text-indigo-500! accent-indigo-600!;
+    }
+}
+
+@layer components {   
+    .clr-field button {
+        @apply w-7! h-7! bg-none! rounded cursor-pointer! bg-size-[6px_6px] top-[45%]! right-[-40px]! pointer-events-auto!;
+    }
+}

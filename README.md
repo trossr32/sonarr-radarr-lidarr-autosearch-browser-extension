@@ -8,7 +8,9 @@
 
 📚 Visit the [Wiki](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki) for installation, settings, and integration guides.
 
-## Overview 
+👉 New: A comprehensive end-user configuration manual is now available: see the [User Configuration Guide](./USER_GUIDE.md).
+
+## Overview
 
 This is an extension for Chromium browsers and Firefox that:
 
@@ -124,9 +126,9 @@ Thanks to the following for helping with this project:
 <a href='https://github.com/MozPri' target='_blank'><picture><img src="https://github.com/MozPri.png" alt="MozPri" title="MozPri" style="width:80px;border-radius: 50%;"></picture></a>
 <a href='https://github.com/dynamiccookies' target='_blank'><picture><img src="https://github.com/dynamiccookies.png" alt="dynamiccookies" title="dynamiccookies" style="width:80px;border-radius: 50%;"></picture></a>
 <a href='https://github.com/theotherp' target='_blank'><picture><img src="https://github.com/theotherp.png" alt="theotherp" title="theotherp" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/0xdevalias)' target='_blank'><picture><img src="https://github.com/0xdevalias.png" alt="0xdevalias" title="0xdevalias" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/StormPooper)' target='_blank'><picture><img src="https://github.com/StormPooper.png" alt="StormPooper" title="StormPooper" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/Xeldarflo)' target='_blank'><picture><img src="https://github.com/Xeldarflo.png" alt="Xeldarflo" title="Xeldarflo" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/0xdevalias' target='_blank'><picture><img src="https://github.com/0xdevalias.png" alt="0xdevalias" title="0xdevalias" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/StormPooper' target='_blank'><picture><img src="https://github.com/StormPooper.png" alt="StormPooper" title="StormPooper" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/Xeldarflo' target='_blank'><picture><img src="https://github.com/Xeldarflo.png" alt="Xeldarflo" title="Xeldarflo" style="width:80px;border-radius: 50%;"></picture></a>
 
 <!--# Thanks to <a href='https://www.jetbrains.com' target='_blank'>JetBrains</a> for providing an open source license for their products to support this project. 
 
