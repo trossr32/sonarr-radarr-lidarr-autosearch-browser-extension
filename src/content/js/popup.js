@@ -7,8 +7,13 @@ const toggleVariant = {
     // Disabled (currently inactive) = show enable action => emerald
     disabled: ['bg-emerald-600', 'hover:bg-emerald-500', 'focus:ring-emerald-400']
 };
+
 const allVariantClasses = toggleVariant.enabled.concat(toggleVariant.disabled).join(' ');
 
+/**
+ * Apply the correct classes and text to the enable/disable toggle button based on current state.
+ * @param {Settings} settings 
+ */
 function applyToggleButtonState(settings) {
     const enabled = settings.config.enabled;
     const $btn = $('#toggleActive');

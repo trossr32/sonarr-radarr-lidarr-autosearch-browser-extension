@@ -2,8 +2,16 @@ var iconPort = browser.runtime.connect({ name: 'icon' });
 
 // Lazy loader promise for Coloris (color picker). Only loaded when custom icon tab is first opened.
 let colorisLoadPromise = null;
+
+/**
+ * Ensure Coloris is loaded, returning a promise that resolves when done.
+ * @returns {Promise<void>}
+ */
 function ensureColoris() {
-    if (colorisLoadPromise) return colorisLoadPromise;
+    if (colorisLoadPromise) {
+        return colorisLoadPromise;
+    }
+
     colorisLoadPromise = new Promise((resolve, reject) => {
         // If Coloris already present (user navigated back) just resolve.
         if (window.Coloris) { resolve(); return; }
@@ -14,9 +22,13 @@ function ensureColoris() {
             // Small defer to allow script to register global
             setTimeout(() => resolve(), 0);
         };
-        script.onerror = (e) => { console.error('Failed to load Coloris', e); reject(e); };
+        script.onerror = (e) => { 
+            console.error('Failed to load Coloris', e); 
+            reject(e);
+        };
         document.head.appendChild(script);
     });
+
     return colorisLoadPromise;
 }
 
@@ -74,7 +86,10 @@ function ensureColoris() {
                 .css('width', opts.width)
                 .text(makeLabel())
                 .on('click', function () {
-                    if ($btn.hasClass('opacity-50')) return; // disabled
+                    if ($btn.hasClass('opacity-50')) {
+                        return; // disabled
+                    }
+
                     $checkbox.prop('checked', !$checkbox.prop('checked'));
                     $btn.attr('aria-pressed', $checkbox.prop('checked'))
                         .removeClass()
@@ -86,15 +101,26 @@ function ensureColoris() {
             $checkbox.after($btn);
             $checkbox.data('twToggleButton', $btn).data('twToggleInitialised', true);
         });
+
         return this;
     };
 })(jQuery);
 
-// Centralised helper to initialise a toggle with common defaults & attach change handler.
-// Usage: initToggle('#selector', { on:'Enabled', off:'Disabled' }, handlerFn)
+/**
+ * Centralised helper to initialise a toggle with common defaults & attach change handler.
+ * Usage: initToggle('#selector', { on:'Enabled', off:'Disabled' }, handlerFn)
+ * @param {jQuery|HTMLElement} selector - The target element(s) to initialize.
+ * @param {Object} opts - Custom options for the toggle.
+ * @param {Function} onChange - Change event handler.
+ * @returns {jQuery} The initialized element(s).
+ */
 function initToggle(selector, opts, onChange) {
     const $el = (selector instanceof jQuery) ? selector : $(selector);
-    if (!$el.length) return $el;
+    
+    if (!$el.length) {
+        return $el;
+    }
+    
     const base = {
         on: 'Enabled',
         off: 'Disabled',
@@ -103,16 +129,24 @@ function initToggle(selector, opts, onChange) {
         width: '100%',
         size: 'small'
     };
+    
     $el.bootstrapToggle($.extend({}, base, opts || {}));
-    if (onChange) { $el.on('change', onChange); }
+    
+    if (onChange) { 
+        $el.on('change', onChange); 
+    }
+    
     return $el;
 }
 
-// =====================
 // Shared enable/disable helpers
-// =====================
 const DISABLED_CLASSES = 'opacity-50 cursor-not-allowed';
 
+/**
+ * Enable/disable basic site fields based on enabled state.
+ * @param {string} siteId
+ * @param {boolean} enabled
+ */
 function setBasicSiteEnabledState(siteId, enabled) {
     const disabled = !enabled;
     const $domain = $(`#${siteId}Domain`);
@@ -136,6 +170,11 @@ function setBasicSiteEnabledState(siteId, enabled) {
     if (disabled) { $(`#${siteId}ApiTestMessage`).addClass('hidden'); }
 }
 
+/**
+ * Enable/disable advanced fields based on autoPopulateActive state.
+ * @param {string} siteId
+ * @param {boolean} autoPopulateActive
+ */
 function setAdvancedAutoPopulateState(siteId, autoPopulateActive) {
     // When autoPopulateActive == true we DISABLE manual editing
     const disabled = autoPopulateActive;
@@ -156,7 +195,10 @@ function setAdvancedAutoPopulateState(siteId, autoPopulateActive) {
     [$path, $sel].forEach($el => { if ($el.length){ $el.prop('disabled', disabled); $el.toggleClass(DISABLED_CLASSES, disabled); }});
 }
 
-// Accessible tab system (independent of Bootstrap nav-tabs)
+/**
+ * Initialize the tab system.
+ * @returns {Promise<void>}
+ */
 function initTabs() {
     const tabTriggers = Array.from(document.querySelectorAll('.tab-trigger'));
     const panels = Array.from(document.querySelectorAll('[role="tabpanel"].panel'));
@@ -190,11 +232,11 @@ function initTabs() {
             ensureColoris().then(() => {
                 if (window.Coloris) {
                     Coloris({
-                        el: 'input[data-coloris]',   // (optional) selector to auto bind
-                        theme: 'large',              // or 'default', 'pill', etc.
+                        el: 'input[data-coloris]',
+                        theme: 'large',
                         themeMode: 'dark',
                         alpha: false,
-                        format: 'hex',               // 'hex' | 'rgb' | 'hsl' | 'auto'
+                        format: 'hex',
                         closeButton: true,
                         clearButton: true,
                     });
@@ -232,12 +274,18 @@ function initTabs() {
     activate(initiallyActive.id);
 }
 
+// Custom icon preview injection/removal
 function removeCustomIconPreview() {
     $("#servarr-ext_custom-icon-wrapper, #servarr-ext_custom-icon-style").remove();
 }
 
+/** 
+ * Show a preview of the custom icon if enabled in settings.
+ * If already shown, remove and re-add (to refresh with latest settings).
+ */
 async function maybeShowCustomIconPreview() {
     const settings = await getSettings();
+
     if (settings.config.customIconPosition) {
         removeCustomIconPreview();
         $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
@@ -246,14 +294,26 @@ async function maybeShowCustomIconPreview() {
 
 // Passive background status probe state
 let backgroundProbeRan = false;
+
+/**
+ * Run a background probe to update status badges for all enabled sites.
+ * @returns {Promise<void>}
+ */
 async function runInitialBackgroundProbe() {
-    if (backgroundProbeRan) return; // safeguard
+    if (backgroundProbeRan) {
+        return; // safeguard
+    }
+
     backgroundProbeRan = true;
+
     const settings = await getSettings();
+
     // Stagger requests slightly to avoid burst (50ms increments)
     const enabledSites = settings.sites.filter(s => s.enabled && s.domain && s.apiKey);
+
     enabledSites.forEach((site, idx) => {
         updateStatusBadge(site.id, 'loading');
+
         setTimeout(async () => {
             try {
                 const response = await callApi({ siteId: site.id, endpoint: 'Version' });
