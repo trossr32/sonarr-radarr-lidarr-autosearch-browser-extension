@@ -209,9 +209,11 @@ function initTabs() {
             const isActive = btn.id === id;
             btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
             if (isActive) {
-                btn.classList.add('is-active', 'bg-white/10');
+                btn.classList.add('is-active', 'bg-white/10', 'text-white');
+                btn.classList.remove('text-slate-300');
             } else {
-                btn.classList.remove('is-active', 'bg-white/10');
+                btn.classList.remove('is-active', 'bg-white/10', 'text-white');
+                btn.classList.add('text-slate-300');
             }
         });
         panels.forEach(panel => {
