@@ -126,7 +126,7 @@ If stores require minimization, `<all_urls>` could be replaced by a dynamic perm
 | `eventPage.js` | Shared background script logic (non‑service worker pieces reused). |
 | `content/js/sonarr_radarr_lidarr_autosearch.js` | Main content script: detects supported integration pages, injects Servarr icon link(s), reads settings, builds search URLs. |
 | `core.js` | Shared helpers: settings access (storage), API version probing, URL building, small `browser` polyfill for non-WebExtension contexts (used in tests). |
-| `options.js` | Options UI assembly (Tailwind utility classes, accessible tabs, toggle wiring, optional lazy load of Coloris color picker). |
+| `options.js` | Options UI assembly (Tailwind utility classes, accessible tabs, toggle wiring, optional lazy load of Coloris colour picker). |
 | `popup.js` | Popup enable/disable toggle + quick settings link. |
 
 All logic is synchronous or simple async with `fetch` only to user‑supplied Servarr endpoints (API base derived from settings). No external analytics endpoints.
@@ -154,7 +154,7 @@ All logic is synchronous or simple async with `fetch` only to user‑supplied Se
 | jQuery | `node_modules/jquery` | Simple DOM selection & legacy code compatibility. |
 | Font Awesome 7 | `@fortawesome/fontawesome-free` | Icons in popup/options/UIs. |
 | Tailwind CSS 4 + Forms plugin | `tailwindcss`, `@tailwindcss/forms` | Utility-first styling, accessible form defaults. Built into single CSS file (`tailwind.css`). |
-| Coloris | `@melloware/coloris` | Optional color picker (lazy-loaded only when custom icon tab is activated). |
+| Coloris | `@melloware/coloris` | Optional colour picker (lazy-loaded only when custom icon tab is activated). |
 | webextension-polyfill | `webextension-polyfill` | Unified `browser.*` API shim across Chrome/Firefox. |
 | Sass | `sass` / `grunt-sass` | Compiles legacy `.scss` (mostly now migrated to Tailwind utilities). |
 
@@ -201,9 +201,9 @@ npm run firefox
 
 | Enable/Disable toggle | Popup → toggle → integration icons & auto-search cease when disabled. |
 | Advanced auto-detect | In options: set base URL + API key for (e.g.) Sonarr → advanced selectors auto-populate; test by removing key and toggling detection off/on. |
-| Custom icon (if enabled) | In options, navigate to custom icon tab; enable & adjust position/color; verify preview updates. |
+| Custom icon (if enabled) | In options, navigate to custom icon tab; enable & adjust position/colour; verify preview updates. |
 
-### 8.4 Color Picker Lazy Load Validation
+### 8.4 Colour Picker Lazy Load Validation
 
 1. Open options page.
 2. Do **not** open custom icon tab yet → confirm `window.Coloris` is undefined in DevTools console.

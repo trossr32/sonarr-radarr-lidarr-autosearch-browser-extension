@@ -1282,7 +1282,7 @@ var title = (s, removeUnderscore) => {
 </style>`;
 
     let siteStyles = `.servarr-ext_icon-image-${siteId} {
-    background: url('${base64Icons.find(i => i.id == siteId).fortyPx}') no-repeat;
+    background: url('${getIconAsDataUri(siteId, null, null)}') no-repeat;
 }
 
 .servarr-ext_floating-icon .servarr-ext_icon-image-${siteId} {
@@ -1390,66 +1390,59 @@ async function init() {
 
                         log([`integration[${ii}] ${integration.id} matched to domain: `, integration]);
 
-                        var matchContainer = $(integration.match.containerSelector),
-                            site = null;
-
+                        var matchContainer = $(integration.match.containerSelector);
                         var matchValue = null;
 
+                        // Determine candidate sites by type (supports multiple instances per type)
+                        let candidateSites = [];
                         if (integration.hasOwnProperty('defaultSite')) {
-                            site = settings.sites
-                                .filter(s => { return s.enabled; })
-                                .find(s => s.id == integration.defaultSite);
-                        } else {
+                            const siteType = integration.defaultSite; // treat as type key
+                            candidateSites = settings.sites.filter(s => s.enabled && s.type === siteType);
+                        } else if (integration.rules && integration.rules.length) {
                             log('iterating rules');
-
-                            $.each(integration.rules, 
-                                function (ir, r) {
-                                    matchValue = getElementValue(matchContainer, integration.match.attribute);
-
-                                    var isMatch = r.match.pattern.test(matchValue);
-
-                                    var hasMatch = r.match.operator === 'eq' ? isMatch : !isMatch; // 'ne', convert to switch if other values are required
-
-                                    log('matchContainer', matchContainer, 'integration.match.attribute', integration.match.attribute, 'matchValue', matchValue, 'isMatch', isMatch, 'hasMatch', hasMatch);
-
-                                    if (hasMatch) {
-                                        site = settings.sites
-                                            .filter(s => { return s.enabled; })
-                                            .find(s => s.id == r.siteId);
-
-                                        return false;
-                                    }
-                                });
+                            for (let ir = 0; ir < integration.rules.length; ir++) {
+                                const r = integration.rules[ir];
+                                matchValue = getElementValue(matchContainer, integration.match.attribute);
+                                const isMatch = r.match.pattern.test(matchValue);
+                                const hasMatch = r.match.operator === 'eq' ? isMatch : !isMatch; // 'ne'
+                                log('matchContainer', matchContainer, 'integration.match.attribute', integration.match.attribute, 'matchValue', matchValue, 'isMatch', isMatch, 'hasMatch', hasMatch);
+                                if (hasMatch) {
+                                    const siteType = r.siteId; // treat rule siteId as type key
+                                    candidateSites = settings.sites.filter(s => s.enabled && s.type === siteType);
+                                    break;
+                                }
+                            }
                         }
 
-                        if (site == null) {
-                            log([`integration ${integration.id} site not found`, 'integration', integration]);
+                        if (!candidateSites || candidateSites.length === 0) {
+                            log([`integration ${integration.id} site not found (no enabled instances for matching type)`, 'integration', integration]);
                             return;
                         }
                         
-                        log([`integration ${integration.id} site found: ${site.id}`, 'site', site, 'integration', integration]);
+                        log([`integration ${integration.id} candidate sites: ${candidateSites.map(s=>s.id).join(', ')}`, 'sites', candidateSites, 'integration', integration]);
 
                         // if the site integration has a where property, then the rules within the where must be evaluated
-                        // and asserted to be correct before the integration is used
+                        // and asserted to be correct before the integration is used (page-level condition)
                         if (integration.hasOwnProperty('where')) {
+                            let whereOk = true;
                             $.each(integration.where, function(i, rule) {
                                 switch (rule.operator){
                                     case 'eq':
-                                        log([`integration ${integration.id} site found: ${site.id} rule: ${rule.attribute} ${rule.operator} ${rule.value}, found: ${getElementValue($(rule.selector), rule.attribute)}`]);
-
-                                        if (rule.value !== getElementValue($(rule.selector), rule.attribute)) {
-                                            site = null;
-                                        }                                                   
-                                        break;  
+                                        const found = getElementValue($(rule.selector), rule.attribute);
+                                        log([`integration ${integration.id} where check: ${rule.attribute} ${rule.operator} ${rule.value}, found: ${found}`]);
+                                        if (rule.value !== found) {
+                                            whereOk = false;
+                                        }
+                                        break;
                                 }
                             });
 
-                            if (site == null) {
+                            if (!whereOk) {
                                 log([`integration ${integration.id} where rules failed`]);
                                 return;
                             }
 
-                            log([`integration ${integration.id} site ${site.id} where rules succeeded`]);
+                            log([`integration ${integration.id} where rules succeeded`]);
                         }
 
                         // This is a bit janky, but some sites (looking at you trakt) load quite slowly and need the processing to be deferred otherwise the
@@ -1457,7 +1450,7 @@ async function init() {
                         // In the case of trakt, page refreshes and tab activations work fine, but page to page navigations don't   ¯\_(ツ)_/¯
                         let deferMs = integration.hasOwnProperty('deferMs') ? integration.deferMs : 0;
 
-                        log([`integration ${integration.id} site ${site.id}, in ${deferMs}ms, will look for ${integration.search.containerSelector}`, $(integration.search.containerSelector)]);
+                        log([`integration ${integration.id} (sites: ${candidateSites.map(s=>s.id).join(', ')}), in ${deferMs}ms, will look for ${integration.search.containerSelector}`, $(integration.search.containerSelector)]);
 
                         setTimeout(() => { 
                             /* iterate all the containers */
@@ -1473,16 +1466,8 @@ async function init() {
                                     return;
                                 }
 
-                                // We always want to display only one icon except when the integration is imbd and the match was made on a
-                                // media type of 'other'. It's impossible to know whether these media types are movies or tv shows so show both icons.
-                                var iconCheckAttributeName = integration.id == 'imdb' && matchValue.indexOf('other') ? `data-${site.id}-ext-completed` : 'data-servarr-ext-completed';
-
-                                // Check if the container has already been processed and had an icon added.
-                                if (containerEl.attr(iconCheckAttributeName)) {
-                                    log(`element '${container}' already has an icon attributed, so skipping`);
-                                    
-                                    return;
-                                }
+                                // Always allow multiple icons for multiple instances; track per-instance to avoid duplicates per site
+                                // Previously used a global data-servarr-ext-completed which blocked multi; now use per-site flag on container
 
                                 var searchTerm = getElementValue(containerEl, integration.search.selectorType);
                                 
@@ -1516,30 +1501,36 @@ async function init() {
 
                                 log(['search term: ', searchTerm]);
 
-                                let searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ').replace(/%3A/g, ':');
-
-                                log(['search url: ', searchUrl]);
-
-                                // Either add an icon to it's configured container or add a custom icon to the page
-                                if (!settings.config.customIconPosition || $(integration.icon.containerSelector).length > 1) {
-                                    // add an icon to the configured container
-                                    let icon = base64Icons.find(i => i.id == site.id),
-                                        linkEl = $(`<a href="${searchUrl}" target="_blank" tooltip="${site.menuText}" title="${site.menuText}" data-servarr-icon="true"></a>`)
-                                            .append($(`<img src="${icon.default}" style="${integration.icon.imgStyles}">`));
-
-                                    let el = integration.icon.hasOwnProperty('wrapLinkWithContainer') ? $(integration.icon.wrapLinkWithContainer).append(linkEl) : linkEl;
-
-                                    if (integration.icon.locator == "append") {
-                                        $(integration.icon.containerSelector).eq(i_el).append(el);
-                                    } else {
-                                        $(integration.icon.containerSelector).eq(i_el).prepend(el);
+                                // Inject an icon for each candidate site
+                                candidateSites.forEach(function(site) {
+                                    const perSiteAttr = `data-servarr-ext-${site.id}-completed`;
+                                    if (containerEl.attr(perSiteAttr)) {
+                                        // already injected for this instance
+                                        return;
                                     }
-                                } else {
-                                    // show a custom icon based on the icon config
-                                    addCustomIconMarkup(settings.injectedIconConfig, site.id, searchUrl);
-                                }
+                                    let searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ').replace(/%3A/g, ':');
+                                    log(['search url: ', searchUrl, 'for site', site]);
 
-                                containerEl.attr(iconCheckAttributeName, true);
+                                    if (!settings.config.customIconPosition || $(integration.icon.containerSelector).length > 1) {
+                                        // add an icon to the configured container
+                                        let icon = getIconFromSiteIconConfig(site.icon, integration.icon.imgStyles, null);
+                                        let linkEl = $(`<a href="${searchUrl}" target="_blank" rel="noopener" tooltip="${site.name}" title="${site.name}" data-servarr-icon="true"></a>`)
+                                            //.append($(`<img src="${icon.default}" style="${integration.icon.imgStyles}">`));
+                                            .append($(icon));
+                                        
+                                            let el = integration.icon.hasOwnProperty('wrapLinkWithContainer') ? $(integration.icon.wrapLinkWithContainer).append(linkEl) : linkEl;
+                                        
+                                        if (integration.icon.locator == "append") {
+                                            $(integration.icon.containerSelector).eq(i_el).append(el);
+                                        } else {
+                                            $(integration.icon.containerSelector).eq(i_el).prepend(el);
+                                        }
+                                    } else {
+                                        // show a custom icon based on the icon config
+                                        addCustomIconMarkup(settings.injectedIconConfig, site.type, searchUrl);
+                                    }
+                                    containerEl.attr(perSiteAttr, true);
+                                });
                             });
                         }, deferMs);
                     }

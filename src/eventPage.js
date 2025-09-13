@@ -1,7 +1,30 @@
+async function getCurrentTab() {
+    try {
+        const [tab] = await browser.tabs.query({ active: true, lastFocusedWindow: true });
+        return tab || null;
+    } catch (e) {
+        await log(['Error getting current tab', e], 'warn');
+        return null;
+    }
+}
+
+// Determine if the URL is eligible for content script injection
+function isInjectableUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    // Disallow internal and restricted schemes/domains
+    const forbiddenSchemes = ['chrome:', 'edge:', 'about:', 'moz-extension:', 'chrome-extension:', 'devtools:', 'view-source:'];
+    if (forbiddenSchemes.some(p => url.startsWith(p))) return false;
+    // Firefox Add-ons and extension pages are non-injectable
+    if (url.startsWith('https://addons.mozilla.org')) return false;
+    // Only inject into http/https pages here
+    if (url.startsWith('http://') || url.startsWith('https://')) return true;
+    return false;
+}
+
 /**
  * Get settings, set the extension icon and execute the content script
  */
-async function initRun(evt) {
+async function initRun(tabId, evt) {
     await log(`running init from ${evt} event`);
     
     try {
@@ -9,24 +32,38 @@ async function initRun(evt) {
 
         await setIcon(settings);
         await buildMenus(settings);
-        await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
-        await browser.tabs.executeScript({ file: 'content/js/icons.js' });
-        await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
+        // Guard: only inject into injectable URLs
+        try {
+            const tab = await browser.tabs.get(tabId);
+            if (!isInjectableUrl(tab && tab.url)) {
+                await log(['Skipping injection for non-injectable URL', tab && tab.url]);
+                return;
+            }
+        } catch (e) {
+            await log(['Failed to resolve tab for injection', e], 'warn');
+            return;
+        }
+        // Explicitly target the tab to avoid implicit/ambiguous injection target
+        await browser.tabs.executeScript(tabId, { file: 'content/js/browser-polyfill.min.js' });
+        await browser.tabs.executeScript(tabId, { file: 'content/js/icons.js' });
+        await browser.tabs.executeScript(tabId, { file: 'content/js/content_script.js' });
     }
     catch(e) {
         await log(e.message, 'error');
     }
 }
 
-browser.tabs.onActivated.addListener(function () {
-    initRun('onActivated')
+browser.tabs.onActivated.addListener(function (activeInfo) {
+    if (activeInfo && typeof activeInfo.tabId === 'number') {
+        initRun(activeInfo.tabId, 'onActivated');
+    }
 });
 
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     log(['change info status', changeInfo]);
 
     if (changeInfo.status == 'complete') {
-        initRun('onUpdated')
+        initRun(tabId, 'onUpdated')
     }
 });
 
@@ -34,7 +71,12 @@ browser.runtime.onConnect.addListener(function(port) {
     switch (port.name) {
         case 'init':
             port.onMessage.addListener(async function () {
-                await initRun('onConnect');
+                const tab = await getCurrentTab();
+                if (tab && typeof tab.id === 'number') {
+                    await initRun(tab.id, 'onConnect');
+                } else {
+                    await log('Could not determine current tab id for init run', 'warn');
+                }
             });
             break;
 
@@ -71,9 +113,42 @@ async function buildMenus(settings) {
     // create parent menu
     browser.contextMenus.create({ "title": "Search Servarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
 
-    // create child menus from enabled sites array
-    for (let i = 0; i < enabledSites.length; i++) {
-        browser.contextMenus.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": `${enabledSites[i].id}Menu`, "contexts": ["selection"] });
+    // Helper: format a type id like 'readarr_ebook' => 'Readarr (Ebook)'
+    function titleType(type) {
+        if (!type) return '';
+        if (type.indexOf('_') > -1) {
+            const parts = type.split('_');
+            return parts[0].charAt(0).toUpperCase() + parts[0].slice(1) + ' (' + (parts[1].charAt(0).toUpperCase() + parts[1].slice(1)) + ')';
+        }
+        return type.charAt(0).toUpperCase() + type.slice(1);
+    }
+
+    // Group enabled sites by type so multiple instances of the same type are nested
+    const groupsByType = enabledSites.reduce((acc, s) => {
+        const t = s.type || s.id;
+        acc[t] = acc[t] || [];
+        acc[t].push(s);
+        return acc;
+    }, {});
+
+    for (const type of Object.keys(groupsByType)) {
+        const group = groupsByType[type];
+        const typeTitle = titleType(type);
+        if (group.length > 1) {
+            // Create a submenu for the type
+            const parentId = `type-${type}`;
+            browser.contextMenus.create({ title: typeTitle, id: parentId, parentId: 'sonarrRadarrLidarr', contexts: ['selection'] });
+            // Add each instance under the type submenu, labelled with its instance name
+            for (const site of group) {
+                const label = `Search ${site.name || typeTitle}`;
+                browser.contextMenus.create({ title: label, parentId, id: `${site.id}Menu`, contexts: ['selection'] });
+            }
+        } else {
+            // Single instance for this type: add directly under the root
+            const site = group[0];
+            const label = `Search ${site.name || typeTitle}`;
+            browser.contextMenus.create({ title: label, parentId: 'sonarrRadarrLidarr', id: `${site.id}Menu`, contexts: ['selection'] });
+        }
     }
 }
 

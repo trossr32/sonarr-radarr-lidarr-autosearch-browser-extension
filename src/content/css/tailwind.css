@@ -11,6 +11,6 @@
 
 @layer components {   
     .clr-field button {
-        @apply w-7! h-7! bg-none! rounded cursor-pointer! bg-size-[6px_6px] top-[45%]! right-[-40px]! pointer-events-auto!;
+        @apply w-6! h-6! bg-none! rounded border! border-slate-600! cursor-pointer! top-1/2! -right-8! pointer-events-auto!;
     }
 }

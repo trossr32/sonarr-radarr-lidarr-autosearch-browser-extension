@@ -15,6 +15,18 @@ async function getCurrentTab() {
     }
 }
 
+function isInjectableUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    // Disallow internal and restricted schemes/domains
+    const forbiddenSchemes = ['chrome:', 'edge:', 'about:', 'moz-extension:', 'chrome-extension:', 'devtools:', 'view-source:'];
+    if (forbiddenSchemes.some(p => url.startsWith(p))) return false;
+    // Chrome Web Store and extension pages are non-injectable
+    if (url.startsWith('https://chrome.google.com/webstore')) return false;
+    // Only inject into http/https pages here
+    if (url.startsWith('http://') || url.startsWith('https://')) return true;
+    return false;
+}
+
 /**
  * Get settings, set the extension icon and execute the content script
  */
@@ -28,6 +40,17 @@ async function initRun(tabId, evt) {
 
         await setIcon(settings);
         await buildMenus(settings);
+        // Guard: only inject into injectable URLs
+        try {
+            const tab = await chrome.tabs.get(tabId);
+            if (!isInjectableUrl(tab && tab.url)) {
+                await log(['Skipping injection for non-injectable URL', tab && tab.url]);
+                return;
+            }
+        } catch (e) {
+            await log(['Failed to resolve tab for injection', e], 'warn');
+            return;
+        }
         await browser.scripting.executeScript({ 
             target: {
                 tabId: tabId
@@ -60,9 +83,12 @@ browser.runtime.onConnect.addListener(function(port) {
     switch (port.name) {
         case 'init':
             port.onMessage.addListener(async function () {
-                let tabId = await getCurrentTab();
-    
-                await initRun(tabId, 'onConnect');
+                let tab = await getCurrentTab();
+                if (tab && typeof tab.id === 'number') {
+                    await initRun(tab.id, 'onConnect');
+                } else {
+                    await log('Could not determine current tab id for init run', 'warn');
+                }
             });
             break;
 

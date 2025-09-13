@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 - Add reviewer guide documentation
 - Preload Servarr API status on options page load (shows version or error immediately)
 - Backup & restore of settings from Options → Backup & restore tab (export to JSON; import with validation; merge or replace modes)
+- Allow multiple Servarr instances to be configured.
 
 ## 2.12.0
 
