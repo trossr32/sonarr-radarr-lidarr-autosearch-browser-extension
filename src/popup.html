@@ -19,7 +19,7 @@
     </style>
 </head>
 <body class="h-full bg-[#1d1e22] text-white font-sans text-sm leading-relaxed antialiased transition-colors duration-150 rounded-md shadow-lg">
-<div class="mx-auto popup-fixed-width text-center px-4 pt-8">
+<div class="mx-auto popup-fixed-width text-center px-4 pt-4">
     <header class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6 overflow-hidden">
         <div class="px-4 py-4 flex items-center justify-between gap-4">
             <div class="flex items-center gap-4 min-w-0">
@@ -36,17 +36,6 @@
         </div>
     </header>
 
-    <!-- Quick actions: Settings primary; links in a compact card below -->
-
-    <div class="w-full mb-3 flex flex-col items-center">
-        <button type="button" id="btnSettings"
-            class="w-3/4 mb-2 inline-flex items-center justify-center gap-2 rounded-md px-5 py-2.5 font-medium tracking-wide text-white bg-indigo-600 hover:bg-indigo-500 transition-colors duration-150 cursor-pointer">
-            <i class="fa-solid fa-cogs"></i>
-            <span>Settings</span>
-        </button>
-          <a href="options.html" target="_blank" id="aSettings" class="text-xs underline decoration-dotted transition-colors text-indigo-300 hover:text-indigo-200">Open Settings in a tab</a>
-    </div>
-
     <!-- Quick links card -->
     <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6 overflow-hidden">
         <div class="px-4 py-3 flex items-center gap-3 border-b border-slate-700">
@@ -54,19 +43,28 @@
             <h2 class="text-sm font-semibold m-0">Quick links</h2>
         </div>
         <div class="p-4">
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col items-center justify-center gap-2">
+                <button type="button" id="btnSettings"
+                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-colors duration-150 cursor-pointer">
+                    <i class="fa-solid fa-cogs"></i>
+                    <span>Settings</span>
+                </button>
+                <a href="options.html" target="_blank" id="aSettings"
+                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                    Open Settings in a tab
+                </a>
                 <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki/User-Guide" target="_blank" rel="noopener"
-                    class="inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
                     <i class="fa-solid fa-book"></i>
                     <span>User Guide</span>
                 </a>
                 <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki" target="_blank" rel="noopener"
-                    class="inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
                     <i class="fa-solid fa-book-open"></i>
                     <span>Wiki</span>
                 </a>
                 <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension" target="_blank" rel="noopener"
-                    class="inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
                     <i class="fa-brands fa-github"></i>
                     <span>GitHub repository</span>
                 </a>

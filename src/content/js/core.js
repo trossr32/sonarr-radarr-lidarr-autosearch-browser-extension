@@ -432,7 +432,7 @@ let sessionId,
                 },
                 {
                     versionMatch: /^[3|4|5|6]/,
-                    searchPath: '/add/new/?term=',
+                    searchPath: '/add/new/',
                     searchInputSelector: 'input[name="seriesLookup"]'
                 }
             ]
@@ -447,7 +447,7 @@ let sessionId,
                 },
                 {
                     versionMatch: /^[3|4|5|6]/,
-                    searchPath: '/add/new/?term=',
+                    searchPath: '/add/new/',
                     searchInputSelector: 'input[name="movieLookup"]'
                 }
             ]
