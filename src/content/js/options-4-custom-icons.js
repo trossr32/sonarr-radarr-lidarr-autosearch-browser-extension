@@ -83,6 +83,7 @@ return `<style id="servarr-ext_custom-icon-style">
 
 /**
  * Build the custom icon settings tab
+ * @param {Settings} settings - current settings
  */
 var initialiseCustomIconForm = function (settings) {
     const grid = $('<div class="grid gap-6 md:grid-cols-2"></div>');
@@ -145,10 +146,20 @@ var initialiseCustomIconForm = function (settings) {
     posGroup.append(posCol, posOffsetCol);
     body.append(posGroup);
 
-    // Background colour
-    const bgRow = $('<div class="space-y-2 flex gap-4"></div>')
-        .append($('<div><label for="icon-background-color" class="font-medium pt-1">Icon background colour</label></div>'))
-        .append($(`<input type="text" id="icon-background-color" data-coloris class=" text-white w-40 rounded-md border border-slate-600 bg-slate-800 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" />`).val(settings.injectedIconConfig.backgroundColor));
+    // Background colour row (label on the left, controls on the right)
+    const bgRow = $('<div class="flex gap-4 items-start"></div>')
+        .append($('<div class="pt-1 min-w-[12rem]"><label for="icon-background-color" class="font-medium">Icon background colour</label></div>'));
+
+    // Controls container: input + swatch button
+    const controls = $('<div class="flex items-center gap-2"></div>');
+
+    // Text input for manual entry (kept same ID for existing logic)
+    const colorInput = $(
+        `<input type="text" id="icon-background-color" class="text-white w-40 rounded-md border border-slate-600 bg-slate-800 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="7" />`
+    ).val(settings.injectedIconConfig.backgroundColor);
+
+    controls.append(colorInput);
+    bgRow.append(controls);
     body.append(bgRow);
 
     mainCard.append(header, body);
@@ -164,16 +175,76 @@ var initialiseCustomIconForm = function (settings) {
     initToggle('#toggle-position', { on: 'Top', off: 'Bottom', offstyle: 'success' }, null);
     initToggle('#toggle-position-offset', { on: 'px', off: '%', offstyle: 'success' }, null);
 
+    // Initialize Spectrum on the input
+    var spectrumOptions = {
+        color: settings.injectedIconConfig.backgroundColor,
+        showPalette: false,
+        showInput: true,
+        showInitial: false,
+        showButtons: true,
+        clickoutFiresChange: true,
+        showAlpha: false,
+        allowEmpty: false,
+        preferredFormat: 'hex',
+        appendTo: 'body',
+        // Update when user confirms selection (Choose/OK) or closes the picker
+        change: function (color) {
+            if (color) {
+                syncFromPicker(color);
+            } else {
+                setTimeout(function () { syncFromPicker(null); }, 0);
+            }
+        },
+        hide: function (color) {
+            if (color) {
+                syncFromPicker(color);
+            } else {
+                setTimeout(function () { syncFromPicker(null); }, 0);
+            }
+        }
+    };
+    colorInput.spectrum(spectrumOptions);
+
+    async function syncFromPicker(color) {
+        var tiny = color;
+        if (!tiny) {
+            try { tiny = colorInput.spectrum('get'); } catch (e) { tiny = null; }
+        }
+        if (!tiny) return;
+        var hex = tiny.toHexString();
+        colorInput.val(hex);
+        await setSettingsPropertiesFromCustomIconForm();
+        await maybeShowCustomIconPreview();
+    }
+
+    // Show picker when focusing or clicking the input (optional UX improvement)
+    colorInput.on('focus', function () {
+        try { colorInput.spectrum('show'); } catch (e) { /* ignore */ }
+    });
+
+    // Update enabled/disabled states consistently (extended to cover button + popover)
     function syncEnabledDisabled() {
         const using = $('#toggle-use-custom-icon').prop('checked');
         const anchored = $('#toggle-icon-type').prop('checked');
 
-        const enableAll = (sel, en) => {
+        const enableAll = function (sel, en) {
             $(sel).each(function () { $(this).bootstrapToggle(en ? 'enable' : 'disable'); });
         };
 
         enableAll('#toggle-icon-type, #toggle-side, #toggle-position, #toggle-side-offset, #toggle-position-offset', using);
+
+        // Inputs and color controls
         $('#side-offset, #position-offset, #icon-background-color').prop('disabled', !using);
+
+        try { 
+            colorInput.spectrum(using ? 'enable' : 'disable'); 
+        } catch (e) { /* ignore */ }
+        
+        if (!using) { 
+            try { 
+                colorInput.spectrum('hide'); 
+            } catch (e) { /* ignore */ } 
+        }
 
         if (!using) return;
 
@@ -195,29 +266,25 @@ var initialiseCustomIconForm = function (settings) {
         syncEnabledDisabled();
         setSettingsPropertiesFromCustomIconForm();
     });
+    
     $('#toggle-icon-type, #toggle-side, #toggle-position, #toggle-side-offset, #toggle-position-offset')
         .on('change', function () { syncEnabledDisabled(); setSettingsPropertiesFromCustomIconForm(); });
-    $('#side-offset, #position-offset, #icon-background-color').on('input', setSettingsPropertiesFromCustomIconForm);
 
-    // Instantiate coloris pickers
-    Coloris({
-        el: 'input[data-coloris]',
-        theme: 'large',
-        themeMode: 'dark',
-        alpha: false,
-        format: 'hex'
-    });
+    $('#side-offset, #position-offset').on('input', setSettingsPropertiesFromCustomIconForm);
 
-    // Color input events
-    const onColorChanged = async () => {
-        await setSettingsPropertiesFromCustomIconForm();
-    };
-
-    // Hook Coloris selection and manual input
-    $(`#icon-background-color`).on('input change', onColorChanged);
-
-    Coloris.setInstance(`#icon-background-color`, {
-        onChange: (color, input) => onColorChanged()
+    // Text input changes -> validate & push to settings + picker
+    const isValidHex = function (v) { return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim()); };
+    colorInput.on('input', async function () {
+        var val = $(this).val().trim();
+        if (val && val[0] !== '#') {
+            val = `#${val}`;
+            $(this).val(val);
+        }
+        if (isValidHex(val)) {
+            try { colorInput.spectrum('set', val); } catch (e) { /* ignore */ }
+            await setSettingsPropertiesFromCustomIconForm();
+            maybeShowCustomIconPreview();
+        }
     });
 
     // Initial state sync
@@ -265,6 +332,7 @@ async function maybeShowCustomIconPreview() {
 
     if (settings.config.customIconPosition) {
         removeCustomIconPreview();
+        
         $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
     }
 }

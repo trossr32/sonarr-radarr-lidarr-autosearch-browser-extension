@@ -26,11 +26,11 @@ module.exports = function (grunt) {
                     { expand: true, flatten: true, src: 'node_modules/jquery/dist/jquery.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map', dest: 'dist/firefox/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/@melloware/coloris/dist/umd/coloris.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' },
                     { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/firefox', filter: 'isFile' },
 
                     // css
-                    { expand: true, flatten: true, src: 'node_modules/@melloware/coloris/dist/coloris.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' },
 
                     // content
                     { expand: true, flatten: true, src: 'src/*.html', dest: 'dist/firefox', filter: 'isFile' },
@@ -51,11 +51,11 @@ module.exports = function (grunt) {
                     { expand: true, flatten: true, src: 'node_modules/jquery/dist/jquery.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map', dest: 'dist/chromium/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/@melloware/coloris/dist/umd/coloris.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
                     { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/chromium', filter: 'isFile' },
 
                     // css
-                    { expand: true, flatten: true, src: 'node_modules/@melloware/coloris/dist/coloris.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
 
                     // content
                     { expand: true, flatten: true, src: 'src/*.html', dest: 'dist/chromium', filter: 'isFile' },
@@ -71,7 +71,12 @@ module.exports = function (grunt) {
                 files: [
                     // debug
                     { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/chromium', filter: 'isFile' },
-                    { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/firefox', filter: 'isFile' }
+                    { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/firefox', filter: 'isFile' },
+                    // Spectrum in debug too
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' }
                 ]
             }
         },
@@ -101,7 +106,7 @@ module.exports = function (grunt) {
                 options: {
                     stdout: true
                 },
-                command: 'powershell.exe -File CreatePackage_Grunt.ps1'
+                command: 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "CreatePackage_Grunt.ps1"'
             },
             sh: {
                 options: {

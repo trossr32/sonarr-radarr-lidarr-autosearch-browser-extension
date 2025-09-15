@@ -1,5 +1,6 @@
 /**
  * Build the debug tab
+ * @param {Setting} settings The current settings object
  */
 var initialiseDebugForm = function (settings) {
     const waitForElTicks = [100,200,300,400,500];

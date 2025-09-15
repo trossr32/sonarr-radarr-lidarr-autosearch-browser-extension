@@ -1,3 +1,6 @@
+// Passive background status probe state
+let backgroundProbeRan = false;
+
 /**
  * Enable/disable basic site fields based on enabled state.
  * @param {string} siteId
@@ -9,9 +12,11 @@ function setBasicSiteEnabledState(siteId, enabled) {
     const $apiKey = $(`#${siteId}ApiKey`);
     const $test = $(`#${siteId}ApiKeyTest`);
     const hintId = `${siteId}BasicDisabledHint`;
+
     // Manage aria-describedby for inputs when disabled
     [$domain, $apiKey].forEach($el => {
         if (!$el.length) return;
+
         if (disabled) {
             const existing = ($el.attr('aria-describedby') || '').split(/\s+/).filter(x=>x);
             if (!existing.includes(hintId)) existing.push(hintId);
@@ -21,9 +26,20 @@ function setBasicSiteEnabledState(siteId, enabled) {
             if (existing.length) $el.attr('aria-describedby', existing.join(' ')); else $el.removeAttr('aria-describedby');
         }
     });
-    [$domain, $apiKey].forEach($el => { if ($el.length){ $el.prop('disabled', disabled); $el.toggleClass(DISABLED_CLASSES, disabled); }});
-    if ($test.length) { $test.prop('disabled', disabled).attr('aria-disabled', disabled ? 'true' : null).toggleClass(DISABLED_CLASSES, disabled); }
-    if (disabled) { $(`#${siteId}ApiTestMessage`).addClass('hidden'); }
+    
+    [$domain, $apiKey].forEach($el => { 
+        if ($el.length) { 
+            $el.prop('disabled', disabled); $el.toggleClass(DISABLED_CLASSES, disabled); 
+        }
+    });
+    
+    if ($test.length) { 
+        $test.prop('disabled', disabled).attr('aria-disabled', disabled ? 'true' : null).toggleClass(DISABLED_CLASSES, disabled); 
+    }
+
+    if (disabled) { 
+        $(`#${siteId}ApiTestMessage`).addClass('hidden'); 
+    }
 }
 
 /**
@@ -69,15 +85,15 @@ var initialiseBasicForm = function (settings) {
             .append($('<label class="text-sm font-medium">API key</label>'));
         const apiFlex = $('<div class="flex gap-2 items-start"></div>')
             .append($(`<input type="text" id="${site.id}ApiKey" data-site-id="${site.id}" class="flex-1 rounded-md border border-slate-600 bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />`).val(site.apiKey))
-            .append($(`<button id="${site.id}ApiKeyTest" type="button" data-site-id="${site.id}" class="inline-flex items-center gap-2 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-3 py-2 shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">` +
+            .append($(`<button id="${site.id}ApiKeyTest" type="button" data-site-id="${site.id}" class="inline-flex items-center gap-2 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-3 py-2 shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">` +
                 '<span>Test</span>' +
                 `<span id="${site.id}ApiKeyIcon"><i class="fa-solid fa-vial"></i></span>` +
                 `<span id="${site.id}ApiKeyIconWorked" class="hidden text-green-400"><i class="fa-solid fa-check"></i></span>` +
                 `<span id="${site.id}ApiKeyIconFailed" class="hidden text-red-400"><i class="fa-solid fa-xmark"></i></span>` +
                 `<span id="${site.id}ApiKeyIconProgress" class="hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>` +
                 '</button>'));
-      apiRow.append(apiFlex)
-          .append($(`<p id="${site.id}BasicDisabledHint" class="text-[11px] text-amber-400 mt-1 ${(site.enabled ? 'hidden' : '')}">Enable this site to edit connection details.</p>`));
+        apiRow.append(apiFlex)
+            .append($(`<p id="${site.id}BasicDisabledHint" class="text-[11px] text-amber-400 mt-1 ${(site.enabled ? 'hidden' : '')}">Enable this site to edit connection details.</p>`));
         body.append(apiRow);
 
         // API test message
@@ -92,6 +108,7 @@ var initialiseBasicForm = function (settings) {
     // Initialise toggles & events
     $.each(settings.sites, function (is, site) {
         const $toggle = $(`#toggle-${site.id}`);
+
         initToggle($toggle, {}, function () {
             const sid = $(this).attr('data-site-id');
             const enabled = $(this).prop('checked');
@@ -99,6 +116,7 @@ var initialiseBasicForm = function (settings) {
             $(`#${sid}BasicDisabledHint`).toggleClass('hidden', enabled);
             setSettingsPropertiesFromForm();
         });
+        
         // Initial sync using shared helper
         setBasicSiteEnabledState(site.id, site.enabled);
         $(`#${site.id}BasicDisabledHint`).toggleClass('hidden', site.enabled);
@@ -114,26 +132,42 @@ var initialiseBasicForm = function (settings) {
             setTestButtonIcon(siteId, 'Progress');
             const $msg = $(`#${site.id}ApiTestMessage`).addClass('hidden');
             const response = await callApi({ siteId: siteId, endpoint: 'Version' });
+
             if (response.success) {
                 setTestButtonIcon(siteId, 'Worked');
+                
                 $msg.removeClass('hidden bg-red-600').addClass('bg-green-600 text-white').html(`Success! Detected version ${response.data.version}`).removeClass('hidden');
+                
                 updateStatusBadge(siteId, 'ok', response.data.version);
+                
                 const settings = await getSettings();
+                
                 updateAdvancedForm(settings);
             } else {
                 setTestButtonIcon(siteId, 'Failed');
+                
                 $msg.removeClass('hidden bg-green-600').addClass('bg-red-600 text-white').html('Failed, please double check the domain and API key').removeClass('hidden');
+                
                 updateStatusBadge(siteId, 'fail');
             }
         });
     });
 };
 
-// Update or create API status badge states
+/**
+ * Update or create API status badge states
+ * @param {string} siteId 
+ * @param {string} state 
+ * @param {string} version 
+ * @returns 
+ */
 function updateStatusBadge(siteId, state, version) {
-    const badge = $('#'+siteId+'StatusBadge');
+    const badge = $(`#${siteId}StatusBadge`);
+    
     if (!badge.length) return;
+    
     badge.removeClass('bg-slate-600 bg-amber-500 bg-green-600 bg-red-600 animate-pulse').text('');
+
     switch(state) {
         case 'loading':
             badge.addClass('bg-amber-500 animate-pulse').text('Testing');
@@ -163,9 +197,6 @@ async function setSettingsPropertiesFromForm() {
 
     await setSettings(settings);
 }
-
-// Passive background status probe state
-let backgroundProbeRan = false;
 
 /**
  * Run a background probe to update status badges for all enabled sites.

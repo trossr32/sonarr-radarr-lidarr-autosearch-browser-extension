@@ -211,6 +211,7 @@ var escapeHtml = (string) =>
 
 /**
  * Build the toggle button
+ * @param {Setting} settings The current settings object
  */
 var initialiseEnabledDisabledButton = function(settings) {
     const $btn = $('#toggleActive');

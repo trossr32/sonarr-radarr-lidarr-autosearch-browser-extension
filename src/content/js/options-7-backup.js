@@ -1,5 +1,6 @@
 /**
  * Build the backup/restore tab
+ * @param {Setting} settings The current settings object
  */
 async function initialiseBackupForm(settings) {
     const container = $('<div class="grid gap-6 md:grid-cols-2"></div>');
@@ -265,6 +266,9 @@ async function initialiseBackupForm(settings) {
 
 /**
  * Deep merge utility (non-destructive). Arrays are replaced; objects merged.
+ * @param {Object} target
+ * @param {Object} source
+ * @returns {Object} New merged object
  */
 function deepMerge(target, source) {
     if (Array.isArray(source)) return source.slice();
@@ -280,6 +284,8 @@ function deepMerge(target, source) {
 
 /**
  * Validate a candidate settings object. Returns { valid, errors[] }
+ * @param {Object} obj
+ * @returns {Object} { valid: boolean, errors: string[] }
  */
 function validateSettingsShape(obj) {
     const errors = [];

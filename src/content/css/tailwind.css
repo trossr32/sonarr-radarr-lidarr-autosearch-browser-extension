@@ -13,4 +13,21 @@
     .clr-field button {
         @apply w-7! h-7! bg-none! rounded cursor-pointer! bg-size-[6px_6px] top-[45%]! right-[-40px]! pointer-events-auto!;
     }
+
+    .sp-add-on {
+        /* @apply w-7! rounded-l-md! rounded-r-none! border! border-slate-600! cursor-pointer! disabled:opacity-50! disabled:cursor-not-allowed!; */
+        @apply hidden!;
+    }
+
+    .sp-container {
+        @apply bg-slate-800! rounded-md! border! border-slate-600!;
+    }
+
+    .sp-input {
+        @apply text-white! rounded-md! border! border-slate-600!;
+    }
+
+    input.spectrum.with-add-on {
+        @apply text-white! border-l! border-s! rounded-s-md! rounded-md! border! border-slate-600!;
+    }
 }

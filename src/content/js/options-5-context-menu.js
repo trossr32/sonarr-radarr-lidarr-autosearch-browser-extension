@@ -1,5 +1,6 @@
 /**
  * Build the context menu tab
+ * @param {Setting} settings The current settings object
  */
 var initialiseContextMenuForm = function (settings) {
     const card = $('<div class="rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden"></div>');
@@ -39,9 +40,7 @@ async function setSettingsPropertiesFromContextMenuForm() {
     // Only update if the element exists (Firefox MV2 vs MV3 differences or future conditional rendering)
     if ($menu.length) {
         const newVal = $menu.prop('checked');
-        if (settings.config.contextMenu !== newVal) {
-            console.log('[ServarrExt] Updating contextMenu setting ->', newVal);
-        }
+
         settings.config.contextMenu = newVal;
     } else {
         // Fallback to false if toggle not present

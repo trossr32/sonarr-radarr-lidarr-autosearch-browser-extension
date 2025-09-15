@@ -1,5 +1,6 @@
 /**
  * Build the integrations tab
+ * @param {Setting} settings The current settings object
  */
 var initialiseIntegrationsForm = function (settings) {
     const wrapper = $('<div class="grid gap-4 grid-cols-2 md:grid-cols-4 xl:grid-cols-6"></div>');

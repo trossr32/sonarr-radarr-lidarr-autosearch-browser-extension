@@ -1,5 +1,6 @@
 /**
  * Build the advanced settings tab
+ * @param {Setting} settings The current settings object
  */
 var initialiseAdvancedForm = function (settings) {
     const wrapper = $('<div class="grid gap-6 md:grid-cols-2"></div>');
@@ -91,6 +92,7 @@ function setAdvancedAutoPopulateState(siteId, autoPopulateActive) {
     const $path = $(`#${siteId}SearchPath`);
     const $sel = $(`#${siteId}SearchInputSelector`);
     const hintId = `${siteId}AdvancedDisabledHint`;
+    
     [$path, $sel].forEach($el => {
         if (!$el.length) return;
         if (disabled) {
@@ -102,20 +104,29 @@ function setAdvancedAutoPopulateState(siteId, autoPopulateActive) {
             if (existing.length) $el.attr('aria-describedby', existing.join(' ')); else $el.removeAttr('aria-describedby');
         }
     });
-    [$path, $sel].forEach($el => { if ($el.length){ $el.prop('disabled', disabled); $el.toggleClass(DISABLED_CLASSES, disabled); }});
+    
+    [$path, $sel].forEach($el => { 
+        if ($el.length) { 
+            $el.prop('disabled', disabled); $el.toggleClass(DISABLED_CLASSES, disabled); 
+        }
+    });
 }
 
 /**
  * Update the advanced settings tab form fields from settings
+ * @param {Setting} settings The current settings object
  */
 var updateAdvancedForm = function (settings) {
     $.each(settings.sites, function (is, site) {
         const auto = $(`#toggle-${site.id}-advanced`).prop('checked');
+        
         if (auto) {
             $(`#${site.id}SearchPath`).val(site.searchPath);
             $(`#${site.id}SearchInputSelector`).val(site.searchInputSelector);
         }
+
         setAdvancedAutoPopulateState(site.id, auto);
+        
         $(`#${site.id}AdvancedDisabledHint`).toggleClass('hidden', !auto);
     }); 
 };
