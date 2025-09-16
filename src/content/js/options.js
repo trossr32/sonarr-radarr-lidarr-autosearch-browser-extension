@@ -298,11 +298,6 @@ $(async function () {
         await setSettings(settings);
     });
 
-    // If user reloads page while custom icon tab is initially active (e.g., deep link in future) ensure Coloris loads.
-    if (document.querySelector('#tab-custom-icon[aria-selected="true"]')) {
-        ensureColoris();
-    }
-
     // Signal to tests that options initialisation finished.
     window.__optionsReady = true;
 });

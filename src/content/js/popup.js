@@ -52,14 +52,24 @@ $(async function () {
 
     const isFirefox = typeof InstallTrigger !== 'undefined';
     const isAndroid = /Android/i.test(navigator.userAgent);
+
+    if (isFirefox) {
+        $('#buttonWrapper').removeClass('w-3/4 md:w-full').addClass('w-full');
+    } else {
+        $('#buttonWrapper').removeClass('w-full').addClass('w-3/4 md:w-full');
+    }
     
     if (isFirefox && !isAndroid) {
-        $('#aSettings').on('click', function() {
+        $('#firefoxDesktopSettings').on('click', function() {
             // Allow the window to open before closing the popup
             setTimeout(() => window.close(), 100);
         });
+
+        $('#firefoxExtensionSettingsLabel').text('Settings (In add-ons manager)');
     } else {
-        $('#aSettings').hide();
+        $('#firefoxDesktopSettings').hide();
+
+        $('#firefoxExtensionSettingsLabel').text('Settings');
     }
     
     $('#btnSettings').on('click', async function() {

@@ -222,6 +222,7 @@ async function runInitialBackgroundProbe() {
                 const response = await callApi({ siteId: site.id, endpoint: 'Version' });
                 if (response.success) {
                     updateStatusBadge(site.id, 'ok', response.data.version);
+                    updateAdvancedForm(settings);
                 } else {
                     updateStatusBadge(site.id, 'fail');
                 }

@@ -43,31 +43,35 @@
             <h2 class="text-sm font-semibold m-0">Quick links</h2>
         </div>
         <div class="p-4">
-            <div class="flex flex-col items-center justify-center gap-2">
-                <button type="button" id="btnSettings"
-                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-colors duration-150 cursor-pointer">
-                    <i class="fa-solid fa-cogs"></i>
-                    <span>Settings</span>
-                </button>
-                <a href="options.html" target="_blank" id="aSettings"
-                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
-                    Open Settings in a tab
-                </a>
-                <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki/User-Guide" target="_blank" rel="noopener"
-                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
-                    <i class="fa-solid fa-book"></i>
-                    <span>User Guide</span>
-                </a>
-                <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki" target="_blank" rel="noopener"
-                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
-                    <i class="fa-solid fa-book-open"></i>
-                    <span>Wiki</span>
-                </a>
-                <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension" target="_blank" rel="noopener"
-                    class="w-3/4 md:w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
-                    <i class="fa-brands fa-github"></i>
-                    <span>GitHub repository</span>
-                </a>
+            <div id="buttonWrapper" class="w-3/4 md:w-full mx-auto">
+                <div class="flex flex-col items-center justify-center gap-2">
+                    <!-- Note: 'firefoxDesktopSettings' link is hidden when extension is active, 'btnSettings' button shown instead. -->
+                    <a href="options.html" target="_blank" id="firefoxDesktopSettings"
+                        class="w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                        <i class="fa-solid fa-cogs"></i> 
+                        <span>Settings</span>
+                    </a>
+                    <button type="button" id="btnSettings"
+                        class="w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-indigo-600 hover:bg-indigo-500 transition-colors duration-150 cursor-pointer">
+                        <i class="fa-solid fa-cogs"></i>
+                        <span id="firefoxExtensionSettingsLabel">Settings</span>
+                    </button>
+                    <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki/User-Guide" target="_blank" rel="noopener"
+                        class="w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                        <i class="fa-solid fa-book"></i>
+                        <span>User Guide</span>
+                    </a>
+                    <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki" target="_blank" rel="noopener"
+                        class="w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                        <i class="fa-solid fa-book-open"></i>
+                        <span>Wiki</span>
+                    </a>
+                    <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension" target="_blank" rel="noopener"
+                        class="w-full inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium text-white bg-slate-700 hover:bg-slate-600 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500">
+                        <i class="fa-brands fa-github"></i>
+                        <span>GitHub repository</span>
+                    </a>
+                </div>
             </div>
         </div>
     </div>

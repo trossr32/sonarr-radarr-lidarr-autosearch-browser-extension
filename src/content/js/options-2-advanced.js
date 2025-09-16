@@ -15,7 +15,7 @@ var initialiseAdvancedForm = function (settings) {
             .append($(`<input type="checkbox" id="toggle-${site.id}-advanced" data-site-id="${site.id}" class="hidden">`).prop('checked', site.autoPopAdvancedFromApi));
         header.append(left, toggleContainer);
 
-    const body = $(`<div class="relative p-4 space-y-6"></div>`);
+        const body = $(`<div class="relative p-4 space-y-6"></div>`);
 
         // Search path
         body.append(
@@ -66,15 +66,22 @@ var initialiseAdvancedForm = function (settings) {
 
     $.each(settings.sites, function (is, site) {
         const $toggle = $(`#toggle-${site.id}-advanced`);
+        
         initToggle($toggle, { on: 'Auto populate from API', off: 'Prevent auto populate' }, function () {
             const sid = $(this).attr('data-site-id');
             const auto = $(this).prop('checked');
+            
             setAdvancedAutoPopulateState(sid, auto);
+            
             $(`#${sid}AdvancedDisabledHint`).toggleClass('hidden', !auto);
+            
             setSettingsPropertiesFromAdvancedForm();
         });
+        
         setAdvancedAutoPopulateState(site.id, site.autoPopAdvancedFromApi);
+        
         $(`#${site.id}AdvancedDisabledHint`).toggleClass('hidden', !site.autoPopAdvancedFromApi);
+
         $.each(['SearchPath', 'SearchInputSelector'], function (iv, v) {
             $(`#${site.id}${v}`).on('input', setSettingsPropertiesFromAdvancedForm);
         });
