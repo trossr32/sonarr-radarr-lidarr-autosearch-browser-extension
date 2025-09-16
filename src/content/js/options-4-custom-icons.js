@@ -291,29 +291,116 @@ var initialiseCustomIconForm = function (settings) {
     syncEnabledDisabled();
 };
 
+/** 
+ * number → "12px" or "12%" (non-negative, finite) 
+ * @param {string|number} rawNumberLike - input to parse
+ * @param {'px'|'%'} unit - unit to append
+ * @param {string} fallback - fallback value if input is invalid (default "0px")
+ * @returns {string} - e.g. "12px" or "12%"
+ */
+function toPxOrPercent(rawNumberLike, unit /* 'px' | '%' */, fallback = '0px') {
+  const n = Number.parseFloat(String(rawNumberLike).trim());
+  if (!Number.isFinite(n) || n < 0) return fallback;
+  return `${n}${unit}`;
+}
+
 /**
- * Update settings from the custom icon tab form fields
+ * 'top' | 'bottom' only 
+ * @param {string} token - input to normalize
+ * @param {string} fallback - fallback value if input is invalid (default "bottom")
+ * @returns {string} - 'top' | 'bottom' 
+*/
+function normalizeVerticalPos(token, fallback = 'bottom') {
+  return token === 'top' ? 'top' : token === 'bottom' ? 'bottom' : fallback;
+}
+
+/** 
+ * 'left' | 'right' only (if you have a side setting) 
+ * @param {string} token - input to normalize
+ * @param {string} fallback - fallback value if input is invalid (default "right")
+ * @returns {string} - 'left' | 'right'
+ */
+function normalizeSide(token, fallback = 'right') {
+  return token === 'left' ? 'left' : token === 'right' ? 'right' : fallback;
+}
+
+/** 
+ * very strict hex: #rgb | #rrggbb | #rrggbbaa 
+ * @param {string} value - input to normalize
+ * @param {string} fallback - fallback value if input is invalid (default "#000000")
+ * @returns {string} - e.g. "#ff0000"
+ */
+function normalizeHexColour(value, fallback = '#000000') {
+  const v = String(value || '').trim();
+  return /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(v) ? v : fallback;
+}
+
+/** 
+ * only allow safe IDs/keys for icon names, etc. 
+ * @param {string} value - input to normalize
+ * @param {string} fallback - fallback value if input is invalid (default "sonarr")
+ * @returns {string} - e.g. "sonarr", "radarr", "lidarr"
+ */
+function safeToken(value, fallback = 'sonarr') {
+  const v = String(value || '').trim();
+  return /^[a-z0-9_-]{1,40}$/i.test(v) ? v : fallback;
+}
+
+/**
+ * Update settings from the custom icon tab form fields (sanitized)
  */
 async function setSettingsPropertiesFromCustomIconForm() {
-    const settings = await getSettings();
+  const settings = await getSettings();
+  
+  settings.injectedIconConfig = settings.injectedIconConfig || {};
 
-    settings.config.customIconPosition = $('#toggle-use-custom-icon').prop('checked');
-    settings.injectedIconConfig.type = $('#toggle-icon-type').prop('checked') ? 'anchored' : 'floating';
-    settings.injectedIconConfig.side = $('#toggle-side').prop('checked') ? 'left' : 'right';
-    settings.injectedIconConfig.sideOffset = $('#toggle-side-offset').prop('checked') ? `${$('#side-offset').val()}px` : `${$('#side-offset').val()}%`;
-    settings.injectedIconConfig.position = $('#toggle-position').prop('checked') ? 'top' : 'bottom';
-    settings.injectedIconConfig.positionOffset = $('#toggle-position-offset').prop('checked') ? `${$('#position-offset').val()}px` : `${$('#position-offset').val()}%`;
-    settings.injectedIconConfig.backgroundColor = $('#icon-background-color').val();
+  // Booleans
+  const useCustomIcon = Boolean($('#toggle-use-custom-icon').prop('checked'));
+  const isAnchored = Boolean($('#toggle-icon-type').prop('checked'));
+  const isLeftSide = Boolean($('#toggle-side').prop('checked'));
+  const sideInPx = Boolean($('#toggle-side-offset').prop('checked'));
+  const isTopPosition = Boolean($('#toggle-position').prop('checked'));
+  const positionInPx = Boolean($('#toggle-position-offset').prop('checked'));
 
-    $("#servarr-ext_custom-icon-wrapper, #servarr-ext_custom-icon-style").remove();
+  // Units & numeric inputs → sanitized CSS lengths
+  const sideUnit = sideInPx ? 'px' : '%';
+  const posUnit = positionInPx ? 'px' : '%';
+  const sideRaw = $('#side-offset').val();
+  const posRaw = $('#position-offset').val();
+  const sideOffset = toPxOrPercent(sideRaw, sideUnit, `0${sideUnit}`);
+  const positionOffset = toPxOrPercent(posRaw, posUnit, `0${posUnit}`);
 
-    // Re-inject preview only if the custom icon tab is currently active (aria-selected)
-    const customIconTabActive = $('#tab-custom-icon[aria-selected="true"]').length > 0;
-    if (settings.config.customIconPosition && customIconTabActive) {
-        $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
-    }
+  // Enum-like fields (normalized)
+  const side = normalizeSide(isLeftSide ? 'left' : 'right');
+  const position = normalizeVerticalPos(isTopPosition ? 'top' : 'bottom');
 
-    await setSettings(settings);
+  // Colours (strict hex only)
+  const backgroundColor = normalizeHexColour($('#icon-background-color').val());
+
+  // Type (anchor/floating) – set from boolean, no free-form strings
+  const type = isAnchored ? 'anchored' : 'floating';
+
+  // Assign to settings (only sanitized values)
+  settings.config.customIconPosition = useCustomIcon;
+  settings.injectedIconConfig.type = type;
+  settings.injectedIconConfig.side = side;
+  settings.injectedIconConfig.sideOffset = sideOffset;
+  settings.injectedIconConfig.position = position;
+  settings.injectedIconConfig.positionOffset = positionOffset;
+  settings.injectedIconConfig.backgroundColor = backgroundColor;
+
+  // Remove any existing preview nodes/styles before re-injecting
+  $("#servarr-ext_custom-icon-wrapper, #servarr-ext_custom-icon-style").remove();
+
+  // Re-inject preview only if the custom icon tab is currently active (aria-selected)
+  const customIconTabActive = $('#tab-custom-icon[aria-selected="true"]').length > 0;
+
+  if (useCustomIcon && customIconTabActive) {
+    // If you have a Node-based renderer, prefer that. Keeping your existing markup call:
+    $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
+  }
+
+  await setSettings(settings);
 }
 
 /**
@@ -332,7 +419,7 @@ async function maybeShowCustomIconPreview() {
 
     if (settings.config.customIconPosition) {
         removeCustomIconPreview();
-        
+
         $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
     }
 }
