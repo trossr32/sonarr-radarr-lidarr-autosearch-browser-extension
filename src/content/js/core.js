@@ -104,6 +104,38 @@
 /**
  * Global variables
  */
+// Minimal browser API shim for non-extension (file://) contexts used in Playwright tests.
+if (typeof browser === 'undefined') {
+    // eslint-disable-next-line no-var
+    var browser = {};
+    browser._listeners = { storage: [] };
+    browser.storage = {
+        _data: {},
+        sync: {
+            get: async (keys) => {
+                if (typeof keys === 'object') {
+                    const result = {};
+                    for (const k in keys) {
+                        result[k] = browser.storage._data[k] || keys[k];
+                    }
+                    return result;
+                }
+                return browser.storage._data;
+            },
+            set: async (obj) => {
+                const changes = {};
+                for (const k in obj) {
+                    changes[k] = { oldValue: browser.storage._data[k], newValue: obj[k] };
+                }
+                Object.assign(browser.storage._data, obj);
+                browser._listeners.storage.forEach(fn => fn(changes, 'sync'));
+            }
+        }
+    };
+    browser.storage.onChanged = { addListener: (fn) => browser._listeners.storage.push(fn) };
+    browser.runtime = { connect: () => ({ postMessage: () => {}, onMessage: { addListener: () => {} } }) };
+    browser.contextMenus = null;
+}
 let sessionId,
     defaultSettings = {
         sites: [
@@ -400,7 +432,7 @@ let sessionId,
                 },
                 {
                     versionMatch: /^[3|4|5|6]/,
-                    searchPath: '/add/new/?term=',
+                    searchPath: '/add/new/',
                     searchInputSelector: 'input[name="seriesLookup"]'
                 }
             ]
@@ -415,7 +447,7 @@ let sessionId,
                 },
                 {
                     versionMatch: /^[3|4|5|6]/,
-                    searchPath: '/add/new/?term=',
+                    searchPath: '/add/new/',
                     searchInputSelector: 'input[name="movieLookup"]'
                 }
             ]
@@ -516,17 +548,10 @@ browser.storage.onChanged.addListener(logStorageChange);
  * Retrieves settings from local storage
  * Checks for potentially missing properties in the settings object (caused by new properties being added on new versions of the code) 
  * and create those properties as defaults or from the defaultSettings object.
+ * @return {Setting} - the settings
  */
 async function getSettings() {
     let data = await browser.storage.sync.get({ 'sonarrRadarrLidarrAutosearchSettings': defaultSettings });
-
-    // if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('enabled')) {
-    //     data.sonarrRadarrLidarrAutosearchSettings.enabled = true;
-    // }
-
-    // if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('debug')) {
-    //     data.sonarrRadarrLidarrAutosearchSettings.debug = false;
-    // }
 
     if (!data.sonarrRadarrLidarrAutosearchSettings.hasOwnProperty('integrations')) {
         data.sonarrRadarrLidarrAutosearchSettings.integrations = defaultSettings.integrations;
@@ -601,7 +626,7 @@ async function getSettings() {
  * Saves settings to local storage
  * Checks for potentially missing properties in the settings object (caused by new properties being added on new versions of the code) 
  * and create those properties as defaults or from the defaultSettings object.
- * @param {Settings} data - settings to save
+ * @param {Setting} data - settings to save
  */
 async function setSettings(data) {
     if (!data.hasOwnProperty('enabled')) {
@@ -613,7 +638,8 @@ async function setSettings(data) {
     }
 
     if (!data.hasOwnProperty('debug')) {
-        data.enabled = false;
+        // Correctly default debug flag without mutating enabled state
+        data.debug = false;
     }
 
     if (!data.hasOwnProperty('integrations')) {
@@ -635,7 +661,6 @@ async function setSettings(data) {
     let obj = {
         'sonarrRadarrLidarrAutosearchSettings': data
     };
-    //obj['sonarrRadarrLidarrAutosearchSettings'] = data;
 
     await browser.storage.sync.set(obj);
     return data;
@@ -705,56 +730,6 @@ async function callApi(request) {
             error: 'no api key set for site'
         };
     }
-
-    // /**
-    //  * Wrap the actual API call in a function so it can be called for multiple url options
-    //  * @param {string} url 
-    //  * @returns {ApiResponse}
-    //  */
-    // async function performCall(url) {
-    //     try {
-    //         const data = await $.getJSON(url);
-    //         const response = {
-    //             data: data,
-    //             request: request,
-    //             success: true,
-    //             error: null
-    //         };
-    
-    //         switch (request.endpoint) {
-    //             // if this is a 'Version' call try to update settings with version specific data
-    //             case 'Version':
-    //                 // if auto population is turned off the just return response
-    //                 if (!site.autoPopAdvancedFromApi && request.source != 'ApiAutoPopEnabled') {
-    //                     return response;
-    //                 }
-    
-    //                 // auto population is enabled, so get the config for this version and update settings
-    //                 let config = getVersionConfig(site.id, data.version);
-    
-    //                 for (let i = 0; i < settings.sites.length; i++) {
-    //                     if (settings.sites[i].id === site.id) {
-    //                         settings.sites[i].searchPath = config.searchPath;
-    //                         settings.sites[i].searchInputSelector = config.searchInputSelector;
-    //                     }
-    //                 }
-    
-    //                 await setSettings(settings);
-    
-    //                 return response;
-    
-    //             default:
-    //                 return response;
-    //         }
-    //     } catch (error) {
-    //         return {
-    //             data: null,
-    //             request: request,
-    //             success: false,
-    //             error: error
-    //         };
-    //     }
-    // }
 
     /**
      * Wrap the actual API call in a function so it can be called for multiple url options

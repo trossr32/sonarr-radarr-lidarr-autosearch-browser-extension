@@ -10,6 +10,7 @@ async function initRun(evt) {
         await setIcon(settings);
         await buildMenus(settings);
         await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
+        await browser.tabs.executeScript({ file: 'content/js/icons.js' });
         await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
     }
     catch(e) {
@@ -102,6 +103,20 @@ browser.runtime.onInstalled.addListener(async function () {
     const settings = await getSettings();
 
     buildMenus(settings);
+});
+
+/**
+ * Listen for storage changes affecting context menu so updates apply immediately without requiring tab events.
+ */
+browser.storage.onChanged.addListener(async (changes, area) => {
+    if (!changes.hasOwnProperty('sonarrRadarrLidarrAutosearchSettings')) return;
+    try {
+        const newSettings = changes.sonarrRadarrLidarrAutosearchSettings.newValue;
+        // Rebuild context menus when enabled / contextMenu flags or site enablement changes.
+        await buildMenus(newSettings);
+    } catch (e) {
+        await log(['Failed rebuilding context menus from storage change', e], 'error');
+    }
 });
 
 /**

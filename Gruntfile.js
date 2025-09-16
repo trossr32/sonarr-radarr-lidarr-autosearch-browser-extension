@@ -2,8 +2,6 @@
 
 /// <binding BeforeBuild='default' />
 module.exports = function (grunt) {
-    const sass = require('sass');
-    
     require('load-grunt-tasks')(grunt);
 
     grunt.initConfig({
@@ -18,83 +16,21 @@ module.exports = function (grunt) {
             }
         },
 
-        sass: {
-            options: {
-                implementation: sass,
-                sourceMap: false, // Create source map
-                outputStyle: 'expanded' // Minify output
-            },
-            chromium_dist: {
-                files: [{
-                    expand: true, // Recursive
-                    cwd: "src/content/sass", // The startup directory
-                    src: ["*.scss"], // Source files
-                    dest: "dist/chromium/content/css", // Destination
-                    ext: ".css", // File extension
-                }]
-            },
-            firefox_dist: {
-                files: [{
-                    expand: true, // Recursive
-                    cwd: "src/content/sass", // The startup directory
-                    src: ["*.scss"], // Source files
-                    dest: "dist/firefox/content/css", // Destination
-                    ext: ".css", // File extension
-                }]
-            }
-        },
-
         copy: {
-            // release: {
-            //     files: [
-            //         // js
-            //         { expand: true, flatten: true, src: 'node_modules/@fortawesome/fontawesome-free/js/all.min.js', dest: 'dist/content/js', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js', dest: 'dist/content/js', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js.map', dest: 'dist/content/js', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/js/bootstrap4-toggle.min.js', dest: 'dist/content/js', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/bootstrap-slider/dist/bootstrap-slider.min.js', dest: 'dist/content/js', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/jquery/dist/jquery.min.js', dest: 'dist/content/js', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js', dest: 'dist/content/js', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map', dest: 'dist/content/js', filter: 'isFile' },
-            //         { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist', filter: 'isFile' },
-
-            //         // css
-            //         { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/css/bootstrap.min.css', dest: 'dist/content/css', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/css/bootstrap.min.css.map', dest: 'dist/content/css', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/css/bootstrap4-toggle.min.css', dest: 'dist/content/css', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/css/bootstrap4-toggle.min.css.map', dest: 'dist/content/css', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/bootstrap-slider/dist/css/bootstrap-slider.min.css', dest: 'dist/content/css', filter: 'isFile' },
-            //         { expand: true, flatten: true, src: 'node_modules/@melloware/coloris/dist/coloris.min.css', dest: 'dist/content/css', filter: 'isFile' },
-            //         //{ expand: true, flatten: false, cwd: "src", src: '**/*.css', dest: 'dist', filter: 'isFile' },
-
-            //         // content
-            //         { expand: true, flatten: true, src: 'src/*.html', dest: 'dist', filter: 'isFile' },
-                    
-            //         // images
-            //         { expand: true, flatten: false, cwd: "src/content/assets/images/", src: '**', dest: 'dist/content/assets/images' }
-            //     ]
-            // },
             firefox: {
                 files: [
                     // js
-                    { expand: true, flatten: true, src: 'node_modules/@fortawesome/fontawesome-free/js/all.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js.map', dest: 'dist/firefox/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/js/bootstrap4-toggle.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap-slider/dist/bootstrap-slider.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/@fortawesome/fontawesome-free/js/fontawesome.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/@fortawesome/fontawesome-free/js/solid.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/@fortawesome/fontawesome-free/js/brands.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/jquery/dist/jquery.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map', dest: 'dist/firefox/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' },
                     { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/firefox', filter: 'isFile' },
 
                     // css
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/css/bootstrap.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/css/bootstrap.min.css.map', dest: 'dist/firefox/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/css/bootstrap4-toggle.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/css/bootstrap4-toggle.min.css.map', dest: 'dist/firefox/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap-slider/dist/css/bootstrap-slider.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/@melloware/coloris/dist/coloris.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' },
-                    //{ expand: true, flatten: false, cwd: "src", src: '**/*.css', dest: 'dist', filter: 'isFile' },
 
                     // content
                     { expand: true, flatten: true, src: 'src/*.html', dest: 'dist/firefox', filter: 'isFile' },
@@ -109,24 +45,17 @@ module.exports = function (grunt) {
             chromium: {
                 files: [
                     // js
-                    { expand: true, flatten: true, src: 'node_modules/@fortawesome/fontawesome-free/js/all.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/js/bootstrap.bundle.min.js.map', dest: 'dist/chromium/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/js/bootstrap4-toggle.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap-slider/dist/bootstrap-slider.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/@fortawesome/fontawesome-free/js/fontawesome.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/@fortawesome/fontawesome-free/js/solid.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/@fortawesome/fontawesome-free/js/brands.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/jquery/dist/jquery.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map', dest: 'dist/chromium/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
                     { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/chromium', filter: 'isFile' },
 
                     // css
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/css/bootstrap.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap/dist/css/bootstrap.min.css.map', dest: 'dist/chromium/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/css/bootstrap4-toggle.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap4-toggle/css/bootstrap4-toggle.min.css.map', dest: 'dist/chromium/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/bootstrap-slider/dist/css/bootstrap-slider.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
-                    { expand: true, flatten: true, src: 'node_modules/@melloware/coloris/dist/coloris.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
-                    //{ expand: true, flatten: false, cwd: "src", src: '**/*.css', dest: 'dist', filter: 'isFile' },
 
                     // content
                     { expand: true, flatten: true, src: 'src/*.html', dest: 'dist/chromium', filter: 'isFile' },
@@ -142,7 +71,12 @@ module.exports = function (grunt) {
                 files: [
                     // debug
                     { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/chromium', filter: 'isFile' },
-                    { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/firefox', filter: 'isFile' }
+                    { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/firefox', filter: 'isFile' },
+                    // Spectrum in debug too
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
+                    { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' }
                 ]
             }
         },
@@ -172,27 +106,34 @@ module.exports = function (grunt) {
                 options: {
                     stdout: true
                 },
-                command: 'powershell.exe -File CreatePackage_Grunt.ps1'
+                command: 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "CreatePackage_Grunt.ps1"'
             },
             sh: {
                 options: {
                     stdout: true
                 },
                 command: './create_package_Grunt.sh'
+            },
+            // Tailwind build for both browsers (uses tailwind.config.js at project root)
+            tailwind_firefox: {
+                command: 'npx tailwindcss -i ./src/content/css/tailwind.css -c ./tailwind.config.js -o ./dist/firefox/content/css/tailwind.css --minify'
+            },
+            tailwind_chromium: {
+                command: 'npx tailwindcss -i ./src/content/css/tailwind.css -c ./tailwind.config.js -o ./dist/chromium/content/css/tailwind.css --minify'
             }
         }
     });
 
     // debug group task
-    grunt.registerTask('debug', ['jshint', 'clean:debug', 'sass', 'copy']);
-    grunt.registerTask('playwright', ['clean:debug', 'sass', 'copy:firefox', 'copy:chromium']);
+    grunt.registerTask('debug', ['jshint', 'clean:debug', 'copy', 'shell:tailwind_firefox', 'shell:tailwind_chromium']);
+    grunt.registerTask('playwright', ['clean:debug', 'copy:firefox', 'copy:chromium', 'shell:tailwind_firefox', 'shell:tailwind_chromium']);
     
     if (process.platform === "win32") {
         // release group task
-        grunt.registerTask('release', ['jshint', 'clean:release', 'sass', 'copy:firefox', 'copy:chromium', 'shell:ps']);
+        grunt.registerTask('release', ['jshint', 'clean:release', 'copy:firefox', 'copy:chromium', 'shell:tailwind_firefox', 'shell:tailwind_chromium', 'shell:ps']);
     } else {
         // Runs the .sh package create. Possibly.
-        grunt.registerTask('release', ['jshint', 'clean:release', 'sass', 'copy:firefox', 'copy:chromium', 'shell:sh']);
+        grunt.registerTask('release', ['jshint', 'clean:release', 'copy:firefox', 'copy:chromium', 'shell:tailwind_firefox', 'shell:tailwind_chromium', 'shell:sh']);
     }
     
     // review group task
