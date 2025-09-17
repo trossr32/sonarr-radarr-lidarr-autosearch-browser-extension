@@ -96,7 +96,7 @@
             icon: {
                 containerSelector: '.header .title h2',
                 locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+                imgStyles: 'width:1em; height:1em; display:inline-block; vertical-align:-0.15em; margin:0 .4em 0 0;'
             }
         },
         // radarr works with tmdb id
@@ -132,7 +132,7 @@
             icon: {
                 containerSelector: '.header .title h2',
                 locator: 'prepend',
-                imgStyles: 'width: 25px; margin: -8px 10px 0 0;'
+                imgStyles: 'width:1em; height:1em; display:inline-block; vertical-align:-0.15em; margin:0 .4em 0 0;'
             }
         },
         // tvdb for sonarr, uses tvdb:xxxxx type search
@@ -257,7 +257,7 @@
             icon: {
                 containerSelector: '.quick-icons > .actions',
                 locator: 'append',
-                imgStyles: 'width: 23px; margin: 0 0 2px 10px;'
+                imgStyles: 'width: 25px; margin: 0 0 -4px 10px;'
             }
         },
         // trakt for radarr, uses tmdb id
@@ -463,7 +463,7 @@
             icon: {
                 containerSelector: 'p[data-episode]',
                 locator: 'append',
-                imgStyles: 'width: 18px; margin: -22px 0 0 0; float: right;'
+                imgStyles: 'width:18px; height:18px; display:inline-block; vertical-align:middle; margin:0 6px 0 6px;'
             }
         },
         {
@@ -486,7 +486,7 @@
             icon: {
                 containerSelector: '#hero-wrap [context="heading"]',
                 locator: 'prepend',
-                imgStyles: 'width: 30px; margin: -4px 10px 0 0;'
+                imgStyles: 'width: 30px; margin: 0 10px 0 0;'
             }
         },
         {
@@ -509,7 +509,7 @@
             icon: {
                 containerSelector: '#hero-wrap [context="heading"]',
                 locator: 'prepend',
-                imgStyles: 'width: 30px; margin: -4px 10px 0 0;'
+                imgStyles: 'width: 30px; margin: 0 10px 0 0;'
             }
         },
         {
@@ -1219,117 +1219,98 @@ var title = (s, removeUnderscore) => {
 };
 
 /**
- * Add a custom icon and inject into the body.
- * @param {InjectedIconConfig} injectedIconConfig - injected icon config
- * @param {string} iconDataUri - icon data uri
- * @param {string} siteId - id of the servarr site; sonarr, radarr, lidarr, etc.
- * @returns {string} - HTML to inject
+ * Add/update the floating/anchored custom icon row and inject one clickable icon
+ * for the given site instance.
+ * Uses siteIconConfig to pick the correct image and siteId to keep classes/IDs unique.
+ * Multiple calls simply append another <a> into the same row with a small gap.
+ * @param {InjectedIconConfig} injectedIconConfig
+ * @param {SiteSetting} site
+ * @param {string} linkHref
  */
- function addCustomIconMarkup(injectedIconConfig, siteId, linkHref) {
-    let styles = `<style id="servarr-ext_custom-icon-style">
-.servarr-ext_icon a {
+function addCustomIconMarkup(injectedIconConfig, site, linkHref) {
+    const isAnchored = injectedIconConfig.type === 'anchored';
+    const side = injectedIconConfig.side;                 // 'left' | 'right'
+    const sideOffset = injectedIconConfig.sideOffset;     // '12px' | '12%'
+    const pos = injectedIconConfig.position;              // 'top' | 'bottom'
+    const posOffset = injectedIconConfig.positionOffset;  // '12px' | '12%'
+
+    // Base style only once (generic, no per-site background rules)
+    if (!document.getElementById('servarr-ext_custom-icon-style')) {
+        const base = document.createElement('style');
+        base.id = 'servarr-ext_custom-icon-style';
+        base.textContent = `
+/* Positioned click-row that holds N anchors side-by-side */
+#servarr-ext_custom-icon-row {
   position: absolute;
-  background-color: ${injectedIconConfig.backgroundColor};
-  text-decoration: none;
   height: 52px;
+  display: inline-flex;
+  align-items: center;
   z-index: 9999999;
 }
 
-.servarr-ext_anchored-icon a {
-  padding: 0 15px;
-  width: 60px;
-}
-
-.servarr-ext_floating-icon a {
-  width: 52px;
+/* Floating vs anchored look & feel */
+.servarr-ext_floating-icon #servarr-ext_custom-icon-row {
   border-radius: 50px;
 }
+.servarr-ext_anchored-icon #servarr-ext_custom-icon-row {
+  padding: 0 0 0 15px;
+}
+.servarr-ext_anchored-left-icon #servarr-ext_custom-icon-row  { left: 0;  border-radius: 0 50px 50px 0; }
+.servarr-ext_anchored-right-icon #servarr-ext_custom-icon-row { right: 0; border-radius: 50px 0 0 50px; }
 
-.servarr-ext_anchored-left-icon a {
-  left: 0;
-  border-radius: 0 50px 50px 0;
+/* Per-anchor sizing */
+#servarr-ext_custom-icon-row > a {
+  width: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
-.servarr-ext_anchored-right-icon a {
-  right: 0;
-  border-radius: 50px 0 0 50px;
-}
-
-.servarr-ext_anchored-left-icon .servarr-ext_anchor-label {
-  margin-top: 8px;
-}
-
-.servarr-ext_anchored-right-icon .servarr-ext_anchor-label {
-  margin: 8px 0 0 50px;
-}
-
-.servarr-ext_icon-image {
+/* Icon image box */
+#servarr-ext_custom-icon-row .servarr-ext_icon-image {
   width: 40px;
   height: 40px;
+  background-size: 40px 40px;
+  background-repeat: no-repeat;
 }
-
-.servarr-ext_anchored-icon .servarr-ext_icon-image {
-  top: 6px;
-}
-
-.servarr-ext_anchored-left-icon .servarr-ext_icon-image {
-  float: right;
-}
-
-.servarr-ext_anchored-right-icon .servarr-ext_icon-image {
-  float: left;
-}
-</style>`;
-
-    let siteStyles = `.servarr-ext_icon-image-${siteId} {
-    background: url('${base64Icons.find(i => i.id == siteId).fortyPx}') no-repeat;
-}
-
-.servarr-ext_floating-icon .servarr-ext_icon-image-${siteId} {
-    margin: ${(siteId == 'radarr' ? '6px 0px 0px 8px' : '6px 0px 0px 6px')};
-}
-
-.servarr-ext_anchored-left-icon .servarr-ext_icon-image-${siteId} {
-    margin: ${(siteId == 'radarr' ? '6px -10px 0 0' : '6px -10px 0 0')};
-}
-
-.servarr-ext_anchored-right-icon .servarr-ext_icon-image-${siteId} {
-    margin: ${(siteId == 'radarr' ? '6px 0px 0px -5px' : '6px 0px 0px -9px')};
-}`;
-
-    // anchor tag
-    let anchor = `<a href="${linkHref}" target="_blank" data-servarr-icon="true" class="servarr-ext_anchor-${siteId} servarr-ext_${injectedIconConfig.type}-anchor-${siteId}">
-    <div class="servarr-ext_icon-image servarr-ext_icon-image-${siteId}"></div>
-    <!-- ${(injectedIconConfig.type == 'anchored' ? ('<div class="servarr-ext_anchor-label">Search<br />' + title(siteId, true) + '</div>') : '')} -->
-</a>`;
-
-    // check if the wrapper already exists
-    if ($('#servarr-ext_custom-icon-wrapper').length) {
-        log(['found servarr-ext_custom-icon-wrapper']);
-
-        let positionOffset = injectedIconConfig.type == 'anchored' ? `calc(${injectedIconConfig.positionOffset} ${(injectedIconConfig.position === 'top' ? '+' : '-')} 57px)` : injectedIconConfig.positionOffset;
-        let sideOffset = injectedIconConfig.type == 'anchored' ? injectedIconConfig.sideOffset : `calc(${injectedIconConfig.sideOffset} ${(injectedIconConfig.position === 'left' ? '+' : '-')} 57px)`;
-
-        siteStyles += `.servarr-ext_anchor-${siteId} { ${injectedIconConfig.position}: ${positionOffset}; }
-.servarr-ext_floating-anchor-${siteId} { ${injectedIconConfig.side}: ${sideOffset}; }`;
-
-        $('body').prepend(`<style id="servarr-ext_custom-icon-style-${siteId}">${siteStyles}</style>`);
-
-        $('#servarr-ext_custom-icon-wrapper').append(anchor);
-
-        return;
+`;
+        document.head.appendChild(base);
     }
 
-    // anchor doesn't exist, create the wrapper
-    let wrapper = `<div id="servarr-ext_custom-icon-wrapper" class="servarr-ext_icon servarr-ext_${injectedIconConfig.type}-icon ${(injectedIconConfig.type == 'anchored' ? ('servarr-ext_anchored-' + injectedIconConfig.side + '-icon') : '')}">
-    ${anchor}
-</div>`;
+    // Create wrapper and row once
+    let $wrapper = $('#servarr-ext_custom-icon-wrapper');
+    if (!$wrapper.length) {
+        const anchoredSideClass = isAnchored ? `servarr-ext_anchored-${side}-icon` : '';
+        $('body').prepend(`
+<div id="servarr-ext_custom-icon-wrapper"
+     class="servarr-ext_icon servarr-ext_${injectedIconConfig.type}-icon ${anchoredSideClass}">
+  <div id="servarr-ext_custom-icon-row"></div>
+</div>`);
+        $wrapper = $('#servarr-ext_custom-icon-wrapper');
+    }
 
-    siteStyles += `.servarr-ext_anchor-${siteId} { ${injectedIconConfig.position}: ${injectedIconConfig.positionOffset}; }
-.servarr-ext_floating-anchor-${siteId} { ${injectedIconConfig.side}: ${injectedIconConfig.sideOffset}; }`;
+    // Keep row styled/positioned from latest config
+    const $row = $('#servarr-ext_custom-icon-row');
+    $row.css({
+        backgroundColor: injectedIconConfig.backgroundColor,
+        // vertical position, match previous anchored offset behavior
+        [pos]: isAnchored ? `calc(${posOffset} ${pos === 'top' ? '+' : '-'} 57px)` : posOffset,
+        // horizontal position, anchored row hugs left/right via wrapper class
+        ...(isAnchored ? {} : { [side]: sideOffset })
+    });
 
-    $('body').prepend(`${styles}<style id="servarr-ext_custom-icon-style-${siteId}">${siteStyles}</style>${wrapper}`);
+    // Append one clickable icon for this specific site instance if not already present
+    if (!$row.find(`.servarr-ext_anchor-${site.id}`).length) {
+        const iconUrl = getIconAsDataUri(site.icon.type, site.icon.fg, site.icon.bg);
+        const $a = $(`<a href="${linkHref}" target="_blank" rel="noopener" class="servarr-ext_anchor-${site.id}" data-servarr-icon="true" title="Search ${site.name}"></a>`);
+        $a.append(
+            $(`<div class="servarr-ext_icon-image" style="background-image:url('${iconUrl}')"></div>`)
+        );
+        $row.append($a);
+    }
 }
+
 
 async function init() {
 	const settings = await getSettings();
@@ -1390,66 +1371,59 @@ async function init() {
 
                         log([`integration[${ii}] ${integration.id} matched to domain: `, integration]);
 
-                        var matchContainer = $(integration.match.containerSelector),
-                            site = null;
-
+                        var matchContainer = $(integration.match.containerSelector);
                         var matchValue = null;
 
+                        // Determine candidate sites by type (supports multiple instances per type)
+                        let candidateSites = [];
                         if (integration.hasOwnProperty('defaultSite')) {
-                            site = settings.sites
-                                .filter(s => { return s.enabled; })
-                                .find(s => s.id == integration.defaultSite);
-                        } else {
+                            const siteType = integration.defaultSite; // treat as type key
+                            candidateSites = settings.sites.filter(s => s.enabled && s.type === siteType);
+                        } else if (integration.rules && integration.rules.length) {
                             log('iterating rules');
-
-                            $.each(integration.rules, 
-                                function (ir, r) {
-                                    matchValue = getElementValue(matchContainer, integration.match.attribute);
-
-                                    var isMatch = r.match.pattern.test(matchValue);
-
-                                    var hasMatch = r.match.operator === 'eq' ? isMatch : !isMatch; // 'ne', convert to switch if other values are required
-
-                                    log('matchContainer', matchContainer, 'integration.match.attribute', integration.match.attribute, 'matchValue', matchValue, 'isMatch', isMatch, 'hasMatch', hasMatch);
-
-                                    if (hasMatch) {
-                                        site = settings.sites
-                                            .filter(s => { return s.enabled; })
-                                            .find(s => s.id == r.siteId);
-
-                                        return false;
-                                    }
-                                });
+                            for (let ir = 0; ir < integration.rules.length; ir++) {
+                                const r = integration.rules[ir];
+                                matchValue = getElementValue(matchContainer, integration.match.attribute);
+                                const isMatch = r.match.pattern.test(matchValue);
+                                const hasMatch = r.match.operator === 'eq' ? isMatch : !isMatch; // 'ne'
+                                log('matchContainer', matchContainer, 'integration.match.attribute', integration.match.attribute, 'matchValue', matchValue, 'isMatch', isMatch, 'hasMatch', hasMatch);
+                                if (hasMatch) {
+                                    const siteType = r.siteId; // treat rule siteId as type key
+                                    candidateSites = settings.sites.filter(s => s.enabled && s.type === siteType);
+                                    break;
+                                }
+                            }
                         }
 
-                        if (site == null) {
-                            log([`integration ${integration.id} site not found`, 'integration', integration]);
+                        if (!candidateSites || candidateSites.length === 0) {
+                            log([`integration ${integration.id} site not found (no enabled instances for matching type)`, 'integration', integration]);
                             return;
                         }
                         
-                        log([`integration ${integration.id} site found: ${site.id}`, 'site', site, 'integration', integration]);
+                        log([`integration ${integration.id} candidate sites: ${candidateSites.map(s=>s.id).join(', ')}`, 'sites', candidateSites, 'integration', integration]);
 
                         // if the site integration has a where property, then the rules within the where must be evaluated
-                        // and asserted to be correct before the integration is used
+                        // and asserted to be correct before the integration is used (page-level condition)
                         if (integration.hasOwnProperty('where')) {
+                            let whereOk = true;
                             $.each(integration.where, function(i, rule) {
                                 switch (rule.operator){
                                     case 'eq':
-                                        log([`integration ${integration.id} site found: ${site.id} rule: ${rule.attribute} ${rule.operator} ${rule.value}, found: ${getElementValue($(rule.selector), rule.attribute)}`]);
-
-                                        if (rule.value !== getElementValue($(rule.selector), rule.attribute)) {
-                                            site = null;
-                                        }                                                   
-                                        break;  
+                                        const found = getElementValue($(rule.selector), rule.attribute);
+                                        log([`integration ${integration.id} where check: ${rule.attribute} ${rule.operator} ${rule.value}, found: ${found}`]);
+                                        if (rule.value !== found) {
+                                            whereOk = false;
+                                        }
+                                        break;
                                 }
                             });
 
-                            if (site == null) {
+                            if (!whereOk) {
                                 log([`integration ${integration.id} where rules failed`]);
                                 return;
                             }
 
-                            log([`integration ${integration.id} site ${site.id} where rules succeeded`]);
+                            log([`integration ${integration.id} where rules succeeded`]);
                         }
 
                         // This is a bit janky, but some sites (looking at you trakt) load quite slowly and need the processing to be deferred otherwise the
@@ -1457,7 +1431,7 @@ async function init() {
                         // In the case of trakt, page refreshes and tab activations work fine, but page to page navigations don't   ¯\_(ツ)_/¯
                         let deferMs = integration.hasOwnProperty('deferMs') ? integration.deferMs : 0;
 
-                        log([`integration ${integration.id} site ${site.id}, in ${deferMs}ms, will look for ${integration.search.containerSelector}`, $(integration.search.containerSelector)]);
+                        log([`integration ${integration.id} (sites: ${candidateSites.map(s=>s.id).join(', ')}), in ${deferMs}ms, will look for ${integration.search.containerSelector}`, $(integration.search.containerSelector)]);
 
                         setTimeout(() => { 
                             /* iterate all the containers */
@@ -1473,16 +1447,8 @@ async function init() {
                                     return;
                                 }
 
-                                // We always want to display only one icon except when the integration is imbd and the match was made on a
-                                // media type of 'other'. It's impossible to know whether these media types are movies or tv shows so show both icons.
-                                var iconCheckAttributeName = integration.id == 'imdb' && matchValue.indexOf('other') ? `data-${site.id}-ext-completed` : 'data-servarr-ext-completed';
-
-                                // Check if the container has already been processed and had an icon added.
-                                if (containerEl.attr(iconCheckAttributeName)) {
-                                    log(`element '${container}' already has an icon attributed, so skipping`);
-                                    
-                                    return;
-                                }
+                                // Always allow multiple icons for multiple instances; track per-instance to avoid duplicates per site
+                                // Previously used a global data-servarr-ext-completed which blocked multi; now use per-site flag on container
 
                                 var searchTerm = getElementValue(containerEl, integration.search.selectorType);
                                 
@@ -1516,30 +1482,36 @@ async function init() {
 
                                 log(['search term: ', searchTerm]);
 
-                                let searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ').replace(/%3A/g, ':');
-
-                                log(['search url: ', searchUrl]);
-
-                                // Either add an icon to it's configured container or add a custom icon to the page
-                                if (!settings.config.customIconPosition || $(integration.icon.containerSelector).length > 1) {
-                                    // add an icon to the configured container
-                                    let icon = base64Icons.find(i => i.id == site.id),
-                                        linkEl = $(`<a href="${searchUrl}" target="_blank" tooltip="${site.menuText}" title="${site.menuText}" data-servarr-icon="true"></a>`)
-                                            .append($(`<img src="${icon.default}" style="${integration.icon.imgStyles}">`));
-
-                                    let el = integration.icon.hasOwnProperty('wrapLinkWithContainer') ? $(integration.icon.wrapLinkWithContainer).append(linkEl) : linkEl;
-
-                                    if (integration.icon.locator == "append") {
-                                        $(integration.icon.containerSelector).eq(i_el).append(el);
-                                    } else {
-                                        $(integration.icon.containerSelector).eq(i_el).prepend(el);
+                                // Inject an icon for each candidate site
+                                candidateSites.forEach(function(site) {
+                                    const perSiteAttr = `data-servarr-ext-${site.id}-completed`;
+                                    if (containerEl.attr(perSiteAttr)) {
+                                        // already injected for this instance
+                                        return;
                                     }
-                                } else {
-                                    // show a custom icon based on the icon config
-                                    addCustomIconMarkup(settings.injectedIconConfig, site.id, searchUrl);
-                                }
+                                    let searchUrl = site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(searchTerm).replace(/\./g, ' ').replace(/%3A/g, ':');
+                                    log(['search url: ', searchUrl, 'for site', site]);
 
-                                containerEl.attr(iconCheckAttributeName, true);
+                                    if (!settings.config.customIconPosition || $(integration.icon.containerSelector).length > 1) {
+                                        // add an icon to the configured container
+                                        let icon = getIconFromSiteIconConfig(site.icon, integration.icon.imgStyles, null);
+                                        let linkEl = $(`<a href="${searchUrl}" target="_blank" rel="noopener" tooltip="${site.name}" title="${site.name}" data-servarr-icon="true"></a>`)
+                                            .append($(icon));
+                                        
+                                            let el = integration.icon.hasOwnProperty('wrapLinkWithContainer') ? $(integration.icon.wrapLinkWithContainer).append(linkEl) : linkEl;
+                                        
+                                        if (integration.icon.locator == "append") {
+                                            $(integration.icon.containerSelector).eq(i_el).append(el);
+                                        } else {
+                                            $(integration.icon.containerSelector).eq(i_el).prepend(el);
+                                        }
+                                    } else {
+                                        // show a custom icon based on the icon config
+                                        //addCustomIconMarkup(settings.injectedIconConfig, site.type, searchUrl);
+                                        addCustomIconMarkup(settings.injectedIconConfig, site, searchUrl);
+                                    }
+                                    containerEl.attr(perSiteAttr, true);
+                                });
                             });
                         }, deferMs);
                     }

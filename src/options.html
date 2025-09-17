@@ -15,7 +15,7 @@
     <script src="content/js/core.js"></script>
     <script src="content/js/icons.js"></script>
     <script src="content/js/options-1-settings.js"></script>
-    <script src="content/js/options-2-advanced.js"></script>
+    <!-- <script src="content/js/options-2-advanced.js"></script> -->
     <script src="content/js/options-3-site-integrations.js"></script>
     <script src="content/js/options-4-custom-icons.js"></script>
     <script src="content/js/options-5-context-menu.js"></script>
@@ -34,7 +34,7 @@
                     </div>
                     <div class="min-w-0">
                         <h1 class="text-xl sm:text-2xl font-semibold tracking-tight truncate m-0">Servarr autosearch options</h1>
-                        <p class="text-xs text-slate-400 mt-1 truncate">Configure connections, integrations, and behavior for your Servarr instances.</p>
+                        <p class="text-xs text-slate-400 mt-1 truncate">Configure connections, integrations, and behaviour for your Servarr instances.</p>
                     </div>
                 </div>
                 <div class="w-40 sm:w-56 flex-shrink-0">
@@ -51,9 +51,9 @@
             <button type="button" id="tab-basic" data-panel="panel-basic" role="tab" aria-selected="true" class="tab-trigger is-active inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-white/10 text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-cog"></i><span class="hidden sm:inline">Settings</span>
             </button>
-            <button type="button" id="tab-advanced" data-panel="panel-advanced" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+            <!-- <button type="button" id="tab-advanced" data-panel="panel-advanced" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-exclamation-triangle"></i><span class="hidden sm:inline">Advanced</span>
-            </button>
+            </button> -->
             <button type="button" id="tab-integrations" data-panel="panel-integrations" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-link"></i><span class="hidden sm:inline">Integrations</span>
             </button>
@@ -81,15 +81,24 @@
                     <i class="fa-solid fa-question-circle fa-lg text-indigo-400 mt-1"></i>
                     <div>
                         <h2 class="font-semibold mb-2">Settings</h2>
-                        <p class="text-sm text-slate-300 mb-2">These settings configure how this extension will connect to your Servarr instances.</p>
-                        <p class="text-sm text-slate-300 mb-2">If an API key is entered and the "Auto populate from API" version is enabled on the advanced settings page, then the advanced settings will be configured automatically.</p>
-                        <p class="text-sm text-slate-300">Auto population will only work if the API call works, otherwise default values will be used.</p>
+                        <p class="text-sm text-slate-300 mb-2">
+                            Configure how this extension connects to your Servarr instances. Use <em>Add instance</em> to add Sonarr/Radarr/Lidarr/Readarr entries, and the <em>trash</em> icon to remove.
+                        </p>
+                        <ul class="text-sm text-slate-300 list-disc pl-5 space-y-1 mb-2">
+                            <li><strong>Show advanced:</strong> toggle the <em>Show advanced</em> button to reveal per-site <em>Icon palette</em> and <em>Advanced settings</em> sections.</li>
+                            <li><strong>Icon palette:</strong> choose foreground/background colours for each site's search icon (or <em>Reset colours</em>).</li>
+                            <li><strong>Advanced settings:</strong> choose auto-population from your Servarr API or edit search path and input selector manually.</li>
+                            <li><strong>Auto-save:</strong> changes are saved immediately; toggle an instance to enable/disable editing and API tests.</li>
+                        </ul>
+                        <p class="text-sm text-slate-300">
+                            Auto-population works only if the API call succeeds; otherwise, defaults or your manual values are used.
+                        </p>
                     </div>
                 </div>
             </div>
             <form id="generalOptionsForm" class="space-y-6"></form>
         </section>
-        <section id="panel-advanced" role="tabpanel" aria-labelledby="tab-advanced" class="panel hidden" hidden>
+        <!-- <section id="panel-advanced" role="tabpanel" aria-labelledby="tab-advanced" class="panel hidden" hidden>
             <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6">
                 <div class="px-4 py-3 flex items-start gap-4 border-b border-slate-700">
                     <i class="fa-solid fa-question-circle fa-lg text-indigo-400 mt-1"></i>
@@ -102,7 +111,7 @@
                 </div>
             </div>
             <form id="advancedOptionsForm" class="space-y-6"></form>
-        </section>
+        </section> -->
         <section id="panel-integrations" role="tabpanel" aria-labelledby="tab-integrations" class="panel hidden" hidden>
             <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6">
                 <div class="px-4 py-3 flex items-start gap-4 border-b border-slate-700">
@@ -131,7 +140,7 @@
                         <h2 class="font-semibold mb-2">Custom icon settings</h2>
                         <p class="text-sm text-slate-300 mb-2">Override integration injection points by showing a custom floating or anchored icon.</p>
                         <p class="text-sm text-slate-300 mb-2">An example icon will appear here while this tab is open if custom icons are enabled.</p>
-                        <p class="text-sm text-slate-300">If multiple elements match the usual selector fallback icon injection logic will be used instead of the custom icon.</p>
+                        <p class="text-sm text-slate-300">If multiple elements match the usual selector, fallback icon injection logic will be used instead of the custom icon.</p>
                     </div>
                 </div>
             </div>

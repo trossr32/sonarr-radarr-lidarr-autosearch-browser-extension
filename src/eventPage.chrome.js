@@ -1,18 +1,26 @@
+// Chrome MV3 service worker
+
 importScripts("./content/js/browser-polyfill.min.js");
 importScripts("./content/js/core.js");
 
 async function getCurrentTab() {
     try {
-        let queryOptions = { active: true, lastFocusedWindow: true };
-    
-        let [tab] = await chrome.tabs.query(queryOptions);
-    
-        return tab;
+        const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+        return tab || null;
     } catch (error) {
         console.warn('Error getting current tab', error);
-
         return null;
     }
+}
+
+function isInjectableUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+    const forbiddenSchemes = ['chrome:', 'edge:', 'about:', 'moz-extension:', 'chrome-extension:', 'devtools:', 'view-source:'];
+    if (forbiddenSchemes.some(p => url.startsWith(p))) return false;
+    // Block both stores for parity
+    if (url.startsWith('https://chrome.google.com/webstore')) return false;
+    if (url.startsWith('https://addons.mozilla.org')) return false;
+    return url.startsWith('http://') || url.startsWith('https://');
 }
 
 /**
@@ -20,121 +28,162 @@ async function getCurrentTab() {
  */
 async function initRun(tabId, evt) {
     await log(`running init from ${evt} event`);
-    
     try {
         const settings = await getSettings();
 
-        log('current tab', tabId);
-
         await setIcon(settings);
         await buildMenus(settings);
-        await browser.scripting.executeScript({ 
-            target: {
-                tabId: tabId
-            },
+
+        // Respect disabled state: don't inject anything when disabled
+        if (!settings?.config?.enabled) {
+            await log('Extension disabled: skipping injection.');
+            return;
+        }
+
+        let tab;
+        try {
+            tab = await chrome.tabs.get(tabId);
+        } catch (e) {
+            await log(['Failed to resolve tab for injection', e], 'warn');
+            return;
+        }
+        if (!isInjectableUrl(tab?.url)) {
+            await log(['Skipping injection for non-injectable URL', tab?.url]);
+            return;
+        }
+
+        await browser.scripting.executeScript({
+            target: { tabId },
             files: [
                 'content/js/browser-polyfill.min.js',
                 'content/js/icons.js',
                 'content/js/content_script.js'
-            ] 
+            ]
         });
-    }
-    catch(e) {
+    } catch (e) {
         await log(e.message, 'error');
     }
 }
 
 browser.tabs.onActivated.addListener(async function (activeInfo) {
-    initRun(activeInfo.tabId, 'onActivated')
+    if (activeInfo && typeof activeInfo.tabId === 'number') {
+        initRun(activeInfo.tabId, 'onActivated');
+    }
 });
 
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     log(['change info status', changeInfo]);
-
-    if (changeInfo.status == 'complete') {
-        initRun(tabId, 'onUpdated')
+    if (changeInfo.status === 'complete') {
+        initRun(tabId, 'onUpdated');
     }
 });
 
-browser.runtime.onConnect.addListener(function(port) {
+browser.runtime.onConnect.addListener(function (port) {
     switch (port.name) {
         case 'init':
             port.onMessage.addListener(async function () {
-                let tabId = await getCurrentTab();
-    
-                await initRun(tabId, 'onConnect');
+                const tab = await getCurrentTab();
+                if (tab && typeof tab.id === 'number') {
+                    await initRun(tab.id, 'onConnect');
+                } else {
+                    await log('Could not determine current tab id for init run', 'warn');
+                }
             });
             break;
-
         case 'icon':
-            port.onMessage.addListener(async function (request) {
+            port.onMessage.addListener(async function () {
                 const settings = await getSettings();
-                
                 await setIcon(settings);
             });
             break;
     }
 });
 
+// One-shot message listener for init and icon messages
+browser.runtime.onMessage.addListener(async (msg, sender) => {
+    if (!msg || typeof msg !== 'object') return;
+    if (msg.type === 'init') {
+        const tabId = sender?.tab?.id ?? (await getCurrentTab())?.id;
+        if (typeof tabId === 'number') {
+            await initRun(tabId, 'onMessage');
+        }
+    } else if (msg.type === 'icon') {
+        const settings = await getSettings();
+        await setIcon(settings);
+    }
+});
+
 /**
- * Build the browser context menus
- * @param {Settings} settings 
+ * Build the browser context menus (grouped by type, parity with Firefox)
+ * @param {Setting} settings 
  */
 async function buildMenus(settings) {
-    await browser.contextMenus.removeAll();
+    await browser.contextMenus?.removeAll();
 
-    // if extension is disabled or context menu option is disabled gtfo
-    if (!settings.config.enabled || !settings.config.contextMenu) {
-        return;
+    if (!browser.contextMenus || !settings?.config?.enabled || !settings?.config?.contextMenu) return;
+
+    const enabledSites = (settings.sites || []).filter(site => site.enabled);
+    if (enabledSites.length === 0) return;
+
+    browser.contextMenus.create({ title: 'Search Servarr', id: 'sonarrRadarrLidarr', contexts: ['selection'] });
+
+    function titleType(type) {
+        if (!type) return '';
+        if (type.includes('_')) {
+            const [a, b] = type.split('_');
+            return `${a.charAt(0).toUpperCase()}${a.slice(1)} (${b.charAt(0).toUpperCase()}${b.slice(1)})`;
+        }
+        return `${type.charAt(0).toUpperCase()}${type.slice(1)}`;
     }
 
-    let enabledSites = settings.sites.filter(site => { return site.enabled; });
+    const groupsByType = enabledSites.reduce((acc, s) => {
+        const t = s.type || s.id;
+        (acc[t] ||= []).push(s);
+        return acc;
+    }, {});
 
-    // if no sites are enabled gtfo
-    if (enabledSites.length === 0) {
-        return;
-    }
-
-    // create parent menu
-    browser.contextMenus.create({ "title": "Search Servarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
-
-    // create child menus from enabled sites array
-    for (let i = 0; i < enabledSites.length; i++) {
-        browser.contextMenus.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": `${enabledSites[i].id}Menu`, "contexts": ["selection"] });
+    for (const type of Object.keys(groupsByType)) {
+        const group = groupsByType[type];
+        const typeTitle = titleType(type);
+        if (group.length > 1) {
+            const parentId = `type-${type}`;
+            browser.contextMenus.create({ title: typeTitle, id: parentId, parentId: 'sonarrRadarrLidarr', contexts: ['selection'] });
+            for (const site of group) {
+                const label = `Search ${site.name || typeTitle}`;
+                browser.contextMenus.create({ title: label, parentId, id: `${site.id}Menu`, contexts: ['selection'] });
+            }
+        } else {
+            const site = group[0];
+            const label = `Search ${site.name || typeTitle}`;
+            browser.contextMenus.create({ title: label, parentId: 'sonarrRadarrLidarr', id: `${site.id}Menu`, contexts: ['selection'] });
+        }
     }
 }
 
 /**
  * Context menu click handler
- * @param {*} info 
- * @param {*} tab 
  */
 async function onClickHandler(info, tab) {
     const settings = await getSettings();
-
-    for (let i = 0; i < settings.sites.length; i++) {
-        if (info.menuItemId == (`${settings.sites[i].id}Menu`)) {
+    for (const site of settings.sites || []) {
+        if (info.menuItemId === `${site.id}Menu`) {
             await browser.tabs.create({
-                'url': settings.sites[i].domain.replace(/\/$/, '') + settings.sites[i].searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
+                url: site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
             });
         }
     }
-};
+}
+browser.contextMenus?.onClicked.addListener(onClickHandler);
 
-browser.contextMenus.onClicked.addListener(onClickHandler);
-
-/**
- * set up context menu tree at install time.
- */
+/** set up context menu tree at install time. */
 browser.runtime.onInstalled.addListener(async function () {
     const settings = await getSettings();
-
     buildMenus(settings);
 });
 
-// Listen for storage changes affecting context menu so updates apply immediately without requiring tab events.
+/** Rebuild menus on storage changes affecting settings. */
 browser.storage.onChanged.addListener(async (changes, area) => {
-    if (!changes.hasOwnProperty('sonarrRadarrLidarrAutosearchSettings')) return;
+    if (!Object.prototype.hasOwnProperty.call(changes, 'sonarrRadarrLidarrAutosearchSettings')) return;
     try {
         const newSettings = changes.sonarrRadarrLidarrAutosearchSettings.newValue;
         await buildMenus(newSettings);
@@ -143,12 +192,8 @@ browser.storage.onChanged.addListener(async (changes, area) => {
     }
 });
 
-/**
- * Set the extension icon
- * @param {Settings} settings 
- */
+/** Set the extension icon */
 async function setIcon(settings) {
-    let img = `content/assets/images/SonarrRadarrLidarr${(settings.config.enabled ? '' : '-faded')}16.png`;
-
+    const img = `content/assets/images/SonarrRadarrLidarr${(settings?.config?.enabled ? '' : '-faded')}16.png`;
     await browser.action.setIcon({ path: img });
 };

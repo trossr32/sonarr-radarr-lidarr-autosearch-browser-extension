@@ -1,85 +1,71 @@
+let __customIconPreviewCount = 1;
+
+const siteTypes = ['sonarr', 'radarr', 'lidarr'];
+
 var getUnitFromOffset = (offset) => offset.match(/(?<amount>[\d|\.]+)(?<unit>.+)/i).groups.unit;
 
 var getAmountFromOffset = (offset) => offset.match(/(?<amount>[\d|\.]+)(?<unit>.+)/i).groups.amount;
 
 /**
  * Get HTML markup for a custom icon to inject into the body.
- * @param {InjectedIconConfig} injectedIconConfig - injected icon config
- * @param {string} iconDataUri - icon data uri
- * @param {string} siteId - id of the servarr site; sonarr, radarr, lidarr, etc.
- * @returns {string} - HTML to inject
+ * Renders N icons side-by-side, picking the icon type from `siteTypes[i]`.
+ * @param {InjectedIconConfig} injectedIconConfig
+ * @param {string} _siteType  // ignored (kept for compatibility with existing calls)
+ * @param {string} linkHref
+ * @param {number} [count=1] how many icons to render in a row
+ * @returns {string}
  */
-function getCustomIconMarkup(injectedIconConfig, siteId, linkHref) {
-return `<style id="servarr-ext_custom-icon-style">
+function getCustomIconMarkup(injectedIconConfig, _siteType, linkHref, count = 1) {
+  const n = Math.max(1, Math.min(3, Number(count) || 1));
+  const multi = n > 1;
+
+  // Build N tiles, each with its own background image from siteTypes[i]
+  const icons = Array.from({ length: n }, (_, i) => {
+    const t = siteTypes[i] || siteTypes[siteTypes.length - 1]; // safe fallback
+    const dataUri = getIconAsDataUri(t, null, null);
+    return `<div class="servarr-ext_icon-image" data-type="${t}" style="background-image:url('${dataUri}')"></div>`;
+  }).join('');
+
+  return `<style id="servarr-ext_custom-icon-style">
 .servarr-ext_icon a {
-    position: absolute;
-    background-color: ${injectedIconConfig.backgroundColor};
-    text-decoration: none;
-    height: 52px;
-    z-index: 9999999;
-    ${injectedIconConfig.position}: ${injectedIconConfig.positionOffset};
+  position: absolute;
+  background-color: ${injectedIconConfig.backgroundColor};
+  text-decoration: none;
+  height: 52px;
+  z-index: 9999999;
+  ${injectedIconConfig.position}: ${injectedIconConfig.positionOffset};
+  display: inline-flex;
+  gap: 14px;
 }
-
 .servarr-ext_anchored-icon a {
-    padding: 0 15px;
-    width: 60px;
+  padding: 0 15px;
+  ${multi ? 'width:auto;' : 'width:60px;'}
 }
-
 .servarr-ext_floating-icon a {
-    width: 52px;
-    ${injectedIconConfig.side}: ${injectedIconConfig.sideOffset};
-    border-radius: 50px;
+  ${injectedIconConfig.side}: ${injectedIconConfig.sideOffset};
+  border-radius: 50px;
+  ${multi ? 'width:auto; padding:6px;' : 'width:52px; padding:6px 0 0 6px;'}
 }
-
-.servarr-ext_anchored-left-icon a {
-    left: 0;
-    border-radius: 0 50px 50px 0;
-}
-
-.servarr-ext_anchored-right-icon a {
-    right: 0;
-    border-radius: 50px 0 0 50px;
-}
-
-.servarr-ext_anchored-left-icon .servarr-ext_anchor-label {
-    margin-top: 8px;
-}
-
-.servarr-ext_anchored-right-icon .servarr-ext_anchor-label {
-    margin: 8px 0 0 50px;
-}
+.servarr-ext_anchored-left-icon a  { left: 0;  border-radius: 0 50px 50px 0; }
+.servarr-ext_anchored-right-icon a { right: 0; border-radius: 50px 0 0 50px; }
 
 .servarr-ext_icon-image {
-    width: 40px;
-    height: 40px;
-    background: url('${base64Icons.find(i => i.id == siteId).fortyPx}') no-repeat;
+  width: 40px;
+  height: 40px;
+  background-repeat: no-repeat;
+  background-size: 40px 40px;
 }
-
-.servarr-ext_anchored-icon .servarr-ext_icon-image {
-    top: 6px;
-}
-
-.servarr-ext_floating-icon .servarr-ext_icon-image {
-    margin: ${(siteId == 'radarr' ? '6px 0px 0px 8px' : '6px 0px 0px 6px')};
-}
-
-.servarr-ext_anchored-left-icon .servarr-ext_icon-image {
-    float: right;
-    margin: ${(siteId == 'radarr' ? '6px -10px 0 0' : '6px -10px 0 0')};
-}
-
-.servarr-ext_anchored-right-icon .servarr-ext_icon-image {
-    float: left;
-    margin: ${(siteId == 'radarr' ? '6px 0px 0px -5px' : '6px 0px 0px -9px')};
-}
+.servarr-ext_anchored-icon .servarr-ext_icon-image { margin: 6px -10px 0 0; }
 </style>
-<div id="servarr-ext_custom-icon-wrapper" class="servarr-ext_icon servarr-ext_${injectedIconConfig.type}-icon ${(injectedIconConfig.type == 'anchored' ? ('servarr-ext_anchored-' + injectedIconConfig.side + '-icon') : '')}">
-    <a href="${linkHref}" target="_blank" data-servarr-icon="true">
-        <div class="servarr-ext_icon-image"></div>
-        <!-- ${(injectedIconConfig.type == 'anchored' ? ('<div class="servarr-ext_anchor-label">Search<br />' + title(siteId) + '</div>') : '')} -->
-    </a>
+<div id="servarr-ext_custom-icon-wrapper"
+     class="servarr-ext_icon servarr-ext_${injectedIconConfig.type}-icon ${(injectedIconConfig.type == 'anchored' ? (`servarr-ext_anchored-${injectedIconConfig.side}-icon`) : '')}"
+     data-count="${n}">
+  <a href="${linkHref}" target="_blank" data-servarr-icon="true">
+    ${icons}
+  </a>
 </div>`;
 }
+
 
 /**
  * Build the custom icon settings tab
@@ -155,12 +141,31 @@ var initialiseCustomIconForm = function (settings) {
 
     // Text input for manual entry (kept same ID for existing logic)
     const colorInput = $(
-        `<input type="text" id="icon-background-color" class="text-white w-40 rounded-md border border-slate-600 bg-slate-800 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="7" />`
+        `<input type="text" id="icon-background-color" class="text-white w-40 rounded-md border border-slate-600 bg-slate-800 px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500" maxlength="9" />`
     ).val(settings.injectedIconConfig.backgroundColor);
 
     controls.append(colorInput);
     bgRow.append(controls);
     body.append(bgRow);
+
+    // Preview count slider
+    const previewRow = $('<div class="flex items-center gap-4"></div>');
+    previewRow.append('<div class="min-w-[12rem]"><label for="icon-preview-count" class="font-medium">Preview count</label><p class="text-xs text-slate-400">Preview multiple icons</p></div>');
+    const sliderWrap = $('<div class="flex items-center gap-2"></div>');
+    const slider = $(`<input type="range" id="icon-preview-count" min="1" max="3" step="1" value="1" class="w-40">`);
+    const sliderVal = $('<span id="icon-preview-count-value" class="text-xs text-slate-400">1</span>');
+    sliderWrap.append(slider, sliderVal);
+    previewRow.append(sliderWrap);
+    body.append(previewRow);
+
+    // Keep module variable in sync and refresh preview; DO NOT save to settings
+    slider.on('input change', async function () {
+        __customIconPreviewCount = Math.max(1, Math.min(3, Number($(this).val()) || 1));
+
+        $('#icon-preview-count-value').text(String(__customIconPreviewCount));
+        
+        await maybeShowCustomIconPreview();
+    });
 
     mainCard.append(header, body);
     grid.append(mainCard);
@@ -176,50 +181,9 @@ var initialiseCustomIconForm = function (settings) {
     initToggle('#toggle-position-offset', { on: 'px', off: '%', offstyle: 'success' }, null);
 
     // Initialize Spectrum on the input
-    var spectrumOptions = {
-        color: settings.injectedIconConfig.backgroundColor,
-        showPalette: false,
-        showInput: true,
-        showInitial: false,
-        showButtons: true,
-        clickoutFiresChange: true,
-        showAlpha: false,
-        allowEmpty: false,
-        preferredFormat: 'hex',
-        appendTo: 'body',
-        // Update when user confirms selection (Choose/OK) or closes the picker
-        change: function (color) {
-            if (color) {
-                syncFromPicker(color);
-            } else {
-                setTimeout(function () { syncFromPicker(null); }, 0);
-            }
-        },
-        hide: function (color) {
-            if (color) {
-                syncFromPicker(color);
-            } else {
-                setTimeout(function () { syncFromPicker(null); }, 0);
-            }
-        }
-    };
-    colorInput.spectrum(spectrumOptions);
-
-    async function syncFromPicker(color) {
-        var tiny = color;
-        if (!tiny) {
-            try { tiny = colorInput.spectrum('get'); } catch (e) { tiny = null; }
-        }
-        if (!tiny) return;
-        var hex = tiny.toHexString();
-        colorInput.val(hex);
+    initSpectrumColorPicker(colorInput, settings.injectedIconConfig.backgroundColor, async function () {
         await setSettingsPropertiesFromCustomIconForm();
         await maybeShowCustomIconPreview();
-    }
-
-    // Show picker when focusing or clicking the input (optional UX improvement)
-    colorInput.on('focus', function () {
-        try { colorInput.spectrum('show'); } catch (e) { /* ignore */ }
     });
 
     // Update enabled/disabled states consistently (extended to cover button + popover)
@@ -271,21 +235,6 @@ var initialiseCustomIconForm = function (settings) {
         .on('change', function () { syncEnabledDisabled(); setSettingsPropertiesFromCustomIconForm(); });
 
     $('#side-offset, #position-offset').on('input', setSettingsPropertiesFromCustomIconForm);
-
-    // Text input changes -> validate & push to settings + picker
-    const isValidHex = function (v) { return /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim()); };
-    colorInput.on('input', async function () {
-        var val = $(this).val().trim();
-        if (val && val[0] !== '#') {
-            val = `#${val}`;
-            $(this).val(val);
-        }
-        if (isValidHex(val)) {
-            try { colorInput.spectrum('set', val); } catch (e) { /* ignore */ }
-            await setSettingsPropertiesFromCustomIconForm();
-            maybeShowCustomIconPreview();
-        }
-    });
 
     // Initial state sync
     syncEnabledDisabled();
@@ -350,57 +299,57 @@ function safeToken(value, fallback = 'sonarr') {
  * Update settings from the custom icon tab form fields (sanitized)
  */
 async function setSettingsPropertiesFromCustomIconForm() {
-  const settings = await getSettings();
-  
-  settings.injectedIconConfig = settings.injectedIconConfig || {};
+    const settings = await getSettings();
+    
+    settings.injectedIconConfig = settings.injectedIconConfig || {};
 
-  // Booleans
-  const useCustomIcon = Boolean($('#toggle-use-custom-icon').prop('checked'));
-  const isAnchored = Boolean($('#toggle-icon-type').prop('checked'));
-  const isLeftSide = Boolean($('#toggle-side').prop('checked'));
-  const sideInPx = Boolean($('#toggle-side-offset').prop('checked'));
-  const isTopPosition = Boolean($('#toggle-position').prop('checked'));
-  const positionInPx = Boolean($('#toggle-position-offset').prop('checked'));
+    // Booleans
+    const useCustomIcon = Boolean($('#toggle-use-custom-icon').prop('checked'));
+    const isAnchored = Boolean($('#toggle-icon-type').prop('checked'));
+    const isLeftSide = Boolean($('#toggle-side').prop('checked'));
+    const sideInPx = Boolean($('#toggle-side-offset').prop('checked'));
+    const isTopPosition = Boolean($('#toggle-position').prop('checked'));
+    const positionInPx = Boolean($('#toggle-position-offset').prop('checked'));
 
-  // Units & numeric inputs → sanitized CSS lengths
-  const sideUnit = sideInPx ? 'px' : '%';
-  const posUnit = positionInPx ? 'px' : '%';
-  const sideRaw = $('#side-offset').val();
-  const posRaw = $('#position-offset').val();
-  const sideOffset = toPxOrPercent(sideRaw, sideUnit, `0${sideUnit}`);
-  const positionOffset = toPxOrPercent(posRaw, posUnit, `0${posUnit}`);
+    // Units & numeric inputs → sanitized CSS lengths
+    const sideUnit = sideInPx ? 'px' : '%';
+    const posUnit = positionInPx ? 'px' : '%';
+    const sideRaw = $('#side-offset').val();
+    const posRaw = $('#position-offset').val();
+    const sideOffset = toPxOrPercent(sideRaw, sideUnit, `0${sideUnit}`);
+    const positionOffset = toPxOrPercent(posRaw, posUnit, `0${posUnit}`);
 
-  // Enum-like fields (normalized)
-  const side = normalizeSide(isLeftSide ? 'left' : 'right');
-  const position = normalizeVerticalPos(isTopPosition ? 'top' : 'bottom');
+    // Enum-like fields (normalized)
+    const side = normalizeSide(isLeftSide ? 'left' : 'right');
+    const position = normalizeVerticalPos(isTopPosition ? 'top' : 'bottom');
 
-  // Colours (strict hex only)
-  const backgroundColor = normalizeHexColour($('#icon-background-color').val());
+    // Colours (strict hex only)
+    const backgroundColor = normalizeHexColour($('#icon-background-color').val());
 
-  // Type (anchor/floating) – set from boolean, no free-form strings
-  const type = isAnchored ? 'anchored' : 'floating';
+    // Type (anchor/floating) – set from boolean, no free-form strings
+    const type = isAnchored ? 'anchored' : 'floating';
 
-  // Assign to settings (only sanitized values)
-  settings.config.customIconPosition = useCustomIcon;
-  settings.injectedIconConfig.type = type;
-  settings.injectedIconConfig.side = side;
-  settings.injectedIconConfig.sideOffset = sideOffset;
-  settings.injectedIconConfig.position = position;
-  settings.injectedIconConfig.positionOffset = positionOffset;
-  settings.injectedIconConfig.backgroundColor = backgroundColor;
+    // Assign to settings (only sanitized values)
+    settings.config.customIconPosition = useCustomIcon;
+    settings.injectedIconConfig.type = type;
+    settings.injectedIconConfig.side = side;
+    settings.injectedIconConfig.sideOffset = sideOffset;
+    settings.injectedIconConfig.position = position;
+    settings.injectedIconConfig.positionOffset = positionOffset;
+    settings.injectedIconConfig.backgroundColor = backgroundColor;
 
-  // Remove any existing preview nodes/styles before re-injecting
-  $("#servarr-ext_custom-icon-wrapper, #servarr-ext_custom-icon-style").remove();
+    // Remove any existing preview nodes/styles before re-injecting
+    $("#servarr-ext_custom-icon-wrapper, #servarr-ext_custom-icon-style").remove();
 
-  // Re-inject preview only if the custom icon tab is currently active (aria-selected)
-  const customIconTabActive = $('#tab-custom-icon[aria-selected="true"]').length > 0;
+    // Re-inject preview only if the custom icon tab is currently active (aria-selected)
+    const customIconTabActive = $('#tab-custom-icon[aria-selected="true"]').length > 0;
 
-  if (useCustomIcon && customIconTabActive) {
-    // If you have a Node-based renderer, prefer that. Keeping your existing markup call:
-    $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
-  }
+    if (useCustomIcon && customIconTabActive) {
+        // If you have a Node-based renderer, prefer that. Keeping your existing markup call:
+        $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#', __customIconPreviewCount));
+    }
 
-  await setSettings(settings);
+    await setSettings(settings);
 }
 
 /**
@@ -420,6 +369,6 @@ async function maybeShowCustomIconPreview() {
     if (settings.config.customIconPosition) {
         removeCustomIconPreview();
 
-        $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#'));
+        $('body').prepend(getCustomIconMarkup(settings.injectedIconConfig, 'sonarr', '#', __customIconPreviewCount));
     }
 }

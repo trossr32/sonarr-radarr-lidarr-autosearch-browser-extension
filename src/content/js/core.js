@@ -39,6 +39,15 @@
  * @property {string} menuText - text that is shown for this site's entry in the context menu
  * @property {string} apiKey - API key
  * @property {bool} autoPopAdvancedFromApi - whether the search path / selector settings should be updated from the API
+ * @property {SiteIconConfig} icon - icon configuration
+ */
+
+/**
+ * Site icon configuration
+ * @typedef {Object} SiteIconConfig
+ * @property {string} type - (sonarr / radarr / lidarr / readarr)
+ * @property {string} fg - foreground colour
+ * @property {string} bg - background colour
  */
 
 /**
@@ -141,49 +150,84 @@ let sessionId,
         sites: [
             {
                 id: 'sonarr',
+                type: 'sonarr',
+                name: 'Sonarr',
                 domain: 'http://my.sonarr-url.domain:8989',
                 enabled: true,
                 searchPath: '/add/new/',
                 searchInputSelector: 'input[name="seriesLookup"]',
                 menuText: 'Search Sonarr for tv',
                 apiKey: '',
-                autoPopAdvancedFromApi: true
+                autoPopAdvancedFromApi: true,
+                icon: {
+                    type: 'sonarr',
+                    fg: '#0cf',
+                    bg: '#eee'
+                }
             }, {
                 id: 'radarr',
+                type: 'radarr',
+                name: 'Radarr',
                 domain: 'http://my.radarr-url.domain:7878',
                 enabled: true,
                 searchPath: '/add/new/',
                 searchInputSelector: 'input[name="movieLookup"]',
                 menuText: 'Search Radarr for movie',
                 apiKey: '',
-                autoPopAdvancedFromApi: true
+                autoPopAdvancedFromApi: true,
+                icon: {
+                    type: 'radarr',
+                    fg: '#ffc230',
+                    bg: '#24292e'
+                }
             }, {
                 id: 'lidarr',
+                type: 'lidarr',
+                name: 'Lidarr',
                 domain: 'http://my.lidarr-url.domain:8686',
                 enabled: true,
                 searchPath: '/add/search/',
                 searchInputSelector: 'input[name="searchBox"]',
                 menuText: 'Search Lidarr',
                 apiKey: '',
-                autoPopAdvancedFromApi: true
+                autoPopAdvancedFromApi: true,
+                icon: {
+                    type: 'lidarr',
+                    fg: '#009252',
+                    bg: '#e5e5e5'
+                }
             }, {
                 id: 'readarr_ebook',
+                type: 'readarr_ebook',
+                name: 'Readarr (ebook)',
                 domain: 'http://my.readarr-ebook-url.domain:8787',
                 enabled: false,
                 searchPath: '/add/search/',
                 searchInputSelector: 'input[name="searchBox"]',
                 menuText: 'Search Readarr (ebook)',
                 apiKey: '',
-                autoPopAdvancedFromApi: true
+                autoPopAdvancedFromApi: true,
+                icon: {
+                    type: 'readarr',
+                    fg: '#8e2222',
+                    bg: '#eee'
+                }
             }, {
                 id: 'readarr_audiobook',
+                type: 'readarr_audiobook',
+                name: 'Readarr (audiobook)',
                 domain: 'http://my.readarr-audiobook-url.domain:8788',
                 enabled: false,
                 searchPath: '/add/search/',
                 searchInputSelector: 'input[name="searchBox"]',
                 menuText: 'Search Readarr (audiobook)',
                 apiKey: '',
-                autoPopAdvancedFromApi: true
+                autoPopAdvancedFromApi: true,
+                icon: {
+                    type: 'readarr',
+                    fg: '#8e2222',
+                    bg: '#eee'
+                }
             }
         ],
         integrations: [
@@ -599,6 +643,13 @@ async function getSettings() {
         data.sonarrRadarrLidarrAutosearchSettings.sites.push(defaultSettings.sites[i]);
     }
 
+    // Precompute default icons map to avoid creating functions inside the loop (lint friendliness)
+    const defaultIconsByType = defaultSettings.sites.reduce((acc, s) => {
+        acc[s.type.indexOf('readarr') >= 0 ? 'readarr' : s.type] = s.icon;
+        return acc;
+    }, {});
+
+    // Migrate per-site fields and ensure required props exist
     for (let i = 0; i < data.sonarrRadarrLidarrAutosearchSettings.sites.length; i++) {
         if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('apiKey')) {
             data.sonarrRadarrLidarrAutosearchSettings.sites[i].apiKey = '';
@@ -606,6 +657,28 @@ async function getSettings() {
 
         if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('autoPopAdvancedFromApi')) {
             data.sonarrRadarrLidarrAutosearchSettings.sites[i].autoPopAdvancedFromApi = true;
+        }
+
+        // New fields: type, name & icon
+        if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('type')) {
+            // default legacy mapping: previous id is effectively the type
+            data.sonarrRadarrLidarrAutosearchSettings.sites[i].type = data.sonarrRadarrLidarrAutosearchSettings.sites[i].id;
+        }
+
+        if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('name')) {
+            // Title-case the type as a reasonable default display name
+            const t = data.sonarrRadarrLidarrAutosearchSettings.sites[i].type;
+            const titled = String(t).replace(/(^|_|\s)\S/g, (m) => m.toUpperCase()).replace('_', ' ');
+            data.sonarrRadarrLidarrAutosearchSettings.sites[i].name = titled;
+        }
+
+        if (!data.sonarrRadarrLidarrAutosearchSettings.sites[i].hasOwnProperty('icon')) {
+            let siteTypeForIcon = data.sonarrRadarrLidarrAutosearchSettings.sites[i].type;
+            siteTypeForIcon = siteTypeForIcon.indexOf('readarr') >= 0 ? 'readarr' : siteTypeForIcon;
+            const defaultIcon = defaultIconsByType[siteTypeForIcon];
+            if (defaultIcon) {
+                data.sonarrRadarrLidarrAutosearchSettings.sites[i].icon = defaultIcon;
+            }
         }
     }
 
@@ -672,9 +745,9 @@ async function setSettings(data) {
  * @param {string} version 
  * @returns {VersionConfigItem}
  */
-let getVersionConfig = (siteId, version) =>
+let getVersionConfig = (siteType, version) =>
     versionConfig
-        .find(v => v.id === siteId)
+        .find(v => v.id === siteType)
         .configs
             .find(c => c.versionMatch.test(version));
 
@@ -686,14 +759,14 @@ let getVersionConfig = (siteId, version) =>
  */
 let getApiUrl = (site, endpoint, useV3 = true) => {
     let _endpoint = apiConfig
-        .find(a => a.id == site.id)
+        .find(a => a.id == site.type)
         .endpoints
             .find(e => e.key == endpoint);
 
     let url = new URL(`${site.domain.replace(/(.+)\/$/, '$1')}/api/${(useV3 ? 'v3/' : '')}${_endpoint.value}`);
 
     // lidarr & readarr uses a different URL structure, so overwrite
-    if (site.id === 'lidarr' || site.id === 'readarr_ebook' || site.id === 'readarr_audiobook') {
+    if (site.type === 'lidarr' || site.type === 'readarr_ebook' || site.type === 'readarr_audiobook') {
         url = new URL(`${site.domain.replace(/(.+)\/$/, '$1')}/api/${_endpoint.value}`);
     }
 
@@ -754,7 +827,7 @@ async function callApi(request) {
                         return apiResponse;
                     }
 
-                    let config = getVersionConfig(site.id, data.version);
+                    let config = getVersionConfig(site.type, data.version);
 
                     for (let i = 0; i < settings.sites.length; i++) {
                         if (settings.sites[i].id === site.id) {

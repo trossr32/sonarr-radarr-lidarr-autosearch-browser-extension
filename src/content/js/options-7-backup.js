@@ -185,9 +185,9 @@ async function initialiseBackupForm(settings) {
         for (var k in seen) {
             var subPath = path ? (path + '.' + k) : k;
             if (!a.hasOwnProperty(k)) {
-                out.push('+ ' + subPath + ': ' + JSON.stringify(b[k]));
+                out.push(`+ ${subPath}: ${JSON.stringify(b[k])}`);
             } else if (!b.hasOwnProperty(k)) {
-                out.push('- ' + subPath + ': ' + JSON.stringify(a[k]));
+                out.push(`- ${subPath}: ${JSON.stringify(a[k])}`);
             } else {
                 diffObjects(a[k], b[k], subPath, out);
             }
