@@ -33,6 +33,24 @@ function isInjectableUrl(url) {
     return url.startsWith('http://') || url.startsWith('https://');
 }
 
+// Returns one of: 'start' | 'injecting' | 'injected'
+async function probeInjectionFF(tabId) {
+    try {
+        const [status] = await browser.tabs.executeScript(tabId, {
+            code: `(function () {
+                if (window.__servarrInjected === true) return 'injected';
+                if (window.__servarrInjecting === true) return 'injecting';
+                window.__servarrInjecting = true;
+                return 'start';
+            })();`
+        });
+        return status || 'start';
+    } catch (e) {
+        await log(['probeInjectionFF failed', e], 'warn');
+        return 'start';
+    }
+}
+
 /**
  * Get settings, set the extension icon and execute the content script
  * @param {number|object} tabOrId Tab object or tab id
@@ -68,6 +86,13 @@ async function initRun(tabOrId, evt) {
             return;
         }
 
+        // probe/lock so we only inject once per page
+        const probe = await probeInjectionFF(tab.id);
+        if (probe !== 'start') {
+            await log(`Skipping injection for tab ${tab.id}; status=${probe}`);
+            return;
+        }
+
         // Explicitly target the tab
         await browser.tabs.executeScript(tab.id, { file: 'content/js/browser-polyfill.min.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/icons.js' });
@@ -93,6 +118,11 @@ async function initRun(tabOrId, evt) {
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/myanimelist.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/rateyourmusic.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/content_script.js' });
+
+        // release lock
+        await browser.tabs.executeScript(tab.id, {
+            code: `window.__servarrInjected = true; delete window.__servarrInjecting;`
+        });
    } catch (e) {
         await log(e.message, 'error');
    }
@@ -107,7 +137,7 @@ browser.tabs.onActivated.addListener(function (activeInfo) {
 
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     log(['change info status', changeInfo]);
-    
+
     if (changeInfo.status === 'complete') {
         initRun(tab, 'onUpdated');
     }

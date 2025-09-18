@@ -66,6 +66,7 @@
     // "*://*.myanimelist.net/*",
     // "*://*.betaseries.com/*",
     // "*://*.primevideo.com/*",
+    // "*://*.rateyourmusic.com/*",
     "<all_urls>",
     "storage",
     "activeTab",

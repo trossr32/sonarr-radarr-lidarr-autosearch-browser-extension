@@ -36,6 +36,25 @@ function isInjectableUrl(url) {
     return url.startsWith('http://') || url.startsWith('https://');
 }
 
+// Returns one of: 'start' | 'injecting' | 'injected'
+async function probeInjection(tabId) {
+    try {
+        const [res] = await browser.scripting.executeScript({
+            target: { tabId },
+            func: () => {
+                if (window.__servarrInjected === true) return 'injected';
+                if (window.__servarrInjecting === true) return 'injecting';
+                window.__servarrInjecting = true;
+                return 'start';
+            }
+        });
+        return (res && res.result) || 'start';
+    } catch (e) {
+        await log(['probeInjection failed', e], 'warn');
+        return 'start';
+    }
+}
+
 /**
  * Get settings, set the extension icon and execute the content script
  * @param {number} tabId Tab id
@@ -62,10 +81,19 @@ async function initRun(tabId, evt) {
             await log(['Failed to resolve tab for injection', e], 'warn');
             return;
         }
+
         if (!isInjectableUrl(tab?.url)) {
             await log(['Skipping injection for non-injectable URL', tab?.url]);
             return;
         }
+
+        // probe/lock so we only inject once per page
+        const probe = await probeInjection(tabId);
+        if (probe !== 'start') {
+            await log(`Skipping injection for tab ${tabId}; status=${probe}`);
+            return;
+        }
+
 
         await browser.scripting.executeScript({
             target: { tabId },
@@ -96,6 +124,12 @@ async function initRun(tabId, evt) {
                 'content/js/content_script.js'
             ]
         });
+
+        // release lock
+        await browser.scripting.executeScript({
+            target: { tabId },
+            func: () => { window.__servarrInjected = true; delete window.__servarrInjecting; }
+        });
     } catch (e) {
         await log(e.message, 'error');
     }
@@ -109,7 +143,7 @@ browser.tabs.onActivated.addListener(async function (activeInfo) {
 
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     log(['change info status', changeInfo]);
-    
+
     if (changeInfo.status === 'complete') {
         initRun(tabId, 'onUpdated');
     }
