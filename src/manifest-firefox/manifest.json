@@ -43,8 +43,7 @@
       "js": [
         "content/js/jquery.min.js",
         "content/js/browser-polyfill.min.js",
-        "content/js/core.js",
-        "content/js/sonarr_radarr_lidarr_autosearch.js"
+        "content/js/core.js"
       ]
     }
   ],

@@ -309,7 +309,13 @@ var initialiseBasicForm = function (settings) {
 
     $('#generalOptionsForm').empty().prepend(wrapper);
 
-    settings.sites.forEach(s => updateTestButtonState(s.id));
+    settings.sites.forEach(s => {
+        const auto = $(`#toggle-${s.id}-advanced`).prop('checked');
+        setAdvancedAutoPopulateState(s.id, auto);
+
+        $(`#${s.id}AdvancedDisabledHint`).toggleClass('hidden', !auto);
+        updateTestButtonState(s.id);
+    });
 
     updateAdvancedVisibility();
 
@@ -321,6 +327,16 @@ var initialiseBasicForm = function (settings) {
 
         $('.js-adv-block').toggleClass('hidden', !on);
         $('#btnToggleAdvancedLabel').text(on ? 'Hide advanced' : 'Show advanced');
+
+        if (on) {
+            getSettings().then(s => {
+                s.sites.forEach(site => {
+                    const auto = $(`#toggle-${site.id}-advanced`).prop('checked');
+                    setAdvancedAutoPopulateState(site.id, auto);
+                    $(`#${site.id}AdvancedDisabledHint`).toggleClass('hidden', !auto);
+                });
+            });
+        }
     }
 
     // Delegated handlers ensure events keep working if cards are rebuilt
