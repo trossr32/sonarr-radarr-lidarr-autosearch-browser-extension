@@ -15,12 +15,11 @@
     <script src="content/js/core.js"></script>
     <script src="content/js/icons.js"></script>
     <script src="content/js/options-1-settings.js"></script>
-    <!-- <script src="content/js/options-2-advanced.js"></script> -->
-    <script src="content/js/options-3-site-integrations.js"></script>
-    <script src="content/js/options-4-custom-icons.js"></script>
-    <script src="content/js/options-5-context-menu.js"></script>
-    <script src="content/js/options-6-debug.js"></script>
-    <script src="content/js/options-7-backup.js"></script>
+    <script src="content/js/options-2-site-integrations.js"></script>
+    <script src="content/js/options-3-custom-icons.js"></script>
+    <script src="content/js/options-4-context-menu.js"></script>
+    <script src="content/js/options-5-debug.js"></script>
+    <script src="content/js/options-6-backup.js"></script>
     <script src="content/js/options.js" defer></script>
 </head>
 <body class="h-full bg-[#1d1e22] text-slate-100 font-sans antialiased selection:bg-indigo-500/20 selection:text-indigo-200">
@@ -51,9 +50,6 @@
             <button type="button" id="tab-basic" data-panel="panel-basic" role="tab" aria-selected="true" class="tab-trigger is-active inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-white/10 text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-cog"></i><span class="hidden sm:inline">Settings</span>
             </button>
-            <!-- <button type="button" id="tab-advanced" data-panel="panel-advanced" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
-                <i class="fa-solid fa-exclamation-triangle"></i><span class="hidden sm:inline">Advanced</span>
-            </button> -->
             <button type="button" id="tab-integrations" data-panel="panel-integrations" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-link"></i><span class="hidden sm:inline">Integrations</span>
             </button>
@@ -98,20 +94,6 @@
             </div>
             <form id="generalOptionsForm" class="space-y-6"></form>
         </section>
-        <!-- <section id="panel-advanced" role="tabpanel" aria-labelledby="tab-advanced" class="panel hidden" hidden>
-            <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6">
-                <div class="px-4 py-3 flex items-start gap-4 border-b border-slate-700">
-                    <i class="fa-solid fa-question-circle fa-lg text-indigo-400 mt-1"></i>
-                    <div>
-                        <h2 class="font-semibold mb-2">Advanced settings</h2>
-                        <p class="text-sm text-slate-300 mb-2">These settings affect how the extension identifies the search page and input field within your Servarr instances.</p>
-                        <p class="text-sm text-slate-300 mb-2">If an API key is entered and the "Auto populate from API" switch is enabled these values will be derived automatically. Otherwise default or manually entered values are used.</p>
-                        <p class="text-sm text-slate-300">Disable auto population to edit the fields manually if detection fails and please raise an issue with your instance/version so it can be supported.</p>
-                    </div>
-                </div>
-            </div>
-            <form id="advancedOptionsForm" class="space-y-6"></form>
-        </section> -->
         <section id="panel-integrations" role="tabpanel" aria-labelledby="tab-integrations" class="panel hidden" hidden>
             <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6">
                 <div class="px-4 py-3 flex items-start gap-4 border-b border-slate-700">
@@ -268,7 +250,7 @@
 
         <!-- Footer -->
         <footer class="mt-10 text-center text-sm text-slate-400">
-            <i>Version 2.13.0</i>
+            <i>Version 3.0.0</i>
         </footer>
     </div>
 </body>

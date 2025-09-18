@@ -1,5 +1,9 @@
 // Firefox MV2 background script
 
+/**
+ * Get the currently active tab in the focused window
+ * @returns {Promise<browser.tabs.Tab|null>} Tab object or null
+ */
 async function getCurrentTab() {
     try {
         const [tab] = await browser.tabs.query({ active: true, lastFocusedWindow: true });
@@ -10,22 +14,33 @@ async function getCurrentTab() {
     }
 }
 
-// Determine if the URL is eligible for content script injection
+/**
+ * Check if a URL is injectable (http(s) and not a browser/system page)
+ * @param {string} url 
+ * @returns {boolean} True if injectable
+ */
 function isInjectableUrl(url) {
     if (!url || typeof url !== 'string') return false;
+
     const forbiddenSchemes = ['chrome:', 'edge:', 'about:', 'moz-extension:', 'chrome-extension:', 'devtools:', 'view-source:'];
     if (forbiddenSchemes.some(p => url.startsWith(p))) return false;
+    
     // Block both stores for parity
     if (url.startsWith('https://addons.mozilla.org')) return false;
     if (url.startsWith('https://chrome.google.com/webstore')) return false;
+    if (url.startsWith('https://microsoftedge.microsoft.com/addons')) return false;
+    
     return url.startsWith('http://') || url.startsWith('https://');
 }
 
 /**
  * Get settings, set the extension icon and execute the content script
+ * @param {number|object} tabOrId Tab object or tab id
+ * @param {string} evt Event name for logging context
  */
 async function initRun(tabOrId, evt) {
    await log(`running init from ${evt} event`);
+
    try {
         const settings = await getSettings();
 
@@ -56,6 +71,27 @@ async function initRun(tabOrId, evt) {
         // Explicitly target the tab
         await browser.tabs.executeScript(tab.id, { file: 'content/js/browser-polyfill.min.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/icons.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/index.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/default.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/imdb.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/tmdb.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/tvdb.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/trakt.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/tvmaze.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/musicbrainz.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/letterboxd.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/tvcalendar.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/rottentomatoes.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/metacritic.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/simkl.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/iptorrents.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/lastfm.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/allocine.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/senscritique.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/betaseries.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/primevideo.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/myanimelist.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/rateyourmusic.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/content_script.js' });
    } catch (e) {
         await log(e.message, 'error');
@@ -71,6 +107,7 @@ browser.tabs.onActivated.addListener(function (activeInfo) {
 
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     log(['change info status', changeInfo]);
+    
     if (changeInfo.status === 'complete') {
         initRun(tab, 'onUpdated');
     }
@@ -100,6 +137,7 @@ browser.runtime.onConnect.addListener(function (port) {
 // Support one-shot message listener for init and icon messages 
 browser.runtime.onMessage.addListener(async (msg, sender) => {
     if (!msg || typeof msg !== 'object') return;
+
     if (msg.type === 'init') {
         if (sender?.tab) {
             await initRun(sender.tab, 'onMessage'); // pass full tab
@@ -129,10 +167,12 @@ async function buildMenus(settings) {
 
     function titleType(type) {
         if (!type) return '';
+        
         if (type.includes('_')) {
             const [a, b] = type.split('_');
             return `${a.charAt(0).toUpperCase()}${a.slice(1)} (${b.charAt(0).toUpperCase()}${b.slice(1)})`;
         }
+
         return `${type.charAt(0).toUpperCase()}${type.slice(1)}`;
     }
 
@@ -145,16 +185,21 @@ async function buildMenus(settings) {
     for (const type of Object.keys(groupsByType)) {
         const group = groupsByType[type];
         const typeTitle = titleType(type);
+        
         if (group.length > 1) {
             const parentId = `type-${type}`;
+            
             browser.contextMenus.create({ title: typeTitle, id: parentId, parentId: 'sonarrRadarrLidarr', contexts: ['selection'] });
+            
             for (const site of group) {
                 const label = `Search ${site.name || typeTitle}`;
+                
                 browser.contextMenus.create({ title: label, parentId, id: `${site.id}Menu`, contexts: ['selection'] });
             }
         } else {
             const site = group[0];
             const label = `Search ${site.name || typeTitle}`;
+            
             browser.contextMenus.create({ title: label, parentId: 'sonarrRadarrLidarr', id: `${site.id}Menu`, contexts: ['selection'] });
         }
     }
@@ -162,9 +207,12 @@ async function buildMenus(settings) {
 
 /**
  * Context menu click handler
+ * @param {object} info 
+ * @param {object} tab
  */
 async function onClickHandler(info, tab) {
     const settings = await getSettings();
+
     for (const site of settings.sites || []) {
         if (info.menuItemId === `${site.id}Menu`) {
             await browser.tabs.create({
@@ -184,6 +232,7 @@ browser.runtime.onInstalled.addListener(async function () {
 /** Rebuild menus on storage changes affecting settings. */
 browser.storage.onChanged.addListener(async (changes, area) => {
     if (!Object.prototype.hasOwnProperty.call(changes, 'sonarrRadarrLidarrAutosearchSettings')) return;
+
     try {
         const newSettings = changes.sonarrRadarrLidarrAutosearchSettings.newValue;
         await buildMenus(newSettings);
@@ -192,7 +241,10 @@ browser.storage.onChanged.addListener(async (changes, area) => {
     }
 });
 
-/** Set the extension icon */
+/** 
+ * Set the extension icon 
+ * @param {Setting} settings
+ */
 async function setIcon(settings) {
     const img = `content/assets/images/SonarrRadarrLidarr${(settings?.config?.enabled ? '' : '-faded')}16.png`;
     await browser.browserAction.setIcon({ path: img });

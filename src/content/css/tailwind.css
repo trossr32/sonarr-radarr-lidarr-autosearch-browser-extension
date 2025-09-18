@@ -3,6 +3,8 @@
 
 @source "../**/*.{js,html}";
 
+@source inline('{bg,text}-{slate,gray,red,amber,green,emerald,indigo}-{50,{100..900..100},950}');
+
 @base {
     input[type=range] {
         @apply text-indigo-500! accent-indigo-600!;

@@ -145,6 +145,7 @@ if (typeof browser === 'undefined') {
     browser.runtime = { connect: () => ({ postMessage: () => {}, onMessage: { addListener: () => {} } }) };
     browser.contextMenus = null;
 }
+
 let sessionId,
     defaultSettings = {
         sites: [
@@ -326,14 +327,15 @@ let sessionId,
                 id: 'betaseries',
                 name: 'BetaSeries',
                 image: 'betaseries.png',
-                enabled: true
+                enabled: true,
+                warning: 'This integration was created by a community member for the French version of the website and is not maintained by the developer.'
             },
             {
                 id: 'primevideo',
                 name: 'Prime Video',
                 image: 'primevideo.png',
                 enabled: true,
-                warning: 'This integration was created by a community member for the French version of the website and is not maintained by the developer.'
+                error: 'This integration is currently broken (2025-09) as it\'s not possible to determine a servarr instance identifier, or a reliable servarr search term from the page source.'
             },
             {
                 id: 'myanimelist',
@@ -345,7 +347,8 @@ let sessionId,
                 id: 'rateyourmusic',
                 name: 'Rate Your Music',
                 image: 'rateyourmusic.jpg',
-                enabled: true
+                enabled: true,
+                warning: 'This integration was created by a community member and is not maintained by the developer due to the site blocking VPN traffic.'
             }
             // {
             //     id: 'nextepisode',

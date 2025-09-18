@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.0.0
+
+### Changed
+
+- Merge advanced tab functionality into the settings tab
+- Allow addition and deletion of multiple Servarr instances
+- Customise Servarr icon colours and names per instance
+- Replace site integration configuration object array with an inheritable engine pattern to allow greater customisation of site integration behaviour
+
 ## 2.13.0
 
 ### Added

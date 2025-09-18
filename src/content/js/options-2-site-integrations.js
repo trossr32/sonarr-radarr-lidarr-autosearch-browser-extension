@@ -8,23 +8,33 @@ var initialiseIntegrationsForm = function (settings) {
     $.each(settings.integrations, function (i, integration) {
         const card = $('<div class="relative rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden flex flex-col pt-2 px-2"></div>');
 
-        if (integration.hasOwnProperty('warning')) {
-            // Unified notice element: icon + label; icon/button triggers tooltip
+        let defaultIntegration = defaultSettings.integrations.find(integ => integ.id === integration.id);
+
+        if (defaultIntegration && (defaultIntegration.hasOwnProperty('warning') || defaultIntegration.hasOwnProperty('error'))) {
+            const level = defaultIntegration.error ? 'error' : 'warning';
+            const message = escapeHtml(defaultIntegration[level]);
+            const icon = level === 'error' ? 'fa-skull-crossbones' : 'fa-triangle-exclamation';
+            const colour = level === 'error' ? 'red' : 'amber';
+            const title = level === 'error' ? 'BROKEN' : 'NOTICE';
+
             const notice = $(
                 `<div class="absolute top-1 left-1 right-1">
-                    <div class="relative flex items-center gap-1 bg-amber-600/20 border border-amber-500/40 text-amber-400 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide select-none">
-                        <button type="button" class="flex items-center gap-1 focus:outline-none" aria-describedby="card-warning-tooltip-${i}" aria-label="Integration notice warning">
-                            <i class="fa-solid fa-exclamation-triangle"></i>
-                            <span>NOTICE</span>
+                    <div class="relative flex items-center gap-1 bg-[#1d1e22] border border-${colour}-500/40 text-${colour}-400 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide select-none">
+                        <button type="button" class="flex items-center gap-1 focus:outline-none" aria-describedby="card-${level}-tooltip-${i}" aria-label="Integration notice ${level}">
+                            <i class="fa-solid ${icon}"></i>
+                            <span>${title}</span>
                         </button>
-                        <div id="card-warning-tooltip-${i}" role="tooltip" class="hidden absolute z-20 top-full left-0 right-0 mt-1 w-full text-xs rounded-md bg-amber-600 text-white px-2 py-1 shadow-lg">${escapeHtml(integration.warning)}</div>
+                        <div id="card-${level}-tooltip-${i}" role="tooltip" class="hidden absolute z-20 top-full left-0 right-0 mt-1 w-full text-xs rounded-md bg-${colour}-600 text-white px-2 py-1 shadow-lg">${message}</div>
                     </div>
                 </div>`
             );
+            
             const btn = notice.find('button');
-            const tip = notice.find(`#card-warning-tooltip-${i}`);
+            const tip = notice.find(`#card-${level}-tooltip-${i}`);
+            
             btn.on('mouseover focus', () => tip.removeClass('hidden'))
                .on('mouseout blur', () => tip.addClass('hidden'));
+            
             card.append(notice);
         }
 

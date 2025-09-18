@@ -332,55 +332,57 @@ var initialiseEnabledDisabledButton = function(settings) {
  * Listen for storage changes
  */
 browser.storage.onChanged.addListener(async (changes, area) => {
-  const change = changes.sonarrRadarrLidarrAutosearchSettings;
-  if (!change) return;
+    const change = changes.sonarrRadarrLidarrAutosearchSettings;
+    if (!change) return;
 
-  initialiseEnabledDisabledButton(change.newValue);
+    initialiseEnabledDisabledButton(change.newValue);
 
-  const oldSites = (change.oldValue && change.oldValue.sites) ? change.oldValue.sites : [];
-  const newSites = (change.newValue && change.newValue.sites) ? change.newValue.sites : [];
+    const oldSites = (change.oldValue && change.oldValue.sites) ? change.oldValue.sites : [];
+    const newSites = (change.newValue && change.newValue.sites) ? change.newValue.sites : [];
 
-  const oldById = {};
-  for (const s of oldSites) if (s && s.id) oldById[s.id] = s;
+    const oldById = {};
+    for (const s of oldSites) if (s && s.id) oldById[s.id] = s;
 
-  const toUpdate = [];
-  for (const newSite of newSites) {
-    if (!newSite?.id) continue;
-    if (!(newSite.autoPopAdvancedFromApi && newSite.enabled)) continue;
+    const toUpdate = [];
+    for (const newSite of newSites) {
+        if (!newSite?.id) continue;
+        if (!(newSite.autoPopAdvancedFromApi && newSite.enabled)) continue;
 
-    const oldSite = oldById[newSite.id];
-    const isNew = !oldSite;
-    const changed =
-      isNew ||
-      oldSite.domain !== newSite.domain ||
-      oldSite.apiKey !== newSite.apiKey ||
-      oldSite.enabled !== newSite.enabled ||
-      oldSite.autoPopAdvancedFromApi !== newSite.autoPopAdvancedFromApi;
+        const oldSite = oldById[newSite.id];
+        const isNew = !oldSite;
+        const changed =
+        isNew ||
+        oldSite.domain !== newSite.domain ||
+        oldSite.apiKey !== newSite.apiKey ||
+        oldSite.enabled !== newSite.enabled ||
+        oldSite.autoPopAdvancedFromApi !== newSite.autoPopAdvancedFromApi;
 
-    if (changed) toUpdate.push(newSite.id);
-  }
-  if (toUpdate.length === 0) return;
-
-  // Fire calls (sequentially to be gentle on the server; swap to Promise.allSettled for parallel)
-  let anySucceeded = false;
-  for (const siteId of toUpdate) {
-    try {
-      log('Advanced settings update check required, calling version API');
-      const response = await callApi({ siteId, endpoint: 'Version' });
-      if (response?.success) {
-        anySucceeded = true;
-        log([`API call succeeded, updating advanced settings for ${siteId}`, response]);
-      } else {
-        log(['API call failed', response]);
-      }
-    } catch (e) {
-      log(['API call threw', e], 'warn');
+        if (changed) toUpdate.push(newSite.id);
     }
-  }
-  if (anySucceeded) {
-    const cur = await getSettings();
-    updateAdvancedForm(cur);
-  }
+    if (toUpdate.length === 0) return;
+
+    // Fire calls (sequentially to be gentle on the server; swap to Promise.allSettled for parallel)
+    let anySucceeded = false;
+    for (const siteId of toUpdate) {
+        try {
+            log('Advanced settings update check required, calling version API');
+            
+            const response = await callApi({ siteId, endpoint: 'Version' });
+            
+            if (response?.success) {
+                anySucceeded = true;
+                log([`API call succeeded, updating advanced settings for ${siteId}`, response]);
+            } else {
+                log(['API call failed', response]);
+            }
+        } catch (e) {
+            log(['API call threw', e], 'warn');
+        }
+    }
+    if (anySucceeded) {
+        const cur = await getSettings();
+        updateAdvancedForm(cur);
+    }
 });
 
 $(async function () {

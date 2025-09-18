@@ -3,6 +3,10 @@
 importScripts("./content/js/browser-polyfill.min.js");
 importScripts("./content/js/core.js");
 
+/**
+ * Get the currently active tab in the focused window
+ * @returns {Promise<chrome.tabs.Tab|null>} Tab object or null
+ */
 async function getCurrentTab() {
     try {
         const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
@@ -13,18 +17,29 @@ async function getCurrentTab() {
     }
 }
 
+/**
+ * Check if a URL is injectable (http(s) and not a browser/system page)
+ * @param {string} url 
+ * @returns {boolean} True if injectable
+ */
 function isInjectableUrl(url) {
     if (!url || typeof url !== 'string') return false;
+    
     const forbiddenSchemes = ['chrome:', 'edge:', 'about:', 'moz-extension:', 'chrome-extension:', 'devtools:', 'view-source:'];
     if (forbiddenSchemes.some(p => url.startsWith(p))) return false;
+    
     // Block both stores for parity
     if (url.startsWith('https://chrome.google.com/webstore')) return false;
     if (url.startsWith('https://addons.mozilla.org')) return false;
+    if (url.startsWith('https://microsoftedge.microsoft.com/addons')) return false;
+
     return url.startsWith('http://') || url.startsWith('https://');
 }
 
 /**
  * Get settings, set the extension icon and execute the content script
+ * @param {number} tabId Tab id
+ * @param {string} evt Event name for logging context
  */
 async function initRun(tabId, evt) {
     await log(`running init from ${evt} event`);
@@ -57,6 +72,27 @@ async function initRun(tabId, evt) {
             files: [
                 'content/js/browser-polyfill.min.js',
                 'content/js/icons.js',
+                'content/engines/index.js',
+                'content/engines/default.js',
+                'content/engines/integrations/imdb.js',
+                'content/engines/integrations/tmdb.js',
+                'content/engines/integrations/tvdb.js',
+                'content/engines/integrations/trakt.js',
+                'content/engines/integrations/tvmaze.js',
+                'content/engines/integrations/musicbrainz.js',
+                'content/engines/integrations/letterboxd.js',
+                'content/engines/integrations/tvcalendar.js',
+                'content/engines/integrations/rottentomatoes.js',
+                'content/engines/integrations/metacritic.js',
+                'content/engines/integrations/simkl.js',
+                'content/engines/integrations/iptorrents.js',
+                'content/engines/integrations/lastfm.js',
+                'content/engines/integrations/allocine.js',
+                'content/engines/integrations/senscritique.js',
+                'content/engines/integrations/betaseries.js',
+                'content/engines/integrations/primevideo.js',
+                'content/engines/integrations/myanimelist.js',
+                'content/engines/integrations/rateyourmusic.js',
                 'content/js/content_script.js'
             ]
         });
@@ -73,6 +109,7 @@ browser.tabs.onActivated.addListener(async function (activeInfo) {
 
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     log(['change info status', changeInfo]);
+    
     if (changeInfo.status === 'complete') {
         initRun(tabId, 'onUpdated');
     }
@@ -102,6 +139,7 @@ browser.runtime.onConnect.addListener(function (port) {
 // One-shot message listener for init and icon messages
 browser.runtime.onMessage.addListener(async (msg, sender) => {
     if (!msg || typeof msg !== 'object') return;
+
     if (msg.type === 'init') {
         const tabId = sender?.tab?.id ?? (await getCurrentTab())?.id;
         if (typeof tabId === 'number') {
@@ -129,10 +167,12 @@ async function buildMenus(settings) {
 
     function titleType(type) {
         if (!type) return '';
+        
         if (type.includes('_')) {
             const [a, b] = type.split('_');
             return `${a.charAt(0).toUpperCase()}${a.slice(1)} (${b.charAt(0).toUpperCase()}${b.slice(1)})`;
         }
+        
         return `${type.charAt(0).toUpperCase()}${type.slice(1)}`;
     }
 
@@ -145,16 +185,21 @@ async function buildMenus(settings) {
     for (const type of Object.keys(groupsByType)) {
         const group = groupsByType[type];
         const typeTitle = titleType(type);
+        
         if (group.length > 1) {
             const parentId = `type-${type}`;
+            
             browser.contextMenus.create({ title: typeTitle, id: parentId, parentId: 'sonarrRadarrLidarr', contexts: ['selection'] });
+            
             for (const site of group) {
                 const label = `Search ${site.name || typeTitle}`;
+                
                 browser.contextMenus.create({ title: label, parentId, id: `${site.id}Menu`, contexts: ['selection'] });
             }
         } else {
             const site = group[0];
             const label = `Search ${site.name || typeTitle}`;
+            
             browser.contextMenus.create({ title: label, parentId: 'sonarrRadarrLidarr', id: `${site.id}Menu`, contexts: ['selection'] });
         }
     }
@@ -162,9 +207,12 @@ async function buildMenus(settings) {
 
 /**
  * Context menu click handler
+ * @param {object} info 
+ * @param {object} tab
  */
 async function onClickHandler(info, tab) {
     const settings = await getSettings();
+
     for (const site of settings.sites || []) {
         if (info.menuItemId === `${site.id}Menu`) {
             await browser.tabs.create({
@@ -184,6 +232,7 @@ browser.runtime.onInstalled.addListener(async function () {
 /** Rebuild menus on storage changes affecting settings. */
 browser.storage.onChanged.addListener(async (changes, area) => {
     if (!Object.prototype.hasOwnProperty.call(changes, 'sonarrRadarrLidarrAutosearchSettings')) return;
+
     try {
         const newSettings = changes.sonarrRadarrLidarrAutosearchSettings.newValue;
         await buildMenus(newSettings);
@@ -192,7 +241,10 @@ browser.storage.onChanged.addListener(async (changes, area) => {
     }
 });
 
-/** Set the extension icon */
+/** 
+ * Set the extension icon 
+ * @param {Setting} settings
+ */
 async function setIcon(settings) {
     const img = `content/assets/images/SonarrRadarrLidarr${(settings?.config?.enabled ? '' : '-faded')}16.png`;
     await browser.action.setIcon({ path: img });

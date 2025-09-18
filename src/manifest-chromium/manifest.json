@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Sonarr/Radarr/Lidarr autosearch",
   "description": "Exposes a context menu that enables direct searching for tv shows, movies and other text in Sonarr, Radarr, Lidarr and Readarr.",
-  "version": "2.13.0.0",
+  "version": "3.0.0.0",
   "browser_specific_settings": {
     "gecko": {
       "id": "sonarr-radarr-lidarr-autosearch@robgreen.me",
