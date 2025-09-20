@@ -17,7 +17,7 @@ async function initialiseBackupForm(settings) {
         .append($('<div class="p-4 space-y-3 text-sm"></div>')
             .append($('<p class="text-slate-300">Download a JSON backup of your current settings.</p>'))
             .append($('<div></div>')
-                .append($('<button id="btnBackup" type="button" class="inline-flex items-center gap-2 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"></button>')
+                .append($('<button id="btnBackup" type="button" class="cursor-pointer inline-flex items-center gap-2 rounded-md bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"></button>')
                     .append($('<i class="fa-solid fa-download"></i>'))
                     .append($('<span>Download backup</span>'))))
         );
@@ -31,10 +31,10 @@ async function initialiseBackupForm(settings) {
             .append($('<p class="text-slate-300">Choose a previously saved JSON file to merge into your current settings.</p>'))
             .append($('<div class="flex items-center gap-3 flex-wrap"></div>')
                 .append($('<input id="fileRestore" type="file" accept="application/json,.json" class="block w-full text-xs text-slate-300 file:mr-3 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-slate-700 file:text-white hover:file:bg-slate-600" />'))
-                .append($('<button id="btnRestore" type="button" class="inline-flex items-center gap-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed" disabled></button>')
+                .append($('<button id="btnRestore" type="button" class="cursor-pointer inline-flex items-center gap-2 rounded-md bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed" disabled></button>')
                     .append($('<i class="fa-solid fa-upload"></i>'))
                     .append($('<span>Restore</span>')))
-                .append($('<button id="btnPreview" type="button" class="inline-flex items-center gap-2 rounded-md bg-slate-600 hover:bg-slate-500 text-white text-xs font-medium px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 disabled:opacity-60 disabled:cursor-not-allowed" disabled></button>')
+                .append($('<button id="btnPreview" type="button" class="cursor-pointer inline-flex items-center gap-2 rounded-md bg-slate-600 hover:bg-slate-500 text-white text-xs font-medium px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-500 disabled:opacity-60 disabled:cursor-not-allowed" disabled></button>')
                     .append($('<i class="fa-solid fa-eye"></i>'))
                     .append($('<span>Preview changes</span>'))))
             .append($('<label class="flex items-center gap-2 text-xs text-slate-300"></label>')
@@ -44,25 +44,46 @@ async function initialiseBackupForm(settings) {
             .append($('<div id="restoreDiff" class="hidden mt-2 rounded bg-black/30 border border-slate-700 p-2 max-h-60 overflow-auto text-[11px] font-mono whitespace-pre-wrap"></div>'))
         );
 
-    container.append(backupCard, restoreCard);
+    // Reset card
+    const resetCard = $('<div class="rounded-lg bg-white/5 border border-slate-700 shadow overflow-hidden flex flex-col"></div>')
+        .append($('<div class="flex items-center gap-3 px-4 py-3 border-b border-slate-700"></div>')
+            .append($('<i class="fa-solid fa-bomb text-red-400"></i>'))
+            .append($('<h3 class="font-semibold text-base m-0">Reset settings</h3>')))
+        .append($('<div class="p-4 space-y-3 text-sm"></div>')
+            .append($('<p class="text-slate-300">Reset all settings to their default values. All configuration changes will be lost.</p>'))
+            .append($('<div></div>')
+                .append($('<button id="btnReset" type="button" class="cursor-pointer inline-flex items-center gap-2 rounded-md bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium px-3 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"></button>')
+                    .append($('<i class="fa-solid fa-land-mine-on"></i>'))
+                    .append($('<span>Reset settings</span>'))))
+            .append($('<div id="resetMessage" class="text-xs text-rose-500"></div>'))
+        );
+
+    container.append(backupCard, restoreCard, resetCard);
     $('#backupOptionsForm').empty().append(container);
 
-    // Utility: sanitize settings for export (remove any volatile/internal fields if ever added)
+    // Sanitize settings for export (remove any volatile/internal fields if ever added)
     function sanitizeSettingsForExport(obj) {
         // Deep clone via JSON (settings is JSON-safe)
         var clone;
-        try { clone = JSON.parse(JSON.stringify(obj)); } catch (e) { clone = obj; }
+        try { 
+            clone = JSON.parse(JSON.stringify(obj)); 
+        } catch (e) { 
+            clone = obj; 
+        }
 
-        // Remove known internal/volatile placeholders if present (future-proof)
-        // Convention: keys starting with '_' or '__' are internal and stripped
+        // Remove known internal/volatile placeholders if present
+        // Keys starting with '_' or '__' are internal and stripped
         function strip(o) {
             if (!o || typeof o !== 'object') return;
+
             if (Array.isArray(o)) {
                 for (var i = 0; i < o.length; i++) strip(o[i]);
                 return;
             }
+
             for (var k in o) {
                 if (!o.hasOwnProperty(k)) continue;
+
                 if (k && (k.charAt(0) === '_' || (k.length > 1 && k.substring(0,2) === '__'))) {
                     delete o[k];
                 } else {
@@ -70,7 +91,9 @@ async function initialiseBackupForm(settings) {
                 }
             }
         }
+
         strip(clone);
+        
         return clone;
     }
 
@@ -92,6 +115,7 @@ async function initialiseBackupForm(settings) {
 
     async function parseBackupJsonText(text) {
         const result = { kind: 'unknown', settings: null, envelope: null, schemaVersion: null, errors: [], warnings: [] };
+
         let obj;
         try { obj = JSON.parse(text); } catch (e) {
             result.errors.push('Selected file is not valid JSON.');
@@ -104,11 +128,13 @@ async function initialiseBackupForm(settings) {
             result.envelope = obj;
             result.schemaVersion = (typeof obj.schemaVersion === 'number') ? obj.schemaVersion : 0;
             result.settings = obj.data;
+
             if (result.schemaVersion > BACKUP_SCHEMA_VERSION) {
                 result.warnings.push('Backup file uses a newer schema (' + result.schemaVersion + ') than this extension supports (' + BACKUP_SCHEMA_VERSION + ').');
             } else if (result.schemaVersion < BACKUP_SCHEMA_VERSION) {
                 result.warnings.push('Backup file uses an older schema (' + result.schemaVersion + '). It will be normalized on import.');
             }
+
             return result;
         }
 
@@ -145,12 +171,15 @@ async function initialiseBackupForm(settings) {
     // Enable restore button when a file is chosen
     const $file = $('#fileRestore');
     const $btnRestore = $('#btnRestore');
-    const $msg = $('#restoreMessage');
+    const $btnReset = $('#btnReset');
+    const $restoreMsg = $('#restoreMessage');
+    const $resetMsg = $('#resetMessage');
+
     $file.on('change', function () {
         var hasFile = $file[0].files && $file[0].files.length;
         $btnRestore.prop('disabled', !hasFile);
         $('#btnPreview').prop('disabled', !hasFile);
-        $msg.text('');
+        $restoreMsg.text('');
         $('#restoreDiff').addClass('hidden').text('');
     });
 
@@ -158,32 +187,38 @@ async function initialiseBackupForm(settings) {
     function diffObjects(a, b, path, out) {
         path = path || '';
         out = out || [];
+
         if (a === b) return out;
+
         var aIsObj = a && typeof a === 'object';
         var bIsObj = b && typeof b === 'object';
+
         if (!aIsObj || !bIsObj) {
             // Primitive or type change
-            out.push('~ ' + path + ': ' + JSON.stringify(a) + ' -> ' + JSON.stringify(b));
+            out.push(`~ ${path}: ${JSON.stringify(a)} -> ${JSON.stringify(b)}`);
             return out;
         }
+
         // Arrays: compare by length and JSON if needed
         var aIsArr = Array.isArray(a), bIsArr = Array.isArray(b);
         if (aIsArr || bIsArr) {
             if (aIsArr !== bIsArr) {
-                out.push('~ ' + path + ': (type) ' + (aIsArr ? 'array' : typeof a) + ' -> ' + (bIsArr ? 'array' : typeof b));
+                out.push(`~ ${path}: (type) ${aIsArr ? 'array' : typeof a} -> ${bIsArr ? 'array' : typeof b}`);
                 return out;
             }
             if (a.length !== b.length || JSON.stringify(a) !== JSON.stringify(b)) {
-                out.push('~ ' + path + ': array changed (len ' + a.length + ' -> ' + b.length + ')');
+                out.push(`~ ${path}: array changed (len ${a.length} -> ${b.length})`);
             }
             return out;
         }
+        
         // Objects: keys union
         var seen = {};
         for (var ka in a) { if (a.hasOwnProperty(ka)) seen[ka] = true; }
         for (var kb in b) { if (b.hasOwnProperty(kb)) seen[kb] = true; }
         for (var k in seen) {
-            var subPath = path ? (path + '.' + k) : k;
+            var subPath = path ? (`${path}.${k}`) : k;
+
             if (!a.hasOwnProperty(k)) {
                 out.push(`+ ${subPath}: ${JSON.stringify(b[k])}`);
             } else if (!b.hasOwnProperty(k)) {
@@ -192,30 +227,38 @@ async function initialiseBackupForm(settings) {
                 diffObjects(a[k], b[k], subPath, out);
             }
         }
+
         return out;
     }
 
     async function renderPreview() {
         $('#restoreDiff').removeClass('hidden').text('Generating preview...');
+
         try {
             if (!$file[0].files || !$file[0].files.length) {
                 $('#restoreDiff').text('No file selected.');
                 return;
             }
+
             var file = $file[0].files[0];
             var text = await file.text();
             var parsed = await parseBackupJsonText(text);
+
             if (parsed.errors.length) { $('#restoreDiff').text(parsed.errors.join('\n')); return; }
+
             var candidate = parsed.settings;
             var v = validateSettingsShape(candidate);
+
             if (!v.valid) {
-                $('#restoreDiff').text('Invalid settings file: ' + v.errors.join(', '));
+                $('#restoreDiff').text(`Invalid settings file: ${v.errors.join(', ')}`);
                 return;
             }
+
             var current = await getSettings();
             var replace = $('#restore-replace').prop('checked');
             var next = replace ? candidate : deepMerge(current, candidate);
             var lines = diffObjects(current, next, '', []);
+
             if (!lines.length) {
                 $('#restoreDiff').text('No changes detected.');
             } else {
@@ -235,32 +278,63 @@ async function initialiseBackupForm(settings) {
     $btnRestore.on('click', async function () {
         if (!$file[0].files || !$file[0].files.length) return;
         const file = $file[0].files[0];
+        
         try {
             const text = await file.text();
             const parsed = await parseBackupJsonText(text);
-            if (parsed.errors.length) { $msg.removeClass().addClass('text-xs text-rose-400').text(parsed.errors.join(', ')); return; }
+
+            if (parsed.errors.length) { 
+                $restoreMsg
+                    .removeClass()
+                    .addClass('text-xs text-rose-400')
+                    .text(parsed.errors.join(', '));                     
+                return; 
+            }
+
             const candidate = parsed.settings;
             const { valid, errors } = validateSettingsShape(candidate);
+
             if (!valid) {
-                $msg.removeClass().addClass('text-xs text-rose-400').text('Invalid settings file: ' + errors.join(', '));
+                $restoreMsg.removeClass().addClass('text-xs text-rose-400').text('Invalid settings file: ' + errors.join(', '));
                 return;
             }
             // Confirm apply with schema warning if needed
-            var confirmMsg = 'Apply settings from backup? This will ' + ($('#restore-replace').prop('checked') ? 'replace' : 'merge over') + ' your current configuration.';
+            var confirmMsg = `Apply settings from backup? This will ${$('#restore-replace').prop('checked') ? 'replace' : 'merge over'} your current configuration.`;
             if (parsed.kind === 'envelope' && parsed.schemaVersion > BACKUP_SCHEMA_VERSION) {
                 confirmMsg += '\n\nWarning: The backup file uses a newer schema (' + parsed.schemaVersion + ') than this extension supports (' + BACKUP_SCHEMA_VERSION + '). Attempt import anyway?';
             }
+
             if (!confirm(confirmMsg)) return;
 
             const current = await getSettings();
             const replace = $('#restore-replace').prop('checked');
             const next = replace ? candidate : deepMerge(current, candidate);
+
             await setSettings(next);
-            $msg.removeClass().addClass('text-xs text-emerald-400').text('Settings restored successfully.');
+
+            $restoreMsg.removeClass().addClass('text-xs text-emerald-400').text('Settings restored successfully.');
         } catch (e) {
             console.error('Restore failed', e);
-            $msg.removeClass().addClass('text-xs text-rose-400').text('Restore failed: ' + (e && e.message ? e.message : 'Unknown error'));
+            $restoreMsg.removeClass().addClass('text-xs text-rose-400').text('Restore failed: ' + (e && e.message ? e.message : 'Unknown error'));
         }
+    });
+
+    // Reset logic
+    $btnReset.on('click', async function () {
+        if (!confirm('Reset all settings to their default values? This action cannot be undone.')) return;
+
+        const settings = await resetSettings();
+
+        $resetMsg.text('Settings reset to default values');
+
+        // Refresh all forms
+        initialiseBasicForm(settings);
+        initialiseIntegrationsForm(settings);
+        initialiseCustomIconForm(settings);
+        initialiseContextMenuForm(settings);
+        initialiseDebugForm(settings);
+        //initialiseBackupForm(settings);
+        initialisePermissionsForm(settings);
     });
 }
 
@@ -272,31 +346,36 @@ async function initialiseBackupForm(settings) {
  */
 function deepMerge(target, source) {
     if (Array.isArray(source)) return source.slice();
+
     if (source && typeof source === 'object') {
         const out = (target && typeof target === 'object') ? Object.assign({}, target) : {};
+
         Object.keys(source).forEach(k => {
             out[k] = deepMerge(target ? target[k] : undefined, source[k]);
         });
+
         return out;
     }
+
     return source;
 }
 
 /**
- * Validate a candidate settings object. Returns { valid, errors[] }
+ * Validate a candidate settings object
  * @param {Object} obj
  * @returns {Object} { valid: boolean, errors: string[] }
  */
 function validateSettingsShape(obj) {
     const errors = [];
+
     if (!obj || typeof obj !== 'object') {
         errors.push('Root is not an object.');
     } else {
         if (!obj.config || typeof obj.config !== 'object') errors.push('Missing or invalid config');
         if (!Array.isArray(obj.sites)) errors.push('Missing or invalid sites array');
         if (!Array.isArray(obj.integrations)) errors.push('Missing or invalid integrations array');
-        // Optional: injectedIconConfig presence
         if (obj.injectedIconConfig && typeof obj.injectedIconConfig !== 'object') errors.push('Invalid injectedIconConfig');
     }
+
     return { valid: errors.length === 0, errors };
 }

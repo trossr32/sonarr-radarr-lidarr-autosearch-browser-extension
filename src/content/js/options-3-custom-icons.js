@@ -16,53 +16,53 @@ var getAmountFromOffset = (offset) => offset.match(/(?<amount>[\d|\.]+)(?<unit>.
  * @returns {string}
  */
 function getCustomIconMarkup(injectedIconConfig, _siteType, linkHref, count = 1) {
-  const n = Math.max(1, Math.min(3, Number(count) || 1));
-  const multi = n > 1;
+    const n = Math.max(1, Math.min(3, Number(count) || 1));
+    const multi = n > 1;
 
-  // Build N tiles, each with its own background image from siteTypes[i]
-  const icons = Array.from({ length: n }, (_, i) => {
-    const t = siteTypes[i] || siteTypes[siteTypes.length - 1]; // safe fallback
-    const dataUri = getIconAsDataUri(t, null, null);
-    return `<div class="servarr-ext_icon-image" data-type="${t}" style="background-image:url('${dataUri}')"></div>`;
-  }).join('');
+    // Build N tiles, each with its own background image from siteTypes[i]
+    const icons = Array.from({ length: n }, (_, i) => {
+        const t = siteTypes[i] || siteTypes[siteTypes.length - 1]; // safe fallback
+        const dataUri = getIconAsDataUri(t, null, null);
+        return `<div class="servarr-ext_icon-image" data-type="${t}" style="background-image:url('${dataUri}')"></div>`;
+    }).join('');
 
-  return `<style id="servarr-ext_custom-icon-style">
+    return `<style id="servarr-ext_custom-icon-style">
 .servarr-ext_icon a {
-  position: absolute;
-  background-color: ${injectedIconConfig.backgroundColor};
-  text-decoration: none;
-  height: 52px;
-  z-index: 9999999;
-  ${injectedIconConfig.position}: ${injectedIconConfig.positionOffset};
-  display: inline-flex;
-  gap: 14px;
+    position: absolute;
+    background-color: ${injectedIconConfig.backgroundColor};
+    text-decoration: none;
+    height: 52px;
+    z-index: 9999999;
+    ${injectedIconConfig.position}: ${injectedIconConfig.positionOffset};
+    display: inline-flex;
+    gap: 14px;
 }
 .servarr-ext_anchored-icon a {
-  padding: 0 15px;
-  ${multi ? 'width:auto;' : 'width:60px;'}
+    padding: 0 15px;
+    ${multi ? 'width:auto;' : 'width:60px;'}
 }
 .servarr-ext_floating-icon a {
-  ${injectedIconConfig.side}: ${injectedIconConfig.sideOffset};
-  border-radius: 50px;
-  ${multi ? 'width:auto; padding:6px;' : 'width:52px; padding:6px 0 0 6px;'}
+    ${injectedIconConfig.side}: ${injectedIconConfig.sideOffset};
+    border-radius: 50px;
+    ${multi ? 'width:auto; padding:6px;' : 'width:52px; padding:6px 0 0 6px;'}
 }
 .servarr-ext_anchored-left-icon a  { left: 0;  border-radius: 0 50px 50px 0; }
 .servarr-ext_anchored-right-icon a { right: 0; border-radius: 50px 0 0 50px; }
 
 .servarr-ext_icon-image {
-  width: 40px;
-  height: 40px;
-  background-repeat: no-repeat;
-  background-size: 40px 40px;
+    width: 40px;
+    height: 40px;
+    background-repeat: no-repeat;
+    background-size: 40px 40px;
 }
 .servarr-ext_anchored-icon .servarr-ext_icon-image { margin: 6px -10px 0 0; }
 </style>
 <div id="servarr-ext_custom-icon-wrapper"
      class="servarr-ext_icon servarr-ext_${injectedIconConfig.type}-icon ${(injectedIconConfig.type == 'anchored' ? (`servarr-ext_anchored-${injectedIconConfig.side}-icon`) : '')}"
      data-count="${n}">
-  <a href="${linkHref}" target="_blank" data-servarr-icon="true">
-    ${icons}
-  </a>
+    <a href="${linkHref}" target="_blank" data-servarr-icon="true">
+        ${icons}
+    </a>
 </div>`;
 }
 
@@ -90,6 +90,7 @@ var initialiseCustomIconForm = function (settings) {
         .append($('<div class="w-28 flex-shrink-0"></div>')
             .append($('<input type="checkbox" id="toggle-use-custom-icon" class="hidden">').prop('checked', settings.config.customIconPosition))
         );
+        
     body.append(useRow);
 
     // Icon type toggle
@@ -100,6 +101,7 @@ var initialiseCustomIconForm = function (settings) {
             '</div>'))
         .append($('<div class="w-32 flex-shrink-0"></div>')
             .append($('<input type="checkbox" id="toggle-icon-type" class="hidden">').prop('checked', settings.injectedIconConfig.type === 'anchored')));
+
     body.append(typeRow);
 
     // Side + offset (horizontal)
@@ -114,6 +116,7 @@ var initialiseCustomIconForm = function (settings) {
             .append($('<input type="checkbox" id="toggle-side-offset" class="hidden">').prop('checked', getUnitFromOffset(settings.injectedIconConfig.sideOffset) === 'px'))
             .append($('<span class="text-xs text-slate-400">Units</span>'))
         );
+
     sideGroup.append(sideCol, sideOffsetCol);
     body.append(sideGroup);
 
@@ -129,6 +132,7 @@ var initialiseCustomIconForm = function (settings) {
             .append($('<input type="checkbox" id="toggle-position-offset" class="hidden">').prop('checked', getUnitFromOffset(settings.injectedIconConfig.positionOffset) === 'px'))
             .append($('<span class="text-xs text-slate-400">Units</span>'))
         );
+
     posGroup.append(posCol, posOffsetCol);
     body.append(posGroup);
 
@@ -150,10 +154,13 @@ var initialiseCustomIconForm = function (settings) {
 
     // Preview count slider
     const previewRow = $('<div class="flex items-center gap-4"></div>');
+    
     previewRow.append('<div class="min-w-[12rem]"><label for="icon-preview-count" class="font-medium">Preview count</label><p class="text-xs text-slate-400">Preview multiple icons</p></div>');
+    
     const sliderWrap = $('<div class="flex items-center gap-2"></div>');
     const slider = $(`<input type="range" id="icon-preview-count" min="1" max="3" step="1" value="1" class="w-40">`);
     const sliderVal = $('<span id="icon-preview-count-value" class="text-xs text-slate-400">1</span>');
+
     sliderWrap.append(slider, sliderVal);
     previewRow.append(sliderWrap);
     body.append(previewRow);
@@ -248,9 +255,9 @@ var initialiseCustomIconForm = function (settings) {
  * @returns {string} - e.g. "12px" or "12%"
  */
 function toPxOrPercent(rawNumberLike, unit /* 'px' | '%' */, fallback = '0px') {
-  const n = Number.parseFloat(String(rawNumberLike).trim());
-  if (!Number.isFinite(n) || n < 0) return fallback;
-  return `${n}${unit}`;
+    const n = Number.parseFloat(String(rawNumberLike).trim());
+    if (!Number.isFinite(n) || n < 0) return fallback;
+    return `${n}${unit}`;
 }
 
 /**
@@ -260,7 +267,7 @@ function toPxOrPercent(rawNumberLike, unit /* 'px' | '%' */, fallback = '0px') {
  * @returns {string} - 'top' | 'bottom' 
 */
 function normalizeVerticalPos(token, fallback = 'bottom') {
-  return token === 'top' ? 'top' : token === 'bottom' ? 'bottom' : fallback;
+    return token === 'top' ? 'top' : token === 'bottom' ? 'bottom' : fallback;
 }
 
 /** 
@@ -270,18 +277,18 @@ function normalizeVerticalPos(token, fallback = 'bottom') {
  * @returns {string} - 'left' | 'right'
  */
 function normalizeSide(token, fallback = 'right') {
-  return token === 'left' ? 'left' : token === 'right' ? 'right' : fallback;
+    return token === 'left' ? 'left' : token === 'right' ? 'right' : fallback;
 }
 
 /** 
- * very strict hex: #rgb | #rrggbb | #rrggbbaa 
+ * strict hex: #rgb | #rrggbb
  * @param {string} value - input to normalize
  * @param {string} fallback - fallback value if input is invalid (default "#000000")
  * @returns {string} - e.g. "#ff0000"
  */
 function normalizeHexColour(value, fallback = '#000000') {
-  const v = String(value || '').trim();
-  return /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(v) ? v : fallback;
+    const v = String(value || '').trim();
+    return /^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(v) ? v : fallback;
 }
 
 /** 
@@ -291,8 +298,8 @@ function normalizeHexColour(value, fallback = '#000000') {
  * @returns {string} - e.g. "sonarr", "radarr", "lidarr"
  */
 function safeToken(value, fallback = 'sonarr') {
-  const v = String(value || '').trim();
-  return /^[a-z0-9_-]{1,40}$/i.test(v) ? v : fallback;
+    const v = String(value || '').trim();
+    return /^[a-z0-9_-]{1,40}$/i.test(v) ? v : fallback;
 }
 
 /**

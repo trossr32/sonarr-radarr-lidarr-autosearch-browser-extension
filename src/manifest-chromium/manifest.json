@@ -23,28 +23,8 @@
     "open_in_tab": true
   },
   "background": {
-    "scripts": [
-      "content/js/jquery.min.js",
-      "content/js/browser-polyfill.min.js",
-      "content/js/core.js",
-      "eventPage.js"
-    ],
     "service_worker": "eventPage.chrome.js"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "*://*/*",
-        "file://*/*"
-      ],
-      "js": [
-        "content/js/jquery.min.js",
-        "content/js/browser-polyfill.min.js",
-        "content/js/core.js"
-      ],
-      "run_at": "document_end"
-    }
-  ],
   "permissions": [
     "scripting", 
     "storage",
@@ -63,13 +43,15 @@
     "*://*.rottentomatoes.com/*",
     "*://*.metacritic.com/*",
     "*://*.simkl.com/*",
-    "*://*.iptorrents*",
+    "*://*.iptorrents/*",
     "*://*.last.fm/*",
     "*://*.allocine.fr/*",
     "*://*.myanimelist.net/*",
     "*://*.betaseries.com/*",
     "*://*.primevideo.com/*",
-    "*://*.rateyourmusic.com/*",
+    "*://*.rateyourmusic.com/*"
+  ],
+  "optional_host_permissions": [
     "<all_urls>"
   ]
 }

@@ -62,6 +62,7 @@ Core instance configuration.
 | Display name | The label shown in icons and menus. | Click the name in the site card header to rename. |
 | Add instance button | Create a new Sonarr/Radarr/Lidarr/Readarr entry. | Button at the top-right of the Settings tab. |
 | Remove (trash icon) | Delete an instance. | Permanently removes the site from your settings. |
+| Grant permissions button | Opens a prompt to allow the extension to access the specified Servarr domain. | Required for detection on Servarr pages for auto-searching. |
 
 Helper Text: If `Auto populate from API` (Advanced) is ON and an API key is set, advanced selector fields will be fetched and filled automatically; otherwise defaults are used.
 
@@ -133,9 +134,15 @@ Diagnostics & logging.
 
 Only enable while troubleshooting; logging adds minor overhead.
 
-### 4.7 GitHub & Support
+### 4.7 Permissions
 
-Provides direct links to both the project repository (where you can report issues or view the source code) and support options. No functional settings.
+Shows all permissions currently granted to the extension. You may need to re‑grant permissions if you change your Servarr instance URLs.
+
+Some permissions are mandatory. Any non‑mandatory permissions can be revoked, but certain features may stop working.
+
+### 4.8 Support
+
+This section contains helpful external links only – there are no settings to toggle here and nothing you do in this section changes the extension's behaviour.
 
 ---
 

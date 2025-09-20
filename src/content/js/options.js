@@ -52,8 +52,8 @@ var entityMap = {
             $checkbox.hide();
 
             const styleMap = (style, active) => {
-                const base = 'inline-flex items-center justify-center rounded-md text-xs font-medium px-2 py-1 transition-colors transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 w-full select-none cursor-pointer active:scale-[.97] disabled:cursor-not-allowed';
-                const palette = style === 'success' ? (active ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-green-700/30 text-green-400') : (style === 'danger' ? (active ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-red-700/30 text-red-400') : (active ? 'bg-slate-600 hover:bg-slate-500 text-white' : 'bg-slate-600/20 text-slate-300'));
+                const base = 'inline-flex items-center justify-center rounded text-xs font-medium px-2 py-0.5 h-7 transition-colors transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 w-full select-none cursor-pointer active:scale-[.97] disabled:cursor-not-allowed';
+                const palette = style === 'success' ? (active ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-green-700/30 text-green-400') : (style === 'danger' ? (active ? 'bg-rose-600 hover:bg-rose-500 text-white' : 'bg-rose-700/30 text-rose-400') : (active ? 'bg-slate-600 hover:bg-slate-500 text-white' : 'bg-slate-600/20 text-slate-300'));
                 return `${base} ${palette}`;
             };
 
@@ -313,10 +313,10 @@ var initialiseEnabledDisabledButton = function(settings) {
     const $btn = $('#toggleActive');
     const enabled = settings.config.enabled;
 
-    $btn.removeClass('bg-green-600 hover:bg-green-500 bg-red-600 hover:bg-red-500');
+    $btn.removeClass('bg-green-600 hover:bg-green-500 bg-rose-600 hover:bg-rose-500');
     
     if (enabled) {
-        $btn.addClass('bg-red-600 hover:bg-red-500');
+        $btn.addClass('bg-rose-600 hover:bg-rose-500');
         $('#toggleActiveLabel').text('Disable');
     } else {
         $btn.addClass('bg-green-600 hover:bg-green-500');
@@ -394,13 +394,12 @@ $(async function () {
     initialiseEnabledDisabledButton(settings);
 
     initialiseBasicForm(settings);
-    // initialiseAdvancedForm(settings);
     initialiseIntegrationsForm(settings);
     initialiseCustomIconForm(settings);
     initialiseContextMenuForm(settings);
     initialiseDebugForm(settings);
-    // Backup/Restore tab
     initialiseBackupForm(settings);
+    initialisePermissionsForm(settings);
 
     // After forms built (badges exist), kick off passive status probe
     runInitialBackgroundProbe();

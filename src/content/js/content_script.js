@@ -293,11 +293,11 @@ async function runServarrSearchInjection() {
                 return;
             }
 
-            const runEngineWork = function (desc, sites, settingsObj) {
-                desc.elements.forEach(function (el) {
+            const runEngine = function (candidates, sites, settingsObj) {
+                candidates.elements.forEach(function (el) {
                     if (!el || (el.hasAttribute && el.hasAttribute('data-servarr-icon'))) return;
 
-                    const term = (desc.getSearch(el) || '').trim();
+                    const term = (candidates.getSearch(el) || '').trim();
                     if (!term) return;
 
                     sites.forEach(function (site) {
@@ -310,12 +310,14 @@ async function runServarrSearchInjection() {
 
                         try {
                             // same decision you already had: custom floating/anchored vs inline
-                            const useCustomIcon = !!settingsObj.config.customIconPosition && desc.elements.length <= 1;
+                            const useCustomIcon = !!settingsObj.config.customIconPosition && candidates.elements.length <= 1;
+
                             if (useCustomIcon) {
                                 addCustomIconMarkup(settingsObj.injectedIconConfig, site, link);
                             } else {
-                                desc.insert({ el, link, site, styles: null });
+                                candidates.insert({ el, link, site, styles: null });
                             }
+                            
                             if (el.setAttribute) el.setAttribute(perSiteAttr, 'true');
                         } catch (e) {
                             if (typeof log === 'function') log(['injection failed', e], 'error');
@@ -330,17 +332,17 @@ async function runServarrSearchInjection() {
                 
                 if (!engine || typeof engine.match !== 'function' || !engine.match(url, document)) continue;
 
-                const desc = engine.candidates({ settings, url, document });
-                if (!desc || !desc.siteType || !desc.elements || !desc.getSearch || !desc.insert) continue;
+                const candidates = engine.candidates({ settings, url, document });
+                if (!candidates || !candidates.siteType || !candidates.elements || !candidates.getSearch || !candidates.insert) continue;
 
                 // Enabled instances for this site type
-                const sites = (settings.sites || []).filter(s => s && s.enabled && s.type === desc.siteType);
+                const sites = (settings.sites || []).filter(s => s && s.enabled && s.type === candidates.siteType);
                 if (!sites.length) continue;
 
                 if (engine.deferMs && engine.deferMs > 0) {
-                    setTimeout(function () { runEngineWork(desc, sites, settings); }, engine.deferMs);
+                    setTimeout(function () { runEngine(candidates, sites, settings); }, engine.deferMs);
                 } else {
-                    runEngineWork(desc, sites, settings);
+                    runEngine(candidates, sites, settings);
                 }
             }
         } catch (e) {

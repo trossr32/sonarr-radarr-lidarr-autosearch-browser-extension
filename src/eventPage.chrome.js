@@ -94,12 +94,13 @@ async function initRun(tabId, evt) {
             return;
         }
 
-
         await browser.scripting.executeScript({
             target: { tabId },
             files: [
+                'content/js/jquery.min.js',
                 'content/js/browser-polyfill.min.js',
                 'content/js/icons.js',
+                'content/js/core.js',
                 'content/engines/index.js',
                 'content/engines/default.js',
                 'content/engines/integrations/imdb.js',
@@ -283,3 +284,30 @@ async function setIcon(settings) {
     const img = `content/assets/images/SonarrRadarrLidarr${(settings?.config?.enabled ? '' : '-faded')}16.png`;
     await browser.action.setIcon({ path: img });
 };
+
+// background/event page
+
+// Change these to whatever you want to open
+const WELCOME_URL = 'options.html#/welcome';
+const UPDATED_URL = 'options.html#/updated';
+
+// Only open on new versions we haven't shown yet
+browser.runtime.onInstalled.addListener(async (details) => {
+    const thisVersion = browser.runtime.getManifest().version;
+    const { lastSeenVersion } = await browser.storage.local.get('lastSeenVersion');
+
+    if (details.reason === 'install') {
+        // first install (optional)
+        await browser.tabs.create({ url: browser.runtime.getURL(WELCOME_URL) });
+        await browser.storage.local.set({ lastSeenVersion: thisVersion });
+        return;
+    }
+
+    if (details.reason === 'update') {
+        // don't re-open if we've already shown for this version
+        if (lastSeenVersion === thisVersion || thisVersion.startsWith('3')) return;
+
+        await browser.tabs.create({ url: browser.runtime.getURL(UPDATED_URL) });
+        await browser.storage.local.set({ lastSeenVersion: thisVersion });
+    }
+});

@@ -19,7 +19,7 @@ var initialiseContextMenuForm = function (settings) {
             );
         body.append(row);
     } else {
-        body.append($('<p class="text-xs text-red-400">Context menus are not supported in this browser.</p>'));
+        body.append($('<p class="text-xs text-rose-400">Context menus are not supported in this browser.</p>'));
     }
 
     card.append(header, body);
@@ -37,7 +37,8 @@ async function setSettingsPropertiesFromContextMenuForm() {
     const settings = await getSettings();
 
     const $menu = $('#toggle-context-menu');
-    // Only update if the element exists (Firefox MV2 vs MV3 differences or future conditional rendering)
+
+    // Only update if the element exists (Firefox MV2 vs MV3 differences)
     if ($menu.length) {
         const newVal = $menu.prop('checked');
 

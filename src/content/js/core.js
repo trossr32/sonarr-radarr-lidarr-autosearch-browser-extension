@@ -742,6 +742,12 @@ async function setSettings(data) {
     return data;
 }
 
+/** Resets settings to defaults */
+async function resetSettings() {
+    await browser.storage.sync.set({ 'sonarrRadarrLidarrAutosearchSettings': defaultSettings });
+    return defaultSettings;
+}
+
 /**
  * Get search path / selector configuration for a given site and version
  * @param {string} siteId 

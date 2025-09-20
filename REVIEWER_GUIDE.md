@@ -79,10 +79,27 @@ There is **no custom packer**, no dynamic code generation beyond Tailwind’s st
 ```json
 "permissions": ["scripting", "storage", "activeTab", "contextMenus"],
 "host_permissions": [
-  "*://*.imdb.com/*", "*://*.themoviedb.org/*", "*://*.thetvdb.com/*", "*://*.trakt.tv/*", "*://*.tvmaze.com/*",
-  "*://*.musicbrainz.org/*", "*://*.letterboxd.com/*", "*://*.pogdesign.co.uk/*", "*://*.rottentomatoes.com/*",
-  "*://*.metacritic.com/*", "*://*.simkl.com/*", "*://*.iptorrents*", "*://*.last.fm/*", "*://*.allocine.fr/*",
-  "*://*.myanimelist.net/*", "*://*.betaseries.com/*", "*://*.primevideo.com/*", "<all_urls>"
+  "*://*.imdb.com/*",
+  "*://*.themoviedb.org/*",
+  "*://*.thetvdb.com/*",
+  "*://*.trakt.tv/*",
+  "*://*.tvmaze.com/*",
+  "*://*.musicbrainz.org/*",
+  "*://*.letterboxd.com/*",
+  "*://*.pogdesign.co.uk/*",
+  "*://*.rottentomatoes.com/*",
+  "*://*.metacritic.com/*",
+  "*://*.simkl.com/*",
+  "*://*.iptorrents/*",
+  "*://*.last.fm/*",
+  "*://*.allocine.fr/*",
+  "*://*.myanimelist.net/*",
+  "*://*.betaseries.com/*",
+  "*://*.primevideo.com/*",
+  "*://*.rateyourmusic.com/*"
+],
+"optional_host_permissions": [
+  "<all_urls>"
 ]
 ```
 
@@ -92,14 +109,41 @@ There is **no custom packer**, no dynamic code generation beyond Tailwind’s st
 | `storage` | Persist user configuration (base URLs, API keys, toggles). |
 | `activeTab` | Allow immediate context menu initiated search to open correct tab / access tab URL when needed. |
 | `contextMenus` | Add right-click Servarr search items. |
-| Host list + `<all_urls>` | Integration discovery & user-specified Servarr domains (unknown hostnames at install time). `<all_urls>` enables: 1) detecting configured Servarr pages for auto-search injection, 2) context menu fallback. The site list is explicit for transparency; `<all_urls>` covers arbitrary self-hosted internal domains (e.g., `http://nas.local:8989`). |
+| Host list | Integration discovery & user-specified Servarr domains (unknown hostnames at install time). `<all_urls>` enables: 1) detecting configured Servarr pages for auto-search injection, 2) context menu fallback. The site list is explicit for transparency; `<all_urls>` covers arbitrary self-hosted internal domains (e.g., `http://nas.local:8989`). |
+| `<all_urls>` (optional) | User-specified Servarr domains (unknown hostnames at install time). User's grant permissions to their Servarr instances on a per domain basis. |
 
 ### Firefox (MV2)
 
 `manifest-firefox/manifest.json` uses:
 
 ```json
-"permissions": ["<all_urls>", "storage", "activeTab", "contextMenus"]
+"permissions": [
+    "*://*.imdb.com/*",
+    "*://*.themoviedb.org/*",
+    "*://*.thetvdb.com/*",
+    "*://*.trakt.tv/*",
+    "*://*.tvmaze.com/*",
+    "*://*.musicbrainz.org/*",
+    "*://*.letterboxd.com/*",
+    "*://*.pogdesign.co.uk/*",
+    "*://*.rottentomatoes.com/*",
+    "*://*.metacritic.com/*",
+    "*://*.simkl.com/*",
+    "*://*.iptorrents/*",
+    "*://*.last.fm/*",
+    "*://*.allocine.fr/*",
+    "*://*.myanimelist.net/*",
+    "*://*.betaseries.com/*",
+    "*://*.primevideo.com/*",
+    "*://*.rateyourmusic.com/*",
+    "storage",
+    "activeTab",
+    "tabs",
+    "contextMenus"
+  ],
+  "optional_permissions": [
+    "<all_urls>"
+  ]
 ```
 
 MV2 does not separate `host_permissions`. Same justifications apply. The commented host list (retained in source) documents intended integration targets for reviewer clarity.
@@ -116,7 +160,6 @@ If stores require minimization, `<all_urls>` could be replaced by a dynamic perm
 |----------|------|
 | `eventPage.chrome.js` | MV3 service worker shim (message routing, context menu handling, storage change propagation). |
 | `eventPage.js` | Shared background script logic (non‑service worker pieces reused). |
-| `content/js/sonarr_radarr_lidarr_autosearch.js` | Main content script: detects supported integration pages, injects Servarr icon link(s), reads settings, builds search URLs. |
 | `core.js` | Shared helpers: settings access (storage), API version probing, URL building, small `browser` polyfill for non-WebExtension contexts (used in tests). |
 | `options.js` | Options UI assembly (Tailwind utility classes, accessible tabs, toggle wiring, Spectrum colour picker). |
 | `options_*.js` | Options tab‑specific logic (settings load/save, site/integration list management, backup/restore handling). |
@@ -230,6 +273,10 @@ Restore
 - If the backup’s `schemaVersion` is newer than the extension supports, a warning appears in the confirmation prompt; older schemas are normalized on import.
 - On confirmation, settings are applied via the WebExtension storage API. A success/failure message is displayed in the UI.
 
+Reset
+
+- Click “Reset settings” → confirmation prompt → resets to built-in defaults.
+
 Notes
 
 - No network transmission occurs during backup or restore; files are handled locally in the browser context.
@@ -314,7 +361,7 @@ Auto-search path:
 | Area | Note |
 |------|------|
 | Layout changes on external sites | May break icon injection; handled by future config updates, not runtime heuristics. |
-| Firefox MV3 migration | Pending full parity; MV2 manifest retained for user stability. |
+| Firefox MV3 migration | Pending full parity; MV2 manifest is currently retained for Android support (See: [Firefox for Android MV3 compatibility](https://extensionworkshop.com/documentation/develop/developing-extensions-for-firefox-for-android/#mv3-compatibility)). |
 
 ---
 

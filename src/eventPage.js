@@ -94,8 +94,10 @@ async function initRun(tabOrId, evt) {
         }
 
         // Explicitly target the tab
+        await browser.tabs.executeScript(tab.id, { file: 'content/js/jquery.min.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/browser-polyfill.min.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/icons.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/js/core.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/index.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/default.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/imdb.js' });
@@ -127,7 +129,6 @@ async function initRun(tabOrId, evt) {
         await log(e.message, 'error');
    }
 }
-
 
 browser.tabs.onActivated.addListener(function (activeInfo) {
     if (activeInfo && typeof activeInfo.tabId === 'number') {
@@ -279,3 +280,30 @@ async function setIcon(settings) {
     const img = `content/assets/images/SonarrRadarrLidarr${(settings?.config?.enabled ? '' : '-faded')}16.png`;
     await browser.browserAction.setIcon({ path: img });
 };
+
+// background/event page
+
+// Change these to whatever you want to open
+const WELCOME_URL = 'options.html#/welcome';
+const UPDATED_URL = 'options.html#/updated';
+
+// Only open on new versions we haven't shown yet
+browser.runtime.onInstalled.addListener(async (details) => {
+    const thisVersion = browser.runtime.getManifest().version;
+    const { lastSeenVersion } = await browser.storage.local.get('lastSeenVersion');
+
+    if (details.reason === 'install') {
+        // first install (optional)
+        await browser.tabs.create({ url: browser.runtime.getURL(WELCOME_URL) });
+        await browser.storage.local.set({ lastSeenVersion: thisVersion });
+        return;
+    }
+
+    if (details.reason === 'update') {
+        // don't re-open if we've already shown for this version
+        if (lastSeenVersion === thisVersion || thisVersion.startsWith('3')) return;
+
+        await browser.tabs.create({ url: browser.runtime.getURL(UPDATED_URL) });
+        await browser.storage.local.set({ lastSeenVersion: thisVersion });
+    }
+});

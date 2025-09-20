@@ -55,6 +55,8 @@ Note: this extension defaults to settings applicable to the latest versions of S
 Fill out the URL fields for each of your Servarr instances in the format http://my.servarr.domain:7357. If you also fill in the API keys for each instance, the advanced settings will be automatically
 populated based on your instance version.
 
+Grant permission for the extension to run on the domains of your Servarr instances. This is required for the extension to be able to populate the search field.
+
 ### Advanced settings
 
 **Search path** - this needs to match the URL path that is the search page. This would only ever need to be changed if the URLs are changed by the Servarr developers.
@@ -114,21 +116,21 @@ If you can make this extension better I'm happy for the help! Please create a pu
 
 Thanks to the following for helping with this project:
 
-<a href='https://github.com/banterboy' target='_blank'><picture><img src="https://github.com/banterboy.png" alt="banterboy" title="banterboy" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/aommm' target='_blank'><picture><img src="https://github.com/aommm.png" alt="aommm" title="aommm" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/ledge74' target='_blank'><picture><img src="https://github.com/ledge74.png" alt="ledge74" title="ledge74" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/almottier' target='_blank'><picture><img src="https://github.com/almottier.png" alt="almottier" title="almottier" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/dannyvink' target='_blank'><picture><img src="https://github.com/dannyvink.png" alt="dannyvink" title="dannyvink" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/Pompiedom' target='_blank'><picture><img src="https://github.com/Pompiedom.png" alt="Pompiedom" title="Pompiedom" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/carsso' target='_blank'><picture><img src="https://github.com/carsso.png" alt="carsso" title="carsso" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/3vanlock' target='_blank'><picture><img src="https://github.com/3vanlock.png" alt="3vanlock" title="3vanlock" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/cyberden' target='_blank'><picture><img src="https://github.com/cyberden.png" alt="cyberden" title="cyberden" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/MozPri' target='_blank'><picture><img src="https://github.com/MozPri.png" alt="MozPri" title="MozPri" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/dynamiccookies' target='_blank'><picture><img src="https://github.com/dynamiccookies.png" alt="dynamiccookies" title="dynamiccookies" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/theotherp' target='_blank'><picture><img src="https://github.com/theotherp.png" alt="theotherp" title="theotherp" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/0xdevalias' target='_blank'><picture><img src="https://github.com/0xdevalias.png" alt="0xdevalias" title="0xdevalias" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/StormPooper' target='_blank'><picture><img src="https://github.com/StormPooper.png" alt="StormPooper" title="StormPooper" style="width:80px;border-radius: 50%;"></picture></a>
-<a href='https://github.com/Xeldarflo' target='_blank'><picture><img src="https://github.com/Xeldarflo.png" alt="Xeldarflo" title="Xeldarflo" style="width:80px;border-radius: 50%;"></picture></a>
+<a href='https://github.com/banterboy' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/banterboy?s=64&v=4" alt="banterboy" title="banterboy" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/aommm' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/aommm?s=64&v=4" alt="aommm" title="aommm" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/ledge74' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/ledge74?s=64&v=4" alt="ledge74" title="ledge74" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/almottier' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/almottier?s=64&v=4" alt="almottier" title="almottier" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/dannyvink' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/dannyvink?s=64&v=4" alt="dannyvink" title="dannyvink" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/Pompiedom' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/Pompiedom?s=64&v=4" alt="Pompiedom" title="Pompiedom" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/carsso' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/carsso?s=64&v=4" alt="carsso" title="carsso" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/3vanlock' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/3vanlock?s=64&v=4" alt="3vanlock" title="3vanlock" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/cyberden' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/cyberden?s=64&v=4" alt="cyberden" title="cyberden" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/MozPri' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/MozPri?s=64&v=4" alt="MozPri" title="MozPri" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/dynamiccookies' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/dynamiccookies?s=64&v=4" alt="dynamiccookies" title="dynamiccookies" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/theotherp' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/theotherp?s=64&v=4" alt="theotherp" title="theotherp" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/0xdevalias' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/0xdevalias?s=64&v=4" alt="0xdevalias" title="0xdevalias" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/StormPooper' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/StormPooper?s=64&v=4" alt="StormPooper" title="StormPooper" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+<a href='https://github.com/Xeldarflo' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/Xeldarflo?s=64&v=4" alt="Xeldarflo" title="Xeldarflo" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
 
 <!--# Thanks to <a href='https://www.jetbrains.com' target='_blank'>JetBrains</a> for providing an open source license for their products to support this project. 
 

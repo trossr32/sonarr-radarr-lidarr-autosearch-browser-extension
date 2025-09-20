@@ -26,15 +26,20 @@ var initialiseDebugForm = function (settings) {
     function buildRange(id, label, ticks, value, min, max, step, unitHelp) {
         const container = $('<div class="space-y-2"></div>');
         container.append($(`<label for="${id}" class="font-medium">${label}</label>`));
+        
         const sliderWrap = $('<div class="space-y-1"></div>');
         const input = $(`<input type="range" id="${id}" class="w-full accent-indigo-600" />`) // accent color for supported browsers
             .attr({ min: min, max: max, step: step, value: value });
         const valueLine = $(`<div class="flex justify-between text-[11px] font-mono text-slate-400"></div>`);
+        
         // tick labels
         ticks.forEach(t => valueLine.append($(`<span>${t}</span>`)));
         const liveValue = $(`<div id="${id}Live" class="text-xs font-medium text-indigo-400">${value}</div>`);
+        
         sliderWrap.append(input, valueLine, liveValue);
+        
         if (unitHelp) sliderWrap.append($(`<p class="text-[11px] text-slate-400">${unitHelp}</p>`));
+        
         container.append(sliderWrap);
         return container;
     }
@@ -61,9 +66,11 @@ var initialiseDebugForm = function (settings) {
     function recompute() {
         const wait = parseInt($('#waitForEl').val(), 10);
         const attempts = parseInt($('#maxAttempts').val(), 10);
+        
         $('#waitForElLive').text(wait);
         $('#maxAttemptsLive').text(attempts);
         $('#totalTimeSpan').text(`${wait * attempts} ms`);
+
         setSettingsPropertiesFromDebugForm();
     }
 

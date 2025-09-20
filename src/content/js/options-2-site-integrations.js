@@ -19,7 +19,7 @@ var initialiseIntegrationsForm = function (settings) {
 
             const notice = $(
                 `<div class="absolute top-1 left-1 right-1">
-                    <div class="relative flex items-center gap-1 bg-[#1d1e22] border border-${colour}-500/40 text-${colour}-400 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide select-none">
+                    <div class="tt-hover relative flex items-center gap-1 bg-[#1d1e22] border border-${colour}-500/40 text-${colour}-400 rounded-md px-2 py-0.5 text-[10px] font-semibold tracking-wide select-none cursor-help">
                         <button type="button" class="flex items-center gap-1 focus:outline-none" aria-describedby="card-${level}-tooltip-${i}" aria-label="Integration notice ${level}">
                             <i class="fa-solid ${icon}"></i>
                             <span>${title}</span>
@@ -29,19 +29,21 @@ var initialiseIntegrationsForm = function (settings) {
                 </div>`
             );
             
-            const btn = notice.find('button');
+            const trigger = notice.find('.tt-hover');
             const tip = notice.find(`#card-${level}-tooltip-${i}`);
             
-            btn.on('mouseover focus', () => tip.removeClass('hidden'))
+            trigger.on('mouseover focus', () => tip.removeClass('hidden'))
                .on('mouseout blur', () => tip.addClass('hidden'));
             
             card.append(notice);
         }
 
         card.append($(`<div class="h-24 w-full bg-center bg-no-repeat bg-contain" style="background-image: url('content/assets/images/integrations/${integration.image}');"></div>`));
+        
         const body = $('<div class="p-3 flex flex-col items-center gap-3 text-center"></div>')
             .append($(`<h4 class="text-sm font-semibold leading-tight">${integration.name}</h4>`))
             .append($(`<input type="checkbox" id="toggle-${integration.id}" class="hidden">`).prop('checked', integration.enabled));
+
         card.append(body);
         wrapper.append(card);
     });
