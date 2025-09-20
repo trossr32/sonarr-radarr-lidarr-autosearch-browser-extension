@@ -15,7 +15,7 @@
         iconStyle: 'width: 26px; margin: 0 5px -4px 0;',
         getSearch: function (_el, doc) {
             var href = getHref('.artistheader > h1 > a', doc);
-            return href ? href.replace('/artist/', 'lidarr:') : '';
+            return href ? href.replace('https://musicbrainz.org', '').replace('/artist/', 'lidarr:') : '';
         }
     });
 
@@ -29,7 +29,7 @@
         iconStyle: 'width: 26px; margin: 0 5px -4px 0;',
         getSearch: function (_el, doc) {
             var href = getHref('.rgheader > h1 > a', doc);
-            return href ? href.replace('/release-group/', 'lidarr:') : '';
+            return href ? href.replace('https://musicbrainz.org', '').replace('/release-group/', 'lidarr:') : '';
         }
     });
 
@@ -43,7 +43,7 @@
         iconStyle: 'width: 26px; margin: 0 5px -4px 0;',
         getSearch: function (_el, doc) {
             var href = getHref('.releaseheader > h1 > a', doc);
-            return href ? href.replace('/release/', 'lidarr:') : '';
+            return href ? href.replace('https://musicbrainz.org', '').replace('/release/', 'lidarr:') : '';
         }
     });
 

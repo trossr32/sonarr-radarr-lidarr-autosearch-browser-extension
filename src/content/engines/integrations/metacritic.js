@@ -7,7 +7,7 @@
     function ogTitle(doc){
         var m = doc.querySelector('meta[property="og:title"]');
         var v = (m && m.getAttribute('content')) || '';
-        return v.replace(' reviews','').trim();
+        return v.replace(/\s+reviews$/i, '').trim();
     }
 
     var Engine = Def({

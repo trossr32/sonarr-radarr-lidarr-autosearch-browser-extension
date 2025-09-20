@@ -85,15 +85,11 @@
             'trakt.tv/movies/anticipated',
             'trakt.tv/movies/boxoffice'
         ],
-        containerSelector: '.quick-icons > .actions',
+        containerSelector: '.titles-link > h3',
         insertWhere: 'append',
         iconStyle: 'width: 23px; margin: 0 0 2px 10px;',
         siteType: 'radarr',
-        getSearch: function (el, doc) {
-            var title = el && el.closest && el.closest('.titles-link');
-            var h3 = title ? title.querySelector('h3') : null;
-            return (h3 && (h3.textContent || '').trim()) || '';
-        }
+        getSearch: function (el) { return (el && (el.textContent || '').trim()) || ''; }
     });
 
     window.__servarrEngines.list.push(ShowsDetail, MoviesDetail, ShowsGroup, MoviesGroup);

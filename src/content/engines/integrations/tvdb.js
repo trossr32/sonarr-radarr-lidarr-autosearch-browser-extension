@@ -27,9 +27,7 @@
             return null;
         },
         getSearch: function (_el, document, url) {
-            var siteType = (/thetvdb\.com\/series\//i.test(url)) ? 'sonarr' : (/thetvdb\.com\/movie\//i.test(url)) ? 'radarr' : null;
-
-            if (siteType === 'sonarr') {
+            if (/series/.test(infoText(document))) {
                 var s = document.querySelector('#series_basic_info > ul > li:first-of-type > span');
                 var v = (s && (s.textContent || '')).trim();
                 return v ? (`tvdb:${v}`) : '';

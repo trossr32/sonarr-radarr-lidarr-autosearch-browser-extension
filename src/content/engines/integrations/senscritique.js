@@ -12,7 +12,8 @@
         insertWhere: 'prepend',
         iconStyle: 'width: 30px; margin: 0 10px 0 0;',
         getSearch: function(_el,doc){ 
-            var n=doc.querySelector('h1'); 
+            var n=doc.querySelector('h1');
+                        
             return (n && (n.textContent||'').trim())||''; 
         }
     });

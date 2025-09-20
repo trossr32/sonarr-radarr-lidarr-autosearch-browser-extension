@@ -145,6 +145,7 @@
         /** @type {'prepend'|'append'|'before'|'after'} */
         var insertWhere = cfg.insertWhere || 'prepend';
         var wrapHTML = cfg.wrapLinkWithContainer || null;
+        var injectStyles = cfg.injectStyles || null;
         var iconStyle = cfg.iconStyle || 'width:25px; margin:-8px 10px 0 0;';
         var deferMs = cfg.deferMs || 0;
 
@@ -230,6 +231,13 @@
                             if (wrapper) {
                                 wrapper.appendChild(a);
                                 nodeToInsert = wrapper;
+                            }
+                        }
+
+                        if (injectStyles) {
+                            var styleNode = createNodeFromHTML(`<style>${injectStyles}</style>`);
+                            if (styleNode) {
+                                document.head.appendChild(styleNode);
                             }
                         }
 

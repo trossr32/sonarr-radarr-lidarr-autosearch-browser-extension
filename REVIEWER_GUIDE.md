@@ -79,27 +79,28 @@ There is **no custom packer**, no dynamic code generation beyond Tailwind’s st
 ```json
 "permissions": ["scripting", "storage", "activeTab", "contextMenus"],
 "host_permissions": [
-  "*://*.imdb.com/*",
-  "*://*.themoviedb.org/*",
-  "*://*.thetvdb.com/*",
-  "*://*.trakt.tv/*",
-  "*://*.tvmaze.com/*",
-  "*://*.musicbrainz.org/*",
-  "*://*.letterboxd.com/*",
-  "*://*.pogdesign.co.uk/*",
-  "*://*.rottentomatoes.com/*",
-  "*://*.metacritic.com/*",
-  "*://*.simkl.com/*",
-  "*://*.iptorrents/*",
-  "*://*.last.fm/*",
-  "*://*.allocine.fr/*",
-  "*://*.myanimelist.net/*",
-  "*://*.betaseries.com/*",
-  "*://*.primevideo.com/*",
-  "*://*.rateyourmusic.com/*"
+    "*://*.allocine.fr/*",
+    "*://*.betaseries.com/*",
+    "*://*.imdb.com/*",
+    "*://*.iptorrents/*",
+    "*://*.last.fm/*",
+    "*://*.letterboxd.com/*",
+    "*://*.metacritic.com/*",
+    "*://*.musicbrainz.org/*",
+    "*://*.myanimelist.net/*",
+    "*://*.primevideo.com/*",
+    "*://*.rateyourmusic.com/*",
+    "*://*.rottentomatoes.com/*",
+    "*://*.senscritique.com/*",
+    "*://*.simkl.com/*",
+    "*://*.themoviedb.org/*",
+    "*://*.thetvdb.com/*",
+    "*://*.trakt.tv/*",
+    "*://*.pogdesign.co.uk/*",
+    "*://*.tvmaze.com/*"
 ],
 "optional_host_permissions": [
-  "<all_urls>"
+    "<all_urls>"
 ]
 ```
 
@@ -118,32 +119,33 @@ There is **no custom packer**, no dynamic code generation beyond Tailwind’s st
 
 ```json
 "permissions": [
+    "*://*.allocine.fr/*",
+    "*://*.betaseries.com/*",
     "*://*.imdb.com/*",
+    "*://*.iptorrents/*",
+    "*://*.last.fm/*",
+    "*://*.letterboxd.com/*",
+    "*://*.metacritic.com/*",
+    "*://*.musicbrainz.org/*",
+    "*://*.myanimelist.net/*",
+    "*://*.primevideo.com/*",
+    "*://*.rateyourmusic.com/*",
+    "*://*.rottentomatoes.com/*",
+    "*://*.senscritique.com/*",
+    "*://*.simkl.com/*",
     "*://*.themoviedb.org/*",
     "*://*.thetvdb.com/*",
     "*://*.trakt.tv/*",
-    "*://*.tvmaze.com/*",
-    "*://*.musicbrainz.org/*",
-    "*://*.letterboxd.com/*",
     "*://*.pogdesign.co.uk/*",
-    "*://*.rottentomatoes.com/*",
-    "*://*.metacritic.com/*",
-    "*://*.simkl.com/*",
-    "*://*.iptorrents/*",
-    "*://*.last.fm/*",
-    "*://*.allocine.fr/*",
-    "*://*.myanimelist.net/*",
-    "*://*.betaseries.com/*",
-    "*://*.primevideo.com/*",
-    "*://*.rateyourmusic.com/*",
+    "*://*.tvmaze.com/*",
     "storage",
     "activeTab",
     "tabs",
     "contextMenus"
-  ],
-  "optional_permissions": [
+],
+"optional_permissions": [
     "<all_urls>"
-  ]
+]
 ```
 
 MV2 does not separate `host_permissions`. Same justifications apply. The commented host list (retained in source) documents intended integration targets for reviewer clarity.
