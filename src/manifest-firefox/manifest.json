@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Sonarr/Radarr/Lidarr autosearch",
   "description": "Exposes a context menu that enables direct searching for tv shows, movies and other text in Sonarr, Radarr, Lidarr and Readarr.",
-  "version": "2.13.0.0",
+  "version": "3.0.0.0",
   "browser_action": {
     "default_icon": "content/assets/images/SonarrRadarrLidarr128.png",
     "default_popup": "popup.html"
@@ -34,41 +34,32 @@
     ],
     "persistent": false
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "*://*/*",
-        "file://*/*"
-      ],
-      "js": [
-        "content/js/jquery.min.js",
-        "content/js/browser-polyfill.min.js",
-        "content/js/core.js",
-        "content/js/sonarr_radarr_lidarr_autosearch.js"
-      ]
-    }
-  ],
   "permissions": [
-    // "*://*.imdb.com/*",
-    // "*://*.themoviedb.org/*",
-    // "*://*.thetvdb.com/*",
-    // "*://*.trakt.tv/*",
-    // "*://*.tvmaze.com/*",
-    // "*://*.musicbrainz.org/*",
-    // "*://*.letterboxd.com/*",
-    // "*://*.pogdesign.co.uk/*",
-    // "*://*.rottentomatoes.com/*",
-    // "*://*.metacritic.com/*",
-    // "*://*.simkl.com/*",
-    // "*://*.iptorrents*",
-    // "*://*.last.fm/*",
-    // "*://*.allocine.fr/*",
-    // "*://*.myanimelist.net/*",
-    // "*://*.betaseries.com/*",
-    // "*://*.primevideo.com/*",
-    "<all_urls>",
+    "*://*.allocine.fr/*",
+    "*://*.betaseries.com/*",
+    "*://*.imdb.com/*",
+    "*://*.iptorrents/*",
+    "*://*.last.fm/*",
+    "*://*.letterboxd.com/*",
+    "*://*.metacritic.com/*",
+    "*://*.musicbrainz.org/*",
+    "*://*.myanimelist.net/*",
+    "*://*.primevideo.com/*",
+    "*://*.rateyourmusic.com/*",
+    "*://*.rottentomatoes.com/*",
+    "*://*.senscritique.com/*",
+    "*://*.simkl.com/*",
+    "*://*.themoviedb.org/*",
+    "*://*.thetvdb.com/*",
+    "*://*.trakt.tv/*",
+    "*://*.pogdesign.co.uk/*",
+    "*://*.tvmaze.com/*",
     "storage",
     "activeTab",
+    "tabs",
     "contextMenus"
+  ],
+  "optional_permissions": [
+    "<all_urls>"
   ]
 }

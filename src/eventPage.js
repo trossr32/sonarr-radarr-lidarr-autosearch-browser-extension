@@ -1,130 +1,309 @@
+// Firefox MV2 background script
+
+/**
+ * Get the currently active tab in the focused window
+ * @returns {Promise<browser.tabs.Tab|null>} Tab object or null
+ */
+async function getCurrentTab() {
+    try {
+        const [tab] = await browser.tabs.query({ active: true, lastFocusedWindow: true });
+        return tab || null;
+    } catch (e) {
+        await log(['Error getting current tab', e], 'warn');
+        return null;
+    }
+}
+
+/**
+ * Check if a URL is injectable (http(s) and not a browser/system page)
+ * @param {string} url 
+ * @returns {boolean} True if injectable
+ */
+function isInjectableUrl(url) {
+    if (!url || typeof url !== 'string') return false;
+
+    const forbiddenSchemes = ['chrome:', 'edge:', 'about:', 'moz-extension:', 'chrome-extension:', 'devtools:', 'view-source:'];
+    if (forbiddenSchemes.some(p => url.startsWith(p))) return false;
+    
+    // Block both stores for parity
+    if (url.startsWith('https://addons.mozilla.org')) return false;
+    if (url.startsWith('https://chrome.google.com/webstore')) return false;
+    if (url.startsWith('https://microsoftedge.microsoft.com/addons')) return false;
+    
+    return url.startsWith('http://') || url.startsWith('https://');
+}
+
+// Returns one of: 'start' | 'injecting' | 'injected'
+async function probeInjectionFF(tabId) {
+    try {
+        const [status] = await browser.tabs.executeScript(tabId, {
+            code: `(function () {
+                if (window.__servarrInjected === true) return 'injected';
+                if (window.__servarrInjecting === true) return 'injecting';
+                window.__servarrInjecting = true;
+                return 'start';
+            })();`
+        });
+        return status || 'start';
+    } catch (e) {
+        await log(['probeInjectionFF failed', e], 'warn');
+        return 'start';
+    }
+}
+
 /**
  * Get settings, set the extension icon and execute the content script
+ * @param {number|object} tabOrId Tab object or tab id
+ * @param {string} evt Event name for logging context
  */
-async function initRun(evt) {
-    await log(`running init from ${evt} event`);
-    
-    try {
+async function initRun(tabOrId, evt) {
+   await log(`running init from ${evt} event`);
+
+   try {
         const settings = await getSettings();
 
         await setIcon(settings);
         await buildMenus(settings);
-        await browser.tabs.executeScript({ file: 'content/js/browser-polyfill.min.js' });
-        await browser.tabs.executeScript({ file: 'content/js/icons.js' });
-        await browser.tabs.executeScript({ file: 'content/js/content_script.js' });
-    }
-    catch(e) {
+
+        if (!settings?.config?.enabled) {
+            await log('Extension disabled: skipping injection.');
+            return;
+        }
+
+        // Use provided Tab object when available; fall back to tabs.get
+        let tab = (tabOrId && typeof tabOrId === 'object') ? tabOrId : null;
+        if (!tab) {
+            try {
+                tab = await browser.tabs.get(tabOrId);
+            } catch (e) {
+                await log(['Failed to resolve tab for injection', e], 'warn');
+                return;
+            }
+        }
+
+        if (!isInjectableUrl(tab?.url)) {
+            await log(['Skipping injection for non-injectable URL', tab?.url]);
+            return;
+        }
+
+        // probe/lock so we only inject once per page
+        const probe = await probeInjectionFF(tab.id);
+        if (probe !== 'start') {
+            await log(`Skipping injection for tab ${tab.id}; status=${probe}`);
+            return;
+        }
+
+        // Explicitly target the tab
+        await browser.tabs.executeScript(tab.id, { file: 'content/js/jquery.min.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/js/browser-polyfill.min.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/js/icons.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/js/core.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/index.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/default.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/imdb.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/tmdb.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/tvdb.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/trakt.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/tvmaze.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/musicbrainz.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/letterboxd.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/tvcalendar.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/rottentomatoes.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/metacritic.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/simkl.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/iptorrents.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/lastfm.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/allocine.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/senscritique.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/betaseries.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/primevideo.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/myanimelist.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/rateyourmusic.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/js/content_script.js' });
+
+        // release lock
+        await browser.tabs.executeScript(tab.id, {
+            code: `window.__servarrInjected = true; delete window.__servarrInjecting;`
+        });
+   } catch (e) {
         await log(e.message, 'error');
-    }
+   }
 }
 
-browser.tabs.onActivated.addListener(function () {
-    initRun('onActivated')
+browser.tabs.onActivated.addListener(function (activeInfo) {
+    if (activeInfo && typeof activeInfo.tabId === 'number') {
+        initRun(activeInfo.tabId, 'onActivated');
+    }
 });
 
 browser.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
     log(['change info status', changeInfo]);
 
-    if (changeInfo.status == 'complete') {
-        initRun('onUpdated')
+    if (changeInfo.status === 'complete') {
+        initRun(tab, 'onUpdated');
     }
 });
 
-browser.runtime.onConnect.addListener(function(port) {
+browser.runtime.onConnect.addListener(function (port) {
     switch (port.name) {
         case 'init':
             port.onMessage.addListener(async function () {
-                await initRun('onConnect');
+                const tab = await getCurrentTab();
+                if (tab && typeof tab.id === 'number') {
+                    await initRun(tab.id, 'onConnect');
+                } else {
+                    await log('Could not determine current tab id for init run', 'warn');
+                }
             });
             break;
-
         case 'icon':
-            port.onMessage.addListener(async function (request) {
+            port.onMessage.addListener(async function () {
                 const settings = await getSettings();
-                
                 await setIcon(settings);
             });
             break;
     }
 });
 
+// Support one-shot message listener for init and icon messages 
+browser.runtime.onMessage.addListener(async (msg, sender) => {
+    if (!msg || typeof msg !== 'object') return;
+
+    if (msg.type === 'init') {
+        if (sender?.tab) {
+            await initRun(sender.tab, 'onMessage'); // pass full tab
+        } else {
+            const tab = await getCurrentTab();
+            if (tab?.id) await initRun(tab, 'onMessage');
+        }
+    } else if (msg.type === 'icon') {
+        const settings = await getSettings();
+        await setIcon(settings);
+    }
+});
+
 /**
- * Build the browser context menus
- * @param {Settings} settings 
+ * Build the browser context menus (grouped by type, parity with Firefox)
+ * @param {Setting} settings 
  */
 async function buildMenus(settings) {
-    // clear all before we decide to gtfo or not
     await browser.contextMenus?.removeAll();
 
-    // if unavailable, extension is disabled or context menu option is disabled gtfo
-    if (!browser.contextMenus || !settings.config.enabled || !settings.config.contextMenu) {
-        return;
+    if (!browser.contextMenus || !settings?.config?.enabled || !settings?.config?.contextMenu) return;
+
+    const enabledSites = (settings.sites || []).filter(site => site.enabled);
+    if (enabledSites.length === 0) return;
+
+    browser.contextMenus.create({ title: 'Search Servarr', id: 'sonarrRadarrLidarr', contexts: ['selection'] });
+
+    function titleType(type) {
+        if (!type) return '';
+        
+        if (type.includes('_')) {
+            const [a, b] = type.split('_');
+            return `${a.charAt(0).toUpperCase()}${a.slice(1)} (${b.charAt(0).toUpperCase()}${b.slice(1)})`;
+        }
+
+        return `${type.charAt(0).toUpperCase()}${type.slice(1)}`;
     }
 
-    let enabledSites = settings.sites.filter(site => { return site.enabled; });
+    const groupsByType = enabledSites.reduce((acc, s) => {
+        const t = s.type || s.id;
+        (acc[t] ||= []).push(s);
+        return acc;
+    }, {});
 
-    // if no sites are enabled gtfo
-    if (enabledSites.length === 0) {
-        return;
-    }
-
-    // create parent menu
-    browser.contextMenus.create({ "title": "Search Servarr", "id": "sonarrRadarrLidarr", "contexts": ["selection"] });
-
-    // create child menus from enabled sites array
-    for (let i = 0; i < enabledSites.length; i++) {
-        browser.contextMenus.create({ "title": enabledSites[i].menuText, "parentId": "sonarrRadarrLidarr", "id": `${enabledSites[i].id}Menu`, "contexts": ["selection"] });
+    for (const type of Object.keys(groupsByType)) {
+        const group = groupsByType[type];
+        const typeTitle = titleType(type);
+        
+        if (group.length > 1) {
+            const parentId = `type-${type}`;
+            
+            browser.contextMenus.create({ title: typeTitle, id: parentId, parentId: 'sonarrRadarrLidarr', contexts: ['selection'] });
+            
+            for (const site of group) {
+                const label = `Search ${site.name || typeTitle}`;
+                
+                browser.contextMenus.create({ title: label, parentId, id: `${site.id}Menu`, contexts: ['selection'] });
+            }
+        } else {
+            const site = group[0];
+            const label = `Search ${site.name || typeTitle}`;
+            
+            browser.contextMenus.create({ title: label, parentId: 'sonarrRadarrLidarr', id: `${site.id}Menu`, contexts: ['selection'] });
+        }
     }
 }
 
 /**
  * Context menu click handler
- * @param {*} info 
- * @param {*} tab 
+ * @param {object} info 
+ * @param {object} tab
  */
 async function onClickHandler(info, tab) {
     const settings = await getSettings();
 
-    for (let i = 0; i < settings.sites.length; i++) {
-        if (info.menuItemId == (`${settings.sites[i].id}Menu`)) {
+    for (const site of settings.sites || []) {
+        if (info.menuItemId === `${site.id}Menu`) {
             await browser.tabs.create({
-                'url': settings.sites[i].domain.replace(/\/$/, '') + settings.sites[i].searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
+                url: site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
             });
         }
     }
-};
-
+}
 browser.contextMenus?.onClicked.addListener(onClickHandler);
 
-/**
- * set up context menu tree at install time.
- */
+/** set up context menu tree at install time. */
 browser.runtime.onInstalled.addListener(async function () {
     const settings = await getSettings();
-
     buildMenus(settings);
 });
 
-/**
- * Listen for storage changes affecting context menu so updates apply immediately without requiring tab events.
- */
+/** Rebuild menus on storage changes affecting settings. */
 browser.storage.onChanged.addListener(async (changes, area) => {
-    if (!changes.hasOwnProperty('sonarrRadarrLidarrAutosearchSettings')) return;
+    if (!Object.prototype.hasOwnProperty.call(changes, 'sonarrRadarrLidarrAutosearchSettings')) return;
+
     try {
         const newSettings = changes.sonarrRadarrLidarrAutosearchSettings.newValue;
-        // Rebuild context menus when enabled / contextMenu flags or site enablement changes.
         await buildMenus(newSettings);
     } catch (e) {
         await log(['Failed rebuilding context menus from storage change', e], 'error');
     }
 });
 
-/**
- * Set the extension icon
- * @param {Settings} settings 
+/** 
+ * Set the extension icon 
+ * @param {Setting} settings
  */
 async function setIcon(settings) {
-    let img = `content/assets/images/SonarrRadarrLidarr${(settings.config.enabled ? '' : '-faded')}16.png`;
-
+    const img = `content/assets/images/SonarrRadarrLidarr${(settings?.config?.enabled ? '' : '-faded')}16.png`;
     await browser.browserAction.setIcon({ path: img });
 };
+
+// background/event page
+
+// Change these to whatever you want to open
+const WELCOME_URL = 'options.html#/welcome';
+const UPDATED_URL = 'options.html#/updated';
+
+// Only open on new versions we haven't shown yet
+browser.runtime.onInstalled.addListener(async (details) => {
+    const thisVersion = browser.runtime.getManifest().version;
+    const { lastSeenVersion } = await browser.storage.local.get('lastSeenVersion');
+
+    if (details.reason === 'install') {
+        // first install (optional)
+        await browser.tabs.create({ url: browser.runtime.getURL(WELCOME_URL) });
+        await browser.storage.local.set({ lastSeenVersion: thisVersion });
+        return;
+    }
+
+    if (details.reason === 'update') {
+        // don't re-open if we've already shown for this version
+        if (lastSeenVersion === thisVersion || thisVersion.startsWith('3')) return;
+
+        await browser.tabs.create({ url: browser.runtime.getURL(UPDATED_URL) });
+        await browser.storage.local.set({ lastSeenVersion: thisVersion });
+    }
+});

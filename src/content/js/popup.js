@@ -3,7 +3,7 @@ var iconPort = browser.runtime.connect({ name: 'icon' });
 // Tailwind variant classes for enable/disable toggle (only state-specific classes)
 const toggleVariant = {
     // Enabled (currently active) = show disable action => red
-    enabled: ['bg-red-600', 'hover:bg-red-500', 'focus:ring-red-400'],
+    enabled: ['bg-rose-600', 'hover:bg-rose-500', 'focus:ring-rose-400'],
     // Disabled (currently inactive) = show enable action => emerald
     disabled: ['bg-emerald-600', 'hover:bg-emerald-500', 'focus:ring-emerald-400']
 };

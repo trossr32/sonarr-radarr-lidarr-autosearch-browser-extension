@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Sonarr/Radarr/Lidarr autosearch",
   "description": "Exposes a context menu that enables direct searching for tv shows, movies and other text in Sonarr, Radarr, Lidarr and Readarr.",
-  "version": "2.13.0.0",
+  "version": "3.0.0.0",
   "browser_specific_settings": {
     "gecko": {
       "id": "sonarr-radarr-lidarr-autosearch@robgreen.me",
@@ -23,29 +23,8 @@
     "open_in_tab": true
   },
   "background": {
-    "scripts": [
-      "content/js/jquery.min.js",
-      "content/js/browser-polyfill.min.js",
-      "content/js/core.js",
-      "eventPage.js"
-    ],
     "service_worker": "eventPage.chrome.js"
   },
-  "content_scripts": [
-    {
-      "matches": [
-        "*://*/*",
-        "file://*/*"
-      ],
-      "js": [
-        "content/js/jquery.min.js",
-        "content/js/browser-polyfill.min.js",
-        "content/js/core.js",
-        "content/js/sonarr_radarr_lidarr_autosearch.js"
-      ],
-      "run_at": "document_end"
-    }
-  ],
   "permissions": [
     "scripting", 
     "storage",
@@ -53,23 +32,27 @@
     "contextMenus"
   ],
   "host_permissions": [
+    "*://*.allocine.fr/*",
+    "*://*.betaseries.com/*",
     "*://*.imdb.com/*",
+    "*://*.iptorrents/*",
+    "*://*.last.fm/*",
+    "*://*.letterboxd.com/*",
+    "*://*.metacritic.com/*",
+    "*://*.musicbrainz.org/*",
+    "*://*.myanimelist.net/*",
+    "*://*.primevideo.com/*",
+    "*://*.rateyourmusic.com/*",
+    "*://*.rottentomatoes.com/*",
+    "*://*.senscritique.com/*",
+    "*://*.simkl.com/*",
     "*://*.themoviedb.org/*",
     "*://*.thetvdb.com/*",
     "*://*.trakt.tv/*",
-    "*://*.tvmaze.com/*",
-    "*://*.musicbrainz.org/*",
-    "*://*.letterboxd.com/*",
     "*://*.pogdesign.co.uk/*",
-    "*://*.rottentomatoes.com/*",
-    "*://*.metacritic.com/*",
-    "*://*.simkl.com/*",
-    "*://*.iptorrents*",
-    "*://*.last.fm/*",
-    "*://*.allocine.fr/*",
-    "*://*.myanimelist.net/*",
-    "*://*.betaseries.com/*",
-    "*://*.primevideo.com/*",
+    "*://*.tvmaze.com/*"
+  ],
+  "optional_host_permissions": [
     "<all_urls>"
   ]
 }

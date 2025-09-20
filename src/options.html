@@ -15,12 +15,12 @@
     <script src="content/js/core.js"></script>
     <script src="content/js/icons.js"></script>
     <script src="content/js/options-1-settings.js"></script>
-    <script src="content/js/options-2-advanced.js"></script>
-    <script src="content/js/options-3-site-integrations.js"></script>
-    <script src="content/js/options-4-custom-icons.js"></script>
-    <script src="content/js/options-5-context-menu.js"></script>
-    <script src="content/js/options-6-debug.js"></script>
-    <script src="content/js/options-7-backup.js"></script>
+    <script src="content/js/options-2-site-integrations.js"></script>
+    <script src="content/js/options-3-custom-icons.js"></script>
+    <script src="content/js/options-4-context-menu.js"></script>
+    <script src="content/js/options-5-debug.js"></script>
+    <script src="content/js/options-6-backup.js"></script>
+    <script src="content/js/options-7-permissions.js"></script>
     <script src="content/js/options.js" defer></script>
 </head>
 <body class="h-full bg-[#1d1e22] text-slate-100 font-sans antialiased selection:bg-indigo-500/20 selection:text-indigo-200">
@@ -34,10 +34,10 @@
                     </div>
                     <div class="min-w-0">
                         <h1 class="text-xl sm:text-2xl font-semibold tracking-tight truncate m-0">Servarr autosearch options</h1>
-                        <p class="text-xs text-slate-400 mt-1 truncate">Configure connections, integrations, and behavior for your Servarr instances.</p>
+                        <p class="text-xs text-slate-400 mt-1 truncate">Configure connections, integrations, and behaviour for your Servarr instances.</p>
                     </div>
                 </div>
-                <div class="w-40 sm:w-56 flex-shrink-0">
+                <div class="flex-shrink-0">
                     <button id="toggleActive" type="button" class="w-full inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium px-4 py-2 bg-green-600 hover:bg-green-500 text-white shadow transition-colors cursor-pointer">
                         <i class="fa-solid fa-power-off"></i>
                         <span id="toggleActiveLabel">Disable</span>
@@ -50,9 +50,6 @@
         <div id="settingsTabs" role="tablist" aria-label="Settings sections" class="flex flex-wrap gap-2 border-b border-slate-700 pb-2 mb-6">
             <button type="button" id="tab-basic" data-panel="panel-basic" role="tab" aria-selected="true" class="tab-trigger is-active inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-white/10 text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-cog"></i><span class="hidden sm:inline">Settings</span>
-            </button>
-            <button type="button" id="tab-advanced" data-panel="panel-advanced" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
-                <i class="fa-solid fa-exclamation-triangle"></i><span class="hidden sm:inline">Advanced</span>
             </button>
             <button type="button" id="tab-integrations" data-panel="panel-integrations" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-link"></i><span class="hidden sm:inline">Integrations</span>
@@ -69,6 +66,9 @@
             <button type="button" id="tab-backup" data-panel="panel-backup" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-file-export"></i><span class="hidden sm:inline">Backup & restore</span>
             </button>
+            <button type="button" id="tab-permissions" data-panel="panel-permissions" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
+                <i class="fa-solid fa-key"></i><span class="hidden sm:inline">Permissions</span>
+            </button>
             <button type="button" id="tab-support" data-panel="panel-support" role="tab" aria-selected="false" class="tab-trigger inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium bg-transparent text-slate-300 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 cursor-pointer">
                 <i class="fa-solid fa-heart text-rose-500"></i><span class="hidden sm:inline">Support</span>
             </button>
@@ -81,27 +81,46 @@
                     <i class="fa-solid fa-question-circle fa-lg text-indigo-400 mt-1"></i>
                     <div>
                         <h2 class="font-semibold mb-2">Settings</h2>
-                        <p class="text-sm text-slate-300 mb-2">These settings configure how this extension will connect to your Servarr instances.</p>
-                        <p class="text-sm text-slate-300 mb-2">If an API key is entered and the "Auto populate from API" version is enabled on the advanced settings page, then the advanced settings will be configured automatically.</p>
-                        <p class="text-sm text-slate-300">Auto population will only work if the API call works, otherwise default values will be used.</p>
+                        <p class="text-sm text-slate-300 mb-2">
+                            Configure how this extension connects to your Servarr instances. Use 
+                            <span class="inline-flex items-center gap-1 rounded-md bg-emerald-600 text-white text-xs px-1 py-0.5 select-none align-middle">
+                                <i class="fa-solid fa-plus text-xs"></i><span>Add instance</span>
+                            </span>
+                            to add Sonarr/Radarr/Lidarr/Readarr entries, and the 
+                            <span class="inline-flex items-center justify-center px-1 py-0.5 rounded bg-slate-700 text-white text-xs select-none align-middle">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </span>
+                            button to remove.
+                        </p>
+                        <ul class="text-sm text-slate-300 list-disc pl-5 space-y-1 mb-2">
+                            <li><strong>Show advanced:</strong> toggle the 
+                                <span class="inline-flex items-center gap-1 rounded-md bg-indigo-600 text-white text-xs px-1 py-0.5 select-none align-middle">
+                                    <i class="fa-solid fa-cogs text-xs"></i><span>Show advanced</span>
+                                </span> button to reveal per-site <span class="font-semibold">Icon palette</span> and <span class="font-semibold">Advanced settings</span> sections.</li>
+                            <li><strong>Icon palette:</strong> choose foreground/background colours for each site's search icon (or 
+                                <span class="inline-flex items-center gap-1 justify-center px-1 py-0.5 rounded bg-slate-700 text-white text-xs select-none align-middle">
+                                    <span>Reset colours</span><i class="fa-solid fa-palette text-xs"></i>
+                                </span>).</li>
+                            <li><strong>Advanced settings:</strong> choose auto-population from your Servarr API or edit search path and input selector manually.</li>
+                            <li><strong>Auto-save:</strong> changes are saved immediately; toggle an instance to enable/disable editing and API tests (use the 
+                                <span class="inline-flex items-center gap-1 rounded-md bg-indigo-600 text-white text-sm px-1 py-0.5 shadow select-none align-middle">
+                                    <i class="fa-solid fa-vial text-xs"></i><span>Test</span>
+                                </span> button).</li>
+                        </ul>
+                        <p class="text-sm text-slate-300 mb-2">
+                            Auto-population works only if the API call succeeds; otherwise, defaults or your manual values are used.
+                        </p>
+                        <p class="text-sm text-slate-300">
+                            <strong>Permissions:</strong> For search icon injection to work on your Servarr pages you must grant host permissions for each Servarr instance you add. After adding an instance either click its 
+                            <span class="inline-flex items-center gap-1 rounded-md bg-indigo-600 text-white text-sm px-1 py-0.5 shadow select-none align-middle">
+                                <i class="fa-solid fa-vial text-xs"></i><span>Test</span>
+                            </span> (API) button (which also requests the host permission) or the 
+                            <span class="inline-flex items-center gap-1 rounded bg-rose-600 text-white text-xs px-1 py-0.5 select-none align-middle">Grant</span> button. You can review all granted permissions and revoke optional ones in the <span class="font-semibold">Permissions</span> tab. See that tab for more details.
+                        </p>
                     </div>
                 </div>
             </div>
             <form id="generalOptionsForm" class="space-y-6"></form>
-        </section>
-        <section id="panel-advanced" role="tabpanel" aria-labelledby="tab-advanced" class="panel hidden" hidden>
-            <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6">
-                <div class="px-4 py-3 flex items-start gap-4 border-b border-slate-700">
-                    <i class="fa-solid fa-question-circle fa-lg text-indigo-400 mt-1"></i>
-                    <div>
-                        <h2 class="font-semibold mb-2">Advanced settings</h2>
-                        <p class="text-sm text-slate-300 mb-2">These settings affect how the extension identifies the search page and input field within your Servarr instances.</p>
-                        <p class="text-sm text-slate-300 mb-2">If an API key is entered and the "Auto populate from API" switch is enabled these values will be derived automatically. Otherwise default or manually entered values are used.</p>
-                        <p class="text-sm text-slate-300">Disable auto population to edit the fields manually if detection fails and please raise an issue with your instance/version so it can be supported.</p>
-                    </div>
-                </div>
-            </div>
-            <form id="advancedOptionsForm" class="space-y-6"></form>
         </section>
         <section id="panel-integrations" role="tabpanel" aria-labelledby="tab-integrations" class="panel hidden" hidden>
             <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6">
@@ -131,7 +150,7 @@
                         <h2 class="font-semibold mb-2">Custom icon settings</h2>
                         <p class="text-sm text-slate-300 mb-2">Override integration injection points by showing a custom floating or anchored icon.</p>
                         <p class="text-sm text-slate-300 mb-2">An example icon will appear here while this tab is open if custom icons are enabled.</p>
-                        <p class="text-sm text-slate-300">If multiple elements match the usual selector fallback icon injection logic will be used instead of the custom icon.</p>
+                        <p class="text-sm text-slate-300">If multiple elements match the usual selector, fallback icon injection logic will be used instead of the custom icon.</p>
                     </div>
                 </div>
             </div>
@@ -157,6 +176,33 @@
 
             <form id="backupOptionsForm" class="space-y-6"></form>
         </section>
+        <section id="panel-permissions" role="tabpanel" aria-labelledby="tab-permissions" class="panel hidden" hidden>
+            <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-6">
+                <div class="px-4 py-3 flex items-start gap-4 border-b border-slate-700">
+                    <i class="fa-solid fa-question-circle fa-lg text-indigo-400 mt-1"></i>
+                    <div>
+                        <h2 class="font-semibold mb-2">Permissions overview</h2>
+                        <p class="text-sm text-slate-300 mb-2">
+                            This tab lists the extension permissions currently granted. API permissions are required for core features like context menus and saving settings.
+                            Host permissions allow the extension to run on specific websites (e.g. integration sites and your Servarr instances).
+                        </p>
+                        <ul class="text-sm text-slate-300 list-disc pl-5 space-y-1 mb-2">
+                            <li class="text-sm">Mandatory permissions come from the extension's manifest and can't be revoked here.</li>
+                            <li class="text-sm">Optional host permissions can be revoked per-origin. These will be added as you test servarr domains and API keys, or when you use the grant permission functionality.</li>
+                        </ul>
+                        <p class="text-sm text-slate-300 mb-2">
+                            If you see entries like <code>*://*/*</code>, <code>file://*/*</code> or <code>&lt;all_urls&gt;</code> below, these are legacy from an older version of the extension and can be revoked safely.
+                        </p>
+                        <p class="text-sm text-slate-300 mb-2">
+                            There is no harm in leaving these permissions in place, but removing them and granting specific access to only your Servarr domain(s) is recommended to narrow this extension's scope of access.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="permissionsOptionsForm" class="space-y-6"></form>
+        </section>
+
         <section id="panel-support" role="tabpanel" aria-labelledby="tab-support" class="panel hidden" hidden>
             <div class="rounded-lg bg-white/5 border border-slate-700 shadow mb-8 overflow-hidden">
                 <div class="px-4 py-3 flex items-start gap-4 border-b border-slate-700">
@@ -187,7 +233,7 @@
                     <div class="flex flex-col rounded-md bg-white/5 border border-slate-700/60 hover:border-slate-500 transition-colors">
                         <div class="p-4 flex-1 flex flex-col gap-3">
                             <div class="flex items-center gap-2">
-                                <i class="fa-solid fa-thumbs-up text-amber-400"></i>
+                                <i class="fa-solid fa-thumbs-up text-emerald-400"></i>
                                 <h3 class="font-semibold text-sm m-0">Leave a review</h3>
                             </div>
                             <p class="text-xs text-slate-400 leading-relaxed">Reviews and ratings in your browser's store help others find the extension and provide valuable feedback.</p>
@@ -230,21 +276,21 @@
                             </div>
                             <p class="text-xs text-slate-400 leading-relaxed">Thanks to the open source community members who have already contributed.</p>
                             <div class="flex flex-wrap items-center gap-2 mb-2">
-                                <a href='https://github.com/banterboy' target='_blank' rel='noopener'><picture><img src="https://github.com/banterboy.png" alt="banterboy" title="banterboy" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/aommm' target='_blank' rel='noopener'><picture><img src="https://github.com/aommm.png" alt="aommm" title="aommm" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/ledge74' target='_blank' rel='noopener'><picture><img src="https://github.com/ledge74.png" alt="ledge74" title="ledge74" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/almottier' target='_blank' rel='noopener'><picture><img src="https://github.com/almottier.png" alt="almottier" title="almottier" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/dannyvink' target='_blank' rel='noopener'><picture><img src="https://github.com/dannyvink.png" alt="dannyvink" title="dannyvink" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/Pompiedom' target='_blank' rel='noopener'><picture><img src="https://github.com/Pompiedom.png" alt="Pompiedom" title="Pompiedom" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/carsso' target='_blank' rel='noopener'><picture><img src="https://github.com/carsso.png" alt="carsso" title="carsso" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/3vanlock' target='_blank' rel='noopener'><picture><img src="https://github.com/3vanlock.png" alt="3vanlock" title="3vanlock" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/cyberden' target='_blank' rel='noopener'><picture><img src="https://github.com/cyberden.png" alt="cyberden" title="cyberden" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/MozPri' target='_blank' rel='noopener'><picture><img src="https://github.com/MozPri.png" alt="MozPri" title="MozPri" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/dynamiccookies' target='_blank' rel='noopener'><picture><img src="https://github.com/dynamiccookies.png" alt="dynamiccookies" title="dynamiccookies" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/theotherp' target='_blank' rel='noopener'><picture><img src="https://github.com/theotherp.png" alt="theotherp" title="theotherp" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/0xdevalias' target='_blank' rel='noopener'><picture><img src="https://github.com/0xdevalias.png" alt="0xdevalias" title="0xdevalias" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/StormPooper' target='_blank' rel='noopener'><picture><img src="https://github.com/StormPooper.png" alt="StormPooper" title="StormPooper" class="w-8 h-8 rounded-full"></picture></a>
-                                <a href='https://github.com/Xeldarflo' target='_blank' rel='noopener'><picture><img src="https://github.com/Xeldarflo.png" alt="Xeldarflo" title="Xeldarflo" class="w-8 h-8 rounded-full"></picture></a>
+                                <a href='https://github.com/banterboy' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/banterboy?s=64&v=4" alt="banterboy" title="banterboy" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/aommm' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/aommm?s=64&v=4" alt="aommm" title="aommm" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/ledge74' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/ledge74?s=64&v=4" alt="ledge74" title="ledge74" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/almottier' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/almottier?s=64&v=4" alt="almottier" title="almottier" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/dannyvink' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/dannyvink?s=64&v=4" alt="dannyvink" title="dannyvink" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/Pompiedom' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/Pompiedom?s=64&v=4" alt="Pompiedom" title="Pompiedom" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/carsso' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/carsso?s=64&v=4" alt="carsso" title="carsso" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/3vanlock' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/3vanlock?s=64&v=4" alt="3vanlock" title="3vanlock" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/cyberden' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/cyberden?s=64&v=4" alt="cyberden" title="cyberden" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/MozPri' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/MozPri?s=64&v=4" alt="MozPri" title="MozPri" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/dynamiccookies' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/dynamiccookies?s=64&v=4" alt="dynamiccookies" title="dynamiccookies" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/theotherp' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/theotherp?s=64&v=4" alt="theotherp" title="theotherp" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/0xdevalias' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/0xdevalias?s=64&v=4" alt="0xdevalias" title="0xdevalias" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/StormPooper' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/StormPooper?s=64&v=4" alt="StormPooper" title="StormPooper" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
+                                <a href='https://github.com/Xeldarflo' target='_blank' rel='noopener'><picture><img src="https://avatars.githubusercontent.com/Xeldarflo?s=64&v=4" alt="Xeldarflo" title="Xeldarflo" class="w-8 h-8 rounded-full" loading="lazy" decoding="async" referrerpolicy="no-referrer" crossorigin="anonymous"></picture></a>
                             </div>
                         </div>
                         <!-- <div class="px-4 pb-4">
@@ -259,7 +305,7 @@
 
         <!-- Footer -->
         <footer class="mt-10 text-center text-sm text-slate-400">
-            <i>Version 2.13.0</i>
+            <i>Version 3.0.0</i>
         </footer>
     </div>
 </body>
