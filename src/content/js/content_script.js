@@ -330,7 +330,7 @@ async function runServarrSearchInjection() {
             for (let i = 0; i < engines.length; i++) {
                 const engine = engines[i];
                 
-                if (!engine || typeof engine.match !== 'function' || !engine.match(url, document)) continue;
+                if (!engine || typeof engine.match !== 'function' || !engine.match(document, url)) continue;
 
                 const candidates = engine.candidates({ settings, url, document });
                 if (!candidates || !candidates.siteType || !candidates.elements || !candidates.getSearch || !candidates.insert) continue;

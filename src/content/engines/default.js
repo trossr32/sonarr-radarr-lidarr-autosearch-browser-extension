@@ -30,6 +30,7 @@
  * @property {string} id Unique engine id (e.g. "imdb", "tmdb").
  * @property {ServarrSiteType|string} [siteType] Fixed target type; omit if using {@link DefaultEngineConfig.resolveSiteType}.
  * @property {string[]} urlIncludes Substrings; engine runs when any is found in location.href.
+ * @property {(document: Document, url: string) => boolean} [match] Optional custom matcher (DOM+URL). Overrides default matcher.
  * @property {string} containerSelector CSS selector for elements to receive icons (insertion container).
  * @property {(el: Element, doc: Document) => string} getSearch Function that returns the search string to send to Servarr (may include prefixes like "imdb:" or "tmdb:"). Return an empty string to skip injecting for that element.
  * @property {(document: Document, url: string, settings: any) => (ServarrSiteType|string|null)} [resolveSiteType] Optional dynamic resolver. If provided, it overrides {@link DefaultEngineConfig.siteType}. Return null to skip the engine on this page.
@@ -139,6 +140,7 @@
         var key = cfg.key || null; // <-- optional unique variant tag for logging
         var staticSiteType = cfg.siteType || null;
         var resolveSiteType = cfg.resolveSiteType || null;
+        var matchOverride = typeof cfg.match === 'function' ? cfg.match : null;
         var urlIncludes = cfg.urlIncludes || [];
         var containerSelector = cfg.containerSelector || '';
         var getSearch = cfg.getSearch || function(){ return ''; };
@@ -149,6 +151,23 @@
         var iconStyle = cfg.iconStyle || 'width:25px; margin:-8px 10px 0 0;';
         var deferMs = cfg.deferMs || 0;
 
+        // Default matcher (using urlIncludes) — no need to define per engine
+        function defaultMatch(document, url) {
+            if (!urlIncludes || urlIncludes.length === 0) return false;
+            return urlIncludes.some(function (s) { return url.indexOf(s) >= 0; });
+        }
+
+        // Back-compat shim if someone accidentally calls match(url, document)
+        function callMatcher(m, document, url) {
+            try {
+                // Prefer (document, url)
+                return m(document, url);
+            } catch (_) {
+                // Fallback: swap if a legacy matcher was written as (url) only
+                return m(url);
+            }
+        }
+
         /** @type {EngineInstance} */
         return {
             id: id, // maps to settings.integrations[].id (group id)
@@ -157,17 +176,16 @@
 
             /**
              * Quick URL check to decide whether this engine should run.
+             * @param {Document} document
              * @param {string} url
              * @returns {boolean}
              */
-            match: function (url) {
-                if (!urlIncludes || urlIncludes.length === 0) return false;
+            match: function (document, url) {
+                if (matchOverride) return callMatcher(matchOverride, document, url);
+                return defaultMatch(document, url);
+                // if (!urlIncludes || urlIncludes.length === 0) return false;
                 
-                var m = urlIncludes.some(function (s) { return url.indexOf(s) >= 0; });
-                
-                if (m) log(['Engine.match.result', { id, url, m }]);
-                
-                return m;
+                // return urlIncludes.some(function (s) { return url.indexOf(s) >= 0; });
             },
 
             /**

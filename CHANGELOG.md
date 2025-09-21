@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Restrict extension permissions to only the enabled site integrations, allowing configured Servarr instances to be added as optional permissions
 - Add a permissions tab to view and manage the extension's permissions
 - Allow resetting all settings to their default values from the backup & restore tab
+- Move Edge to MV3
 
 ## 2.13.0
 
