@@ -30,7 +30,20 @@ Create a file `src/content/engines/integrations/yoursite.js`:
         id: 'yoursite',
 
         // Where to run (simple substring checks against window.location.href)
+        // Not required if using a custom `match` function below.
         urlIncludes: ['yoursite.example.com/path'],
+
+        // When to run (more complex logic, e.g., regex + DOM gates)
+        // Not required if using `urlIncludes` above.
+        match: function (document, url) {
+            // Example: simple regex match on the URL
+            urlMatches = /.+letterboxd\.com\/film\/.+/i.test(url);
+
+            if (!urlMatches) return false;
+
+            // Example: gate on DOM content
+            return !(document.querySelector('a[href*="themoviedb.org/movie/"]'));
+        },
 
         // Where to place the icon (container to inject into)
         containerSelector: 'h1.title',

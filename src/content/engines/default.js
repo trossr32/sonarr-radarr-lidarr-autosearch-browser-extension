@@ -140,8 +140,8 @@
         var key = cfg.key || null; // <-- optional unique variant tag for logging
         var staticSiteType = cfg.siteType || null;
         var resolveSiteType = cfg.resolveSiteType || null;
-        var matchOverride = typeof cfg.match === 'function' ? cfg.match : null;
-        var urlIncludes = cfg.urlIncludes || [];
+        var matchOverride = typeof cfg.match === 'function' ? cfg.match : null; // optional custom matcher function
+        var urlIncludes = cfg.urlIncludes || []; // use url matches if no matchOverride is provided
         var containerSelector = cfg.containerSelector || '';
         var getSearch = cfg.getSearch || function(){ return ''; };
         /** @type {'prepend'|'append'|'before'|'after'} */
@@ -183,9 +183,6 @@
             match: function (document, url) {
                 if (matchOverride) return callMatcher(matchOverride, document, url);
                 return defaultMatch(document, url);
-                // if (!urlIncludes || urlIncludes.length === 0) return false;
-                
-                // return urlIncludes.some(function (s) { return url.indexOf(s) >= 0; });
             },
 
             /**
