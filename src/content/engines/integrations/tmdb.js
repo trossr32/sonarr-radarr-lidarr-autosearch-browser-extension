@@ -20,15 +20,15 @@
             if (/themoviedb\.org\/movie\//i.test(href)) return 'radarr';
             return null;
         },
-        getSearch: function (_el, document) {
-            var href = canonicalHref(document);
+        getSearch: function (_el, doc) {
+            var href = canonicalHref(doc);
             if (/themoviedb\.org\/tv\//i.test(href)) {
-                var a = document.querySelector('.header .title h2 a');
+                var a = doc.querySelector('.header .title h2 a');
                 return (a && a.textContent || '').trim();
             }
             if (/themoviedb\.org\/movie\//i.test(href)) {
                 var m = href.match(/\/(\d{2,10})-/i);
-                return m ? ('tmdb:' + m[1]) : '';
+                return m ? (`tmdb:${m[1]}`) : '';
             }
             return '';
         }

@@ -118,7 +118,7 @@ Create a file `src/content/engines/integrations/yoursite.js`:
 | `deferMs` | `deferMs` (unchanged) |
 | `where` gates | Implement inside `resolveSiteType` (return `null` to skip) or early-exit in `getSearch` |
 
-> You can keep the same behaviors: extract IDs (`imdb:tt…`, `tmdb:…`), trim/rewrite titles, or gate on `og:type`, etc.
+> You can keep the same behaviours: extract IDs (`imdb:tt…`, `tmdb:…`), trim/rewrite titles, or gate on `og:type`, etc.
 
 ---
 

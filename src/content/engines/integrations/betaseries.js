@@ -21,7 +21,7 @@
                 { siteId: 'sonarr', pattern: /^video\.tv_show$/i }
             ]);
         },
-        getSearch: function(){ return title(document); }
+        getSearch: function(_el,doc){ return title(doc); }
     });
 
     var Movie = Def({
@@ -36,7 +36,7 @@
                 { siteId: 'radarr', pattern: /^video\.movie$/i }
             ]);
         },
-        getSearch: function(){ return title(document); }
+        getSearch: function(_el,doc){ return title(doc); }
     });
 
     window.__servarrEngines.list.push(TV, Movie);

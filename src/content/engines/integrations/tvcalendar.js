@@ -20,8 +20,8 @@
     // Keep the svg simple; let the wrapper do the layout
     iconStyle: 'width:18px; height:18px; display:block;',
 
-    getSearch: function (el) {
-      var a = el && el.querySelector('a:first-of-type');
+    getSearch: function (_el,doc) {
+      var a = _el && _el.querySelector('a:first-of-type');
       return (a && (a.textContent || '').trim()) || '';
     }
   });

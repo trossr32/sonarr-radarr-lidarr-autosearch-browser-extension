@@ -11,8 +11,8 @@
         containerSelector: 'b.MovieTitle',
         insertWhere: 'append',
         iconStyle: 'width: 20px; margin: 5px 0 0 0;',
-        getSearch: function(el){ 
-            var a=el && el.querySelector('a'); 
+        getSearch: function(_el,doc){ 
+            var a=_el && _el.querySelector('a'); 
             return (a && (a.textContent||'').trim())||''; 
         }
     });
@@ -25,8 +25,8 @@
         containerSelector: 'b.MovieTitle',
         insertWhere: 'append',
         iconStyle: 'width: 20px; margin: 5px 0 0 0;',
-        getSearch: function(el){
-            var a = el && el.querySelector('a');
+        getSearch: function(_el,doc){
+            var a = _el && _el.querySelector('a');
             var href = (a && a.href) || '';
             var m = href.match(/(tt\d{5,10})/i);
             return m ? ('imdb:' + m[1]) : '';

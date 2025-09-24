@@ -26,14 +26,14 @@
             
             return null;
         },
-        getSearch: function (_el, document, url) {
-            if (/series/.test(infoText(document))) {
-                var s = document.querySelector('#series_basic_info > ul > li:first-of-type > span');
+        getSearch: function (_el, doc) {
+            if (/series/.test(infoText(doc))) {
+                var s = doc.querySelector('#series_basic_info > ul > li:first-of-type > span');
                 var v = (s && (s.textContent || '')).trim();
                 return v ? (`tvdb:${v}`) : '';
             }
-            
-            var t = document.querySelector('#series_title');
+
+            var t = doc.querySelector('#series_title');
             
             return (t && (t.textContent || '').trim()) || '';
         }

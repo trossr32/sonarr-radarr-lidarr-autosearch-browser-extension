@@ -16,7 +16,7 @@
         // no static siteType here — we decide at runtime
         urlIncludes: ['imdb.com'],
         containerSelector: 'h1',
-        getSearch: function (_el, document) { return extractImdbId(document); },
+        getSearch: function (_el, doc) { return extractImdbId(doc); },
         iconStyle: 'width:35px; height:35px; display:inline-block; vertical-align:middle; margin:0 8px 0 0;',
 
         // Restore the old "rules" behaviour:
@@ -39,7 +39,7 @@
         // no static siteType here — we decide at runtime
         urlIncludes: ['imdb.com'],
         containerSelector: 'h1',
-        getSearch: function (_el, document) { return extractImdbId(document); },
+        getSearch: function (_el, doc) { return extractImdbId(doc); },
         iconStyle: 'width:35px; height:35px; display:inline-block; vertical-align:middle; margin:0 8px 0 0;',
 
         // Restore the old "rules" behaviour:

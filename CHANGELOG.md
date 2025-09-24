@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Add a permissions tab to view and manage the extension's permissions
 - Allow resetting all settings to their default values from the backup & restore tab
 - Move Edge to MV3
+- Split letterboxd functionality from only Radarr to Sonarr & Radarr
 
 ## 2.13.0
 

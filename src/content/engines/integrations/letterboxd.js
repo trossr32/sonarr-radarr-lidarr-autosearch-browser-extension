@@ -8,7 +8,7 @@
         key: 'letterboxd-tv',
 
         match: function (document, url) {
-            urlMatches = /.+letterboxd\.com\/film\/.+/i.test(url);
+            const urlMatches = /.+letterboxd\.com\/film\/.+/i.test(url);
 
             if (!urlMatches) return false;
 
@@ -52,7 +52,7 @@
         key: 'letterboxd-movie',
 
         match: function (document, url) {
-            urlMatches = /.+letterboxd\.com\/film\/.+/i.test(url);
+            const urlMatches = /.+letterboxd\.com\/film\/.+/i.test(url);
 
             if (!urlMatches) return false;
 

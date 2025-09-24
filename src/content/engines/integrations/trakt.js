@@ -69,7 +69,7 @@
         insertWhere: 'append',
         iconStyle: 'width: 25px; margin: 0 0 -4px 10px;',
         siteType: 'sonarr',
-        getSearch: function (el) { return (el && (el.textContent || '').trim()) || ''; }
+        getSearch: function (_el,doc) { return (_el && (_el.textContent || '').trim()) || ''; }
     });
 
     // Movies group listings (default Radarr)
@@ -89,7 +89,7 @@
         insertWhere: 'append',
         iconStyle: 'width: 23px; margin: 0 0 2px 10px;',
         siteType: 'radarr',
-        getSearch: function (el) { return (el && (el.textContent || '').trim()) || ''; }
+        getSearch: function (_el,doc) { return (_el && (_el.textContent || '').trim()) || ''; }
     });
 
     window.__servarrEngines.list.push(ShowsDetail, MoviesDetail, ShowsGroup, MoviesGroup);

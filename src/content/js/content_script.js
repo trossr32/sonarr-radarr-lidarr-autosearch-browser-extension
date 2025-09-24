@@ -148,7 +148,7 @@ function addCustomIconMarkup(injectedIconConfig, site, linkHref) {
     const $row = $('#servarr-ext_custom-icon-row');
     $row.css({
         backgroundColor: injectedIconConfig.backgroundColor,
-        // vertical position, match previous anchored offset behavior
+        // vertical position, match previous anchored offset behaviour
         [pos]: isAnchored ? `calc(${posOffset} ${pos === 'top' ? '+' : '-'} 57px)` : posOffset,
         // horizontal position, anchored row hugs left/right via wrapper class
         ...(isAnchored ? {} : { [side]: sideOffset })

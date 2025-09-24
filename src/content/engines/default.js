@@ -87,7 +87,7 @@
 
     /**
      * Inspect a DOM node and return the first matching rule's siteId.
-     * Mirrors the old `rules` behavior from the integrations array.
+     * Mirrors the old `rules` behaviour from the integrations array.
      * @param {Document} document
      * @param {string} selector           - CSS selector for the node to read.
      * @param {string|null} attr          - Attribute name to read (e.g. 'content' / 'href'), or null to read textContent.
@@ -193,7 +193,9 @@
             candidates: function (ctx) {
                 log(['Engine.candidates', { id, ctx }]);
 
-                var document = ctx.document, url = ctx.url, settings = ctx.settings;
+                var document = ctx.document, 
+                    url = ctx.url, 
+                    settings = ctx.settings;
 
                 /** @type {(ServarrSiteType|string|null)} */
                 var computedSiteType = (typeof resolveSiteType === 'function') ? (resolveSiteType(document, url, settings) || null) : staticSiteType;

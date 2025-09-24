@@ -47,8 +47,8 @@
         wrapLinkWithContainer: '<section style="float: left; margin: 2px 4px 0 0"></section>',
         insertWhere: 'prepend',
         iconStyle: 'width: 12px;',
-        getSearch: function(el){ 
-            var a=el && el.querySelector('a'); 
+        getSearch: function(_el,doc){ 
+            var a=_el && _el.querySelector('a'); 
             return (a && (a.textContent||'').trim())||''; 
         }
     });
