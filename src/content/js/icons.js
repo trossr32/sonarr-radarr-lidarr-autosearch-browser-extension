@@ -31,6 +31,21 @@ const svgIcons = [
  * @param {string} bg Background color
  * @returns {string|null} SVG string or null if not found
  */
+
+// Sanitize user-supplied color before injecting into SVG markup
+function sanitizeColorInput(color) {
+    if (typeof color !== "string") return null;
+    color = color.trim();
+    // Accept: #rgb, #rrggbb, #rgba/#rrggbbaa, rgb(), rgba(), hsl(), hsla(); case-insensitive, optional spaces
+    if (/^#([a-f0-9]{3,8})$/i.test(color)) return color;
+    if (/^rgba?\(\s*(\d{1,3}\s*,){2,3}\s*[\d.]+\s*\)$/i.test(color)) return color;
+    if (/^hsla?\(\s*[\d.]+\s*,\s*[\d.]+%\s*,\s*[\d.]+%\s*(?:,\s*[\d.]+)?\s*\)$/i.test(color)) return color;
+    // Add more known safe named colors if needed (optional)
+    var cssNamedColors = ['black','silver','gray','white','maroon','red','purple','fuchsia','green','lime','olive','yellow','navy','blue','teal','aqua','orange']; // minimal
+    if (cssNamedColors.includes(color.toLowerCase())) return color.toLowerCase();
+    return null; // reject unsafe colors
+}
+
 function getIcon(type, styles = null, classes = null, fg = null, bg = null) {
     type = type.indexOf('readarr') >= 0 ? 'readarr' : type;
     const icon = svgIcons.find(i => i.type === type);
@@ -42,6 +57,10 @@ function getIcon(type, styles = null, classes = null, fg = null, bg = null) {
     fg = fg !== null ? fg : icon.fg;
     bg = bg !== null ? bg : icon.bg;
 
+    // Sanitize color values; fallback to default if invalid
+    const safeFg = sanitizeColorInput(fg) || icon.fg;
+    const safeBg = sanitizeColorInput(bg) || icon.bg;
+
     let svg = icon.svg;
 
     if (styles !== null) {
@@ -52,8 +71,8 @@ function getIcon(type, styles = null, classes = null, fg = null, bg = null) {
         svg = svg.replace('<svg ', `<svg class="${classes}" `);
     }
 
-    // Replace all occurrences of placeholder tokens
-    return svg.replace(/\[fg\]/g, fg).replace(/\[bg\]/g, bg);
+    // Replace all occurrences of placeholder tokens with sanitized colors
+    return svg.replace(/\[fg\]/g, safeFg).replace(/\[bg\]/g, safeBg);
 }
 
 /**
