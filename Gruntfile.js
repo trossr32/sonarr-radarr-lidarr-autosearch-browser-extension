@@ -30,8 +30,6 @@ module.exports = function (grunt) {
                     { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' },
                     { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/firefox', filter: 'isFile' },
 
-                    // css
-
                     // content
                     { expand: true, flatten: true, src: 'src/*.html', dest: 'dist/firefox', filter: 'isFile' },
                     
@@ -54,8 +52,6 @@ module.exports = function (grunt) {
                     { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
                     { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/chromium', filter: 'isFile' },
-
-                    // css
 
                     // content
                     { expand: true, flatten: true, src: 'src/*.html', dest: 'dist/chromium', filter: 'isFile' },

@@ -1,3 +1,16 @@
+const DISABLED_CLASSES = 'opacity-50 cursor-not-allowed';
+var iconPort = browser.runtime.connect({ name: 'icon' });
+var entityMap = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+        '/': '&#x2F;',
+        '`': '&#x60;',
+        '=': '&#x3D;'
+    };
+
 /**
  * Small shim replicating the bootstrapToggle API.
  * Supported features:
@@ -14,11 +27,13 @@
             if (typeof arg === 'string') {
                 const cmd = arg.toLowerCase();
                 const $btn = $checkbox.data('twToggleButton');
+                
                 if (!$btn) return; // not initialised yet
+                
                 if (cmd === 'enable') {
-                    $btn.removeClass('opacity-50 pointer-events-none');
+                    $btn.removeClass('opacity-50').prop('disabled', false).attr('aria-disabled', null);
                 } else if (cmd === 'disable') {
-                    $btn.addClass('opacity-50 pointer-events-none');
+                    $btn.addClass('opacity-50').prop('disabled', true).attr('aria-disabled', 'true');
                 }
                 return;
             }
@@ -37,9 +52,9 @@
             $checkbox.hide();
 
             const styleMap = (style, active) => {
-                const base = 'inline-flex items-center justify-center rounded-md text-xs font-medium px-2 py-1 transition-colors transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 w-full select-none cursor-pointer active:scale-[.97]';
-                const palette = style === 'success' ? (active ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-green-700/30 text-green-400') : (style === 'danger' ? (active ? 'bg-red-600 hover:bg-red-500 text-white' : 'bg-red-700/30 text-red-400') : (active ? 'bg-slate-600 hover:bg-slate-500 text-white' : 'bg-slate-600/20 text-slate-300'));
-                return base + ' ' + palette;
+                const base = 'inline-flex items-center justify-center rounded text-xs font-medium px-2 py-0.5 h-7 transition-colors transition-transform focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 w-full select-none cursor-pointer active:scale-[.97] disabled:cursor-not-allowed';
+                const palette = style === 'success' ? (active ? 'bg-green-600 hover:bg-green-500 text-white' : 'bg-green-700/30 text-green-400') : (style === 'danger' ? (active ? 'bg-rose-600 hover:bg-rose-500 text-white' : 'bg-rose-700/30 text-rose-400') : (active ? 'bg-slate-600 hover:bg-slate-500 text-white' : 'bg-slate-600/20 text-slate-300'));
+                return `${base} ${palette}`;
             };
 
             const makeLabel = () => $checkbox.prop('checked') ? opts.on : opts.off;
@@ -105,8 +120,93 @@ function initToggle(selector, opts, onChange) {
     return $el;
 }
 
-// Shared enable/disable helpers
-const DISABLED_CLASSES = 'opacity-50 cursor-not-allowed';
+// ---- Shared spectrum helpers ----
+/**
+ * Initialize a Spectrum color picker on a text <input>.
+ * @param {jQuery} $input
+ * @param {string} initialColor - hex color to seed
+ * @param {Function} onChangeAsync - async () => void; called on value change
+ */
+function initSpectrumColorPicker($input, initialColor, onChangeAsync) {
+    if (!$input || !$input.length) return;
+
+    if (initialColor) $input.val(initialColor);
+
+    function isValidHex(v) {
+        const s = String((v || '').trim());
+
+        // allow #rgb | #rrggbb
+        return /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(s);
+    }
+
+    async function sync(colorObjOrNull) {
+        let tiny = colorObjOrNull;
+
+        if (!tiny) { 
+            try { 
+                tiny = $input.spectrum('get'); 
+            } catch (_) { tiny = null; } 
+        }
+
+        if (!tiny) return;
+
+        if ($input.val() !== tiny.toHexString()) $input.val(tiny.toHexString());
+        if (typeof onChangeAsync === 'function') await onChangeAsync();
+    }
+
+    $input.spectrum({
+        color: initialColor || $input.val() || '#000000',
+        showPalette: false,
+        showInput: true,
+        showInitial: false,
+        showButtons: true,
+        clickoutFiresChange: true,
+        showAlpha: false,
+        allowEmpty: false,
+        preferredFormat: 'hex',
+        appendTo: 'body',
+        change: sync,
+        hide: sync
+    });
+
+    // Show on focus for nicer UX
+    $input.on('focus', function(){ try { $input.spectrum('show'); } catch(_){} });
+
+    // Manual typing → keep picker in sync & fire callback
+    $input.on('input', async function () {
+        let val = $(this).val().trim();
+        
+        if (val && val[0] !== '#') { val = `#${val}`; $(this).val(val); }
+
+        if (isValidHex(val)) {
+            try { $input.spectrum('set', val); } catch (_){}
+            if (typeof onChangeAsync === 'function') await onChangeAsync();
+        }
+    });
+}
+
+/**
+ * Enable/disable a Spectrum instance bound to $input.
+ * @param {jQuery} $input
+ * @param {boolean} enabled
+ */
+function setSpectrumEnabled($input, enabled) {
+    if (!$input || !$input.length) return;
+    try {
+        $input.spectrum(enabled ? 'enable' : 'disable');
+        if (!enabled) $input.spectrum('hide');
+    } catch (_) {}
+}
+
+/**
+ * Destroy Spectrum instance (safe if not initialized).
+ * @param {jQuery} $input
+ */
+function destroySpectrum($input) {
+    if (!$input || !$input.length) return;
+    try { $input.spectrum('destroy'); } catch (_) {}
+}
+// -----------------------------------
 
 /**
  * Initialize the tab system.
@@ -120,7 +220,9 @@ function initTabs() {
     function activate(id) {
         tabTriggers.forEach(btn => {
             const isActive = btn.id === id;
+
             btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            
             if (isActive) {
                 btn.classList.add('is-active', 'bg-white/10', 'text-white');
                 btn.classList.remove('text-slate-300');
@@ -129,6 +231,7 @@ function initTabs() {
                 btn.classList.add('text-slate-300');
             }
         });
+
         panels.forEach(panel => {
             const match = 'panel-' + id.replace('tab-', '');
             const show = panel.id === match;
@@ -153,14 +256,18 @@ function initTabs() {
         btn.addEventListener('click', () => activate(btn.id));
         btn.addEventListener('keydown', e => {
             const idx = tabTriggers.indexOf(btn);
+
             if (['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(e.key)) {
                 e.preventDefault();
                 let nextIndex = idx;
+                
                 if (e.key === 'ArrowRight') nextIndex = (idx + 1) % tabTriggers.length;
                 if (e.key === 'ArrowLeft') nextIndex = (idx - 1 + tabTriggers.length) % tabTriggers.length;
                 if (e.key === 'Home') nextIndex = 0;
                 if (e.key === 'End') nextIndex = tabTriggers.length - 1;
+                
                 tabTriggers[nextIndex].focus();
+                
                 activate(tabTriggers[nextIndex].id);
             }
         });
@@ -170,17 +277,6 @@ function initTabs() {
     const initiallyActive = tabTriggers.find(b => b.getAttribute('aria-selected') === 'true') || tabTriggers[0];
     activate(initiallyActive.id);
 }
-
-var entityMap = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#39;',
-        '/': '&#x2F;',
-        '`': '&#x60;',
-        '=': '&#x3D;'
-    };
 
 /**
  * Convert string to title case
@@ -216,61 +312,76 @@ var escapeHtml = (string) =>
 var initialiseEnabledDisabledButton = function(settings) {
     const $btn = $('#toggleActive');
     const enabled = settings.config.enabled;
-    $btn.removeClass('bg-green-600 hover:bg-green-500 bg-red-600 hover:bg-red-500');
+
+    $btn.removeClass('bg-green-600 hover:bg-green-500 bg-rose-600 hover:bg-rose-500');
+    
     if (enabled) {
-        $btn.addClass('bg-red-600 hover:bg-red-500');
+        $btn.addClass('bg-rose-600 hover:bg-rose-500');
         $('#toggleActiveLabel').text('Disable');
     } else {
         $btn.addClass('bg-green-600 hover:bg-green-500');
         $('#toggleActiveLabel').text('Enable');
     }
-    try { if (iconPort && iconPort.postMessage) iconPort.postMessage({ x: "y" }); } catch(e) { /* ignore disconnected port */ }
+    
+    try { 
+        if (iconPort && iconPort.postMessage) iconPort.postMessage({ x: "y" }); 
+    } catch(e) { /* ignore disconnected port */ }
 };
 
 /**
  * Listen for storage changes
  */
-browser.storage.onChanged.addListener(async function(changes, area) {
-    let changedItems = Object.keys(changes);
+browser.storage.onChanged.addListener(async (changes, area) => {
+    const change = changes.sonarrRadarrLidarrAutosearchSettings;
+    if (!change) return;
 
-    for (let item of changedItems) {
-        if (item !== 'sonarrRadarrLidarrAutosearchSettings') {
-            continue;
-        }
+    initialiseEnabledDisabledButton(change.newValue);
 
-        initialiseEnabledDisabledButton(changes[item].newValue);
+    const oldSites = (change.oldValue && change.oldValue.sites) ? change.oldValue.sites : [];
+    const newSites = (change.newValue && change.newValue.sites) ? change.newValue.sites : [];
 
-        /**
-         * call API version type endpoint if the auto populate from API setting is true and:
-         * . on the Settings tab the domain or api key for any site has been changed, or the site has been set to enabled
-         * . on the Advanced Settings tab the auto populate from API switch has been enabled
-         */ 
-        for (let i = 0; i < changes[item].oldValue.sites.length; i++) {
-            let oldSite = changes[item].oldValue.sites[i],
-                newSite = changes[item].newValue.sites[i];
+    const oldById = {};
+    for (const s of oldSites) if (s && s.id) oldById[s.id] = s;
+
+    const toUpdate = [];
+    for (const newSite of newSites) {
+        if (!newSite?.id) continue;
+        if (!(newSite.autoPopAdvancedFromApi && newSite.enabled)) continue;
+
+        const oldSite = oldById[newSite.id];
+        const isNew = !oldSite;
+        const changed =
+        isNew ||
+        oldSite.domain !== newSite.domain ||
+        oldSite.apiKey !== newSite.apiKey ||
+        oldSite.enabled !== newSite.enabled ||
+        oldSite.autoPopAdvancedFromApi !== newSite.autoPopAdvancedFromApi;
+
+        if (changed) toUpdate.push(newSite.id);
+    }
+    if (toUpdate.length === 0) return;
+
+    // Fire calls (sequentially to be gentle on the server; swap to Promise.allSettled for parallel)
+    let anySucceeded = false;
+    for (const siteId of toUpdate) {
+        try {
+            log('Advanced settings update check required, calling version API');
             
-            if (newSite.autoPopAdvancedFromApi &&
-                newSite.enabled &&
-                (oldSite.apiKey != newSite.apiKey ||
-                oldSite.domain != newSite.domain ||
-                oldSite.enabled != newSite.enabled ||
-                oldSite.autoPopAdvancedFromApi != newSite.autoPopAdvancedFromApi)) {
-                    log('Advanced settings update check required, calling version API');
-
-                    const response = await callApi({ siteId: newSite.id, endpoint: 'Version' });
-
-                    if (response.success) {
-                        log([`API call succeeded, updating advanced settings for ${newSite.id}`, response]);
-
-                        const settings = await getSettings();
-                        updateAdvancedForm(settings);
-                    } else {
-                        log(['API call failed', response]);
-                    }
-
-                    // notify?
-                }
+            const response = await callApi({ siteId, endpoint: 'Version' });
+            
+            if (response?.success) {
+                anySucceeded = true;
+                log([`API call succeeded, updating advanced settings for ${siteId}`, response]);
+            } else {
+                log(['API call failed', response]);
+            }
+        } catch (e) {
+            log(['API call threw', e], 'warn');
         }
+    }
+    if (anySucceeded) {
+        const cur = await getSettings();
+        updateAdvancedForm(cur);
     }
 });
 
@@ -279,15 +390,16 @@ $(async function () {
     initTabs();
 
     const settings = await getSettings();
+
     initialiseEnabledDisabledButton(settings);
+
     initialiseBasicForm(settings);
-    initialiseAdvancedForm(settings);
     initialiseIntegrationsForm(settings);
     initialiseCustomIconForm(settings);
     initialiseContextMenuForm(settings);
     initialiseDebugForm(settings);
-    // Backup/Restore tab
     initialiseBackupForm(settings);
+    initialisePermissionsForm(settings);
 
     // After forms built (badges exist), kick off passive status probe
     runInitialBackgroundProbe();
