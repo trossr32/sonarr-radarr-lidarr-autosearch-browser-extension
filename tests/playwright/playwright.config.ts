@@ -60,7 +60,7 @@ export default defineConfig({
     //   use: { ...devices['iPhone 12'] },
     // },
 
-    /* Test against branded browsers. */
+    /* Test against branded browsers. Playwright (or more specifically the branded Chrome and Edge browsers) don't allow for extensions to be side-loaded. */
     // {
     //   name: 'Microsoft Edge',
     //   use: { ...devices['Desktop Edge'], channel: 'msedge' },

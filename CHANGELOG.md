@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.0.0
+
+### Changed
+
+- Merge advanced tab functionality into the settings tab
+- Allow addition and deletion of multiple Servarr instances
+- Customise Servarr icon colours and names per instance
+- Replace site integration configuration object array with an inheritable engine pattern to allow greater customisation of site integration behaviour
+- Restrict extension permissions to only the enabled site integrations, allowing configured Servarr instances to be added as optional permissions
+- Add a permissions tab to view and manage the extension's permissions
+- Allow resetting all settings to their default values from the backup & restore tab
+- Move Edge to MV3
+- Split letterboxd functionality from only Radarr to Sonarr & Radarr
+
 ## 2.13.0
 
 ### Added
@@ -40,7 +54,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Migrate to manifest v3 for chromium browsers (Firefox staying on manifest v2 for now - [more info](https://blog.mozilla.org/addons/2024/03/13/manifest-v3-manifest-v2-march-2024-update/)). - ([#143](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/143)). 
+- Migrate to manifest v3 for chromium browsers (Firefox staying on manifest v2 for now - [more info](https://blog.mozilla.org/addons/2024/03/13/manifest-v3-manifest-v2-march-2024-update/)). - ([#143](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/143)).
 - Fixed Letterboxd missing Radarr icon - ([#193](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/193)). Thanks to [MozPri](https://github.com/MozPri).
 - Fix bug where colon is replaced by "%3A". ([#196](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/196)). Thanks to [dynamiccookies](https://github.com/dynamiccookies).
 
@@ -72,7 +86,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- IMDB TV episode 
+- IMDB TV episode
 
 ## 2.8.4
 

@@ -84,9 +84,9 @@ jobs:
           path: tests/playwright/playwright-report/
           retention-days: 30
 
-      # If the test step fails, create an issue using the same method as before.
+      # If the test step fails, create an issue using the same method as before, if running on the main or master branch.
       - name: Create issue if test fails
-        if: failure()
+        if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         uses: dacbd/create-issue-action@main
         with:
           token: ${{ github.token }}

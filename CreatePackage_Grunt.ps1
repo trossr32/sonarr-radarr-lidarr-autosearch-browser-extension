@@ -21,7 +21,8 @@ try {
 	npm i -g web-ext
 }
 
-# build Firefox add on
+# build Firefox and Chromium packages
+# xpi for Firefox, zip for Chromium
 
 $buildConfigs = @(
     @{ Path = "firefox"; Extension = "xpi" },
@@ -32,9 +33,3 @@ foreach ($config in $buildConfigs) {
     $addon = Resolve-Path -LiteralPath "dist/$($config.Path)"
     web-ext build -s $addon -a $publish -o --filename "sonarr_radarr_lidarr_autosearch-{version}.$($config.Extension)"
 }
-
-Set-Location $publish
-
-$xpi = Get-Childitem -Include *xpi* -File -Recurse -ErrorAction SilentlyContinue
-
-Copy-Item -Path $xpi -Destination ($xpi.FullName -replace ".xpi", "_edge.zip") -Force
