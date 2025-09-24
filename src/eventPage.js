@@ -25,10 +25,27 @@ function isInjectableUrl(url) {
     const forbiddenSchemes = ['chrome:', 'edge:', 'about:', 'moz-extension:', 'chrome-extension:', 'devtools:', 'view-source:'];
     if (forbiddenSchemes.some(p => url.startsWith(p))) return false;
     
-    // Block both stores for parity
-    if (url.startsWith('https://addons.mozilla.org')) return false;
-    if (url.startsWith('https://chrome.google.com/webstore')) return false;
-    if (url.startsWith('https://microsoftedge.microsoft.com/addons')) return false;
+    // Block addon/webstore hosts for parity (use parsed host)
+    let host = '';
+    try {
+        host = (new URL(url)).host;
+    } catch {
+        // Invalid/unknown URL
+        return false;
+    }
+    const forbiddenHosts = [
+        'addons.mozilla.org',
+        'chrome.google.com',
+        'microsoftedge.microsoft.com'
+    ];
+    // Block root store hosts, and for parity block webstore/addons subdomains
+    if (
+        forbiddenHosts.includes(host) ||
+        host === 'chrome.google.com' && url.startsWith('https://chrome.google.com/webstore') ||
+        host === 'microsoftedge.microsoft.com' && url.startsWith('https://microsoftedge.microsoft.com/addons')
+    ) {
+        return false;
+    }
     
     return url.startsWith('http://') || url.startsWith('https://');
 }
