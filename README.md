@@ -8,7 +8,7 @@
 
 📚 Visit the [Wiki](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki) for installation, settings, and integration guides.
 
-👉 New: A comprehensive end-user configuration manual is now available: see the [User Configuration Guide](./USER_GUIDE.md).
+👉 New: A comprehensive end-user configuration manual is now available: see the [User Guide](./USER_GUIDE.md).
 
 ## Overview
 
