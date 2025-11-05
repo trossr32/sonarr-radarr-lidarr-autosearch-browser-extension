@@ -18,8 +18,56 @@ on:
   workflow_dispatch:
 
 jobs:
-  # First job: discover all the *.spec.ts files and output a JSON matrix.
+  # First job: setup and build extension artifacts
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          
+      - name: Publish extension to dist folder
+        run: |
+          npm ci
+          npm i grunt -g
+          grunt playwright
+
+      - name: Install test dependencies
+        run: npm ci
+        working-directory: tests/playwright
+
+      - name: Install Playwright browser (chromium)
+        run: npx playwright install --with-deps chromium
+        working-directory: tests/playwright
+
+      # Upload the built extension
+      - name: Upload extension artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: extension-dist
+          path: dist/
+          retention-days: 1
+
+      # Upload node_modules from the test directory (includes Playwright browsers)
+      - name: Upload test dependencies
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-node-modules
+          path: tests/playwright/node_modules/
+          retention-days: 1
+
+      # Upload the Playwright cache (browsers and dependencies)
+      - name: Upload Playwright cache
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-cache
+          path: ~/.cache/ms-playwright/
+          retention-days: 1
+
+  # Second job: discover all the *.spec.ts files and output a JSON matrix.
   discover-tests:
+    needs: setup
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.discover.outputs.matrix }}
@@ -44,34 +92,44 @@ jobs:
           matrix="${matrix::-1}]}"
           echo "matrix=$matrix" >> $GITHUB_OUTPUT
   
-  # Second job: run tests in parallel – one per file – using the matrix.
+  # Third job: run tests in parallel using shared artifacts
   test:
     name: ${{ matrix.tests.name }}
-    needs: discover-tests
-    timeout-minutes: 15
+    needs: [setup, discover-tests]
+    timeout-minutes: 10
     strategy:
       matrix: ${{ fromJson(needs.discover-tests.outputs.matrix) }}
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      
+      # Download the pre-built extension
+      - name: Download extension artifacts
+        uses: actions/download-artifact@v4
         with:
-          node-version: lts/*
-          
-      - name: Publish extension to dist folder
+          name: extension-dist
+          path: dist/
+
+      # Download test dependencies
+      - name: Download test dependencies
+        uses: actions/download-artifact@v4
+        with:
+          name: test-node-modules
+          path: tests/playwright/node_modules/
+
+      # Download Playwright cache
+      - name: Download Playwright cache
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-cache
+          path: ~/.cache/ms-playwright/
+
+      # Make sure the downloaded files have proper permissions
+      - name: Set permissions
         run: |
-          npm ci
-          npm i grunt -g
-          grunt playwright
-
-      - name: Install test dependencies
-        run: npm ci
-        working-directory: tests/playwright
-
-      - name: Install Playwright browser (chromium)
-        run: npx playwright install --with-deps chromium
-        working-directory: tests/playwright
+          chmod +x tests/playwright/node_modules/.bin/* || true
+          chmod +x ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome || true
 
       - name: Run Playwright test for ${{ matrix.tests.name }}
         run: npx playwright test ${{ matrix.tests.file }}
