@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 - Fixed styling in Firefox add-ons manager options view.
 - Fixed test button not requesting permissions for servarr hosts in Firefox.
+- Add SPA support to engines and activate to Trakt. Introduces a URL listener to detect client-side navigation and re-run the engines when the URL changes.
 
 ## 3.0.1
 

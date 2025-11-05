@@ -21,6 +21,10 @@
         containerSelector: 'h3',
         insertWhere: 'prepend',
         iconStyle: 'width: 36px; margin-right: 10px;',
+        spa: {
+            domains: ['trakt.tv'],
+            urlCheckIntervalMs: 400
+        },
         resolveSiteType: function (doc) {
             return pick(doc, 'meta[property="og:type"][content^="video"]', 'content', [
                 { siteId: 'sonarr', pattern: /video\.tv_show/i }
@@ -38,6 +42,10 @@
         containerSelector: 'h3',
         insertWhere: 'prepend',
         iconStyle: 'width: 36px; margin-right: 10px;',
+        spa: {
+            domains: ['trakt.tv'],
+            urlCheckIntervalMs: 400
+        },
         resolveSiteType: function (doc) {
             return pick(doc, 'meta[property="og:type"][content^="video"]', 'content', [
                 { siteId: 'radarr', pattern: /video\.movie/i }
@@ -63,6 +71,10 @@
         insertWhere: 'prepend',
         iconStyle: 'width: 20px; margin: 0;',
         siteType: 'sonarr',
+        spa: {
+            domains: ['trakt.tv'],
+            urlCheckIntervalMs: 400
+        },
         getInsertElOverride: function(el) { return el.querySelector('.trakt-card-footer') || el; },
         getSearch: function (_el, doc) {
             const a = _el.querySelector('a');
@@ -95,6 +107,10 @@
         insertWhere: 'prepend',
         iconStyle: 'width: 20px; margin: 0;',
         siteType: 'radarr',
+        spa: {
+            domains: ['trakt.tv'],
+            urlCheckIntervalMs: 500
+        },
         getInsertElOverride: function(el) { return el.querySelector('.trakt-card-footer') || el; },
         getSearch: function (_el, doc) {
             const a = _el.querySelector('a');

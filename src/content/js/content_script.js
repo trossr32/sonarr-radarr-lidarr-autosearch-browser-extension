@@ -232,125 +232,225 @@ async function runServarrSearchInjection() {
     }
 }
 
+// URL change detection for SPA navigation
+let currentUrl = window.location.href;
+let urlChangeCheckInterval = null;
+let activeSpaConfig = null; // Store the active SPA configuration
 
-(function () {
-    async function runEngines() {
-        try {
-            const settings = await getSettings();
-            if (!settings || !settings.config || !settings.config.enabled) return;
-
-            const url = window.location.href;
-
-            // Figure out which integration IDs are enabled in user settings
-            // Expecting: settings.integrations = [{ id: 'imdb', enabled: true }, ...]
-            const enabledIds = new Set(
-                (settings.integrations || [])
-                .filter(it => it && it.id && it.enabled === true)
-                .map(it => it.id)
-            );
-
-            // Start from all registered engines…
-            const allEngines = (window.__servarrEngines && window.__servarrEngines.list) ? window.__servarrEngines.list : [];
-
-            // Build a flat list of engine ids, then dedupe
-            const allIds = (allEngines || [])
-                .map(e => e && e.id)
-                .filter(Boolean);
-
-            const uniqueEngineIds = Array.from(new Set(allIds));
-
-            // Optional: counts per id (handy for debugging)
-            const countsById = allIds.reduce((acc, id) => {
-                acc[id] = (acc[id] || 0) + 1;
-                return acc;
-            }, {});
-
-            // Intersections & diffs vs user settings
-            const enabledUniqueIds = uniqueEngineIds.filter(id => enabledIds.has(id));
-            const missingFromRegistry = Array.from(enabledIds).filter(id => !uniqueEngineIds.includes(id));
-            const presentButDisabled = uniqueEngineIds.filter(id => !enabledIds.has(id));
-
-            // Logs
-            log(`Engines: ${allEngines.length} instances, ${uniqueEngineIds.length} unique ids.`);
-            log(`Enabled in settings: ${enabledIds.size} → [${Array.from(enabledIds).join(', ')}]`);
-            log(`Enabled & present: ${enabledUniqueIds.length} → [${enabledUniqueIds.join(', ')}]`);
-            if (missingFromRegistry.length) log(`Enabled but no engine registered: [${missingFromRegistry.join(', ')}]`);
-            if (presentButDisabled.length) log(`Registered but disabled in settings: [${presentButDisabled.join(', ')}]`);
-            log(['Counts per id:', countsById]);
-
-            // If you want to only run engines that are enabled in settings:
-            const enginesToRun = allEngines.filter(e => e && enabledIds.has(e.id));
-            log(`Will run ${enginesToRun.length} engine instance(s) across ${enabledUniqueIds.length} enabled id(s).`);
+/**
+ * Starts monitoring URL changes for SPA navigation based on the provided configuration.
+ * @param {SpaConfig} spaConfig 
+ */
+function startUrlChangeDetection(spaConfig) {
+    // Clear any existing interval
+    if (urlChangeCheckInterval) {
+        clearInterval(urlChangeCheckInterval);
+    }
+    
+    activeSpaConfig = spaConfig;
+    const checkInterval = (spaConfig && spaConfig.urlCheckIntervalMs) || 500;
+    
+    // Check for URL changes
+    urlChangeCheckInterval = setInterval(() => {
+        const newUrl = window.location.href;
+        if (newUrl !== currentUrl) {
+            log(`URL changed from ${currentUrl} to ${newUrl} - re-running engines`);
+            currentUrl = newUrl;
             
-            // then keep only the enabled ones.
-            // If the user has *no* integration settings yet, run all engines so we don't silently disable everything.
-            const engines = enabledIds.size > 0 ? allEngines.filter(e => e && enabledIds.has(e.id)) : allEngines;
-
-            log(`Found ${engines.length} matching engines for current URL`);
-
-            if (!engines.length) {
-                if (typeof log === 'function') log('No enabled engines registered');
+            // Check if we're still on a domain that needs SPA detection
+            const stillOnSpaDomain = spaConfig && spaConfig.domains && 
+                spaConfig.domains.some(domain => newUrl.includes(domain));
+            
+            if (!stillOnSpaDomain) {
+                log('Navigated away from SPA domain - stopping URL change detection');
+                stopUrlChangeDetection();
                 return;
             }
-
-            const runEngine = function (candidates, sites, settingsObj) {
-                candidates.elements.forEach(function (el) {
-                    if (!el || (el.hasAttribute && el.hasAttribute('data-servarr-icon'))) return;
-
-                    const term = (candidates.getSearch(el) || '').trim();
-                    if (!term) return;
-
-                    sites.forEach(function (site) {
-                        const perSiteAttr = `data-servarr-ext-${site.id}-completed`;
-                        if (el.getAttribute && el.getAttribute(perSiteAttr)) return;
-
-                        const base = (site.domain || '').replace(/\/$/, '');
-                        const path = (site.searchPath || '');
-                        const link = base + path + encodeURIComponent(term).replace(/%3A/g, ':');
-
-                        try {
-                            // same decision you already had: custom floating/anchored vs inline
-                            const useCustomIcon = !!settingsObj.config.customIconPosition && candidates.elements.length <= 1;
-
-                            if (useCustomIcon) {
-                                addCustomIconMarkup(settingsObj.injectedIconConfig, site, link);
-                            } else {
-                                candidates.insert({ el, link, site, styles: null });
-                            }
-                            
-                            if (el.setAttribute) el.setAttribute(perSiteAttr, 'true');
-                        } catch (e) {
-                            if (typeof log === 'function') log(['injection failed', e], 'error');
-                        }
-                    });
+            
+            // Clear previous injection markers to allow re-injection on new pages
+            document.querySelectorAll('[data-servarr-icon]').forEach(el => {
+                el.remove();
+            });
+            
+            // Remove any existing custom icon wrapper
+            const customWrapper = document.getElementById('servarr-ext_custom-icon-wrapper');
+            if (customWrapper) {
+                customWrapper.remove();
+            }
+            
+            // Clear per-site completion markers on all elements
+            sites.forEach(function (site) {
+                document.querySelectorAll(`[data-servarr-ext-${site.id}-completed]`).forEach(el => {
+                    el.removeAttribute(`data-servarr-ext-${site.id}-completed`);
                 });
-            };
+            });
+            
+            // Re-run engines for the new URL
+            runEngines();
+        }
+    }, checkInterval);
+}
 
-            // Normal engine loop
-            for (let i = 0; i < engines.length; i++) {
-                const engine = engines[i];
-                
-                if (!engine || typeof engine.match !== 'function' || !engine.match(document, url)) continue;
+/**
+ * Stops URL change detection for SPA navigation.
+ */
+function stopUrlChangeDetection() {
+    if (urlChangeCheckInterval) {
+        clearInterval(urlChangeCheckInterval);
+        urlChangeCheckInterval = null;
+    }
+}
 
-                const candidates = engine.candidates({ settings, url, document });
-                if (!candidates || !candidates.siteType || !candidates.elements || !candidates.getSearch || !candidates.insert) continue;
+/**
+ * Runs the active search engines.
+ * @returns {Promise<void>}
+ */
+async function runEngines() {
+    try {
+        const settings = await getSettings();
+        if (!settings || !settings.config || !settings.config.enabled) return;
 
-                // Enabled instances for this site type
-                const sites = (settings.sites || []).filter(s => s && s.enabled && s.type === candidates.siteType);
-                if (!sites.length) continue;
+        const url = window.location.href;
 
-                if (engine.deferMs && engine.deferMs > 0) {
-                    setTimeout(function () { runEngine(candidates, sites, settings); }, engine.deferMs);
-                } else {
-                    runEngine(candidates, sites, settings);
+        // Figure out which integration IDs are enabled in user settings
+        // Expecting: settings.integrations = [{ id: 'imdb', enabled: true }, ...]
+        const enabledIds = new Set(
+            (settings.integrations || [])
+            .filter(it => it && it.id && it.enabled === true)
+            .map(it => it.id)
+        );
+
+        // Start from all registered engines…
+        const allEngines = (window.__servarrEngines && window.__servarrEngines.list) ? window.__servarrEngines.list : [];
+
+        // Build a flat list of engine ids, then dedupe
+        const allIds = (allEngines || [])
+            .map(e => e && e.id)
+            .filter(Boolean);
+
+        const uniqueEngineIds = Array.from(new Set(allIds));
+
+        // Optional: counts per id (handy for debugging)
+        const countsById = allIds.reduce((acc, id) => {
+            acc[id] = (acc[id] || 0) + 1;
+            return acc;
+        }, {});
+
+        // Intersections & diffs vs user settings
+        const enabledUniqueIds = uniqueEngineIds.filter(id => enabledIds.has(id));
+        const missingFromRegistry = Array.from(enabledIds).filter(id => !uniqueEngineIds.includes(id));
+        const presentButDisabled = uniqueEngineIds.filter(id => !enabledIds.has(id));
+
+        // Logs
+        log(`Engines: ${allEngines.length} instances, ${uniqueEngineIds.length} unique ids.`);
+        log(`Enabled in settings: ${enabledIds.size} → [${Array.from(enabledIds).join(', ')}]`);
+        log(`Enabled & present: ${enabledUniqueIds.length} → [${enabledUniqueIds.join(', ')}]`);
+        if (missingFromRegistry.length) log(`Enabled but no engine registered: [${missingFromRegistry.join(', ')}]`);
+        if (presentButDisabled.length) log(`Registered but disabled in settings: [${presentButDisabled.join(', ')}]`);
+        log(['Counts per id:', countsById]);
+
+        // If you want to only run engines that are enabled in settings:
+        const enginesToRun = allEngines.filter(e => e && enabledIds.has(e.id));
+        log(`Will run ${enginesToRun.length} engine instance(s) across ${enabledUniqueIds.length} enabled id(s).`);
+        
+        // then keep only the enabled ones.
+        // If the user has *no* integration settings yet, run all engines so we don't silently disable everything.
+        const engines = enabledIds.size > 0 ? allEngines.filter(e => e && enabledIds.has(e.id)) : allEngines;
+
+        log(`Found ${engines.length} matching engines for current URL`);
+
+        if (!engines.length) {
+            if (typeof log === 'function') log('No enabled engines registered');
+            return;
+        }
+
+        const runEngine = function (candidates, sites, settingsObj) {
+            candidates.elements.forEach(function (el) {
+                if (!el || (el.hasAttribute && el.hasAttribute('data-servarr-icon'))) return;
+
+                const term = (candidates.getSearch(el) || '').trim();
+                if (!term) return;
+
+                sites.forEach(function (site) {
+                    const perSiteAttr = `data-servarr-ext-${site.id}-completed`;
+                    if (el.getAttribute && el.getAttribute(perSiteAttr)) return;
+
+                    const base = (site.domain || '').replace(/\/$/, '');
+                    const path = (site.searchPath || '');
+                    const link = base + path + encodeURIComponent(term).replace(/%3A/g, ':');
+
+                    try {
+                        // same decision you already had: custom floating/anchored vs inline
+                        const useCustomIcon = !!settingsObj.config.customIconPosition && candidates.elements.length <= 1;
+
+                        if (useCustomIcon) {
+                            addCustomIconMarkup(settingsObj.injectedIconConfig, site, link);
+                        } else {
+                            candidates.insert({ el, link, site, styles: null });
+                        }
+                        
+                        if (el.setAttribute) el.setAttribute(perSiteAttr, 'true');
+                    } catch (e) {
+                        if (typeof log === 'function') log(['injection failed', e], 'error');
+                    }
+                });
+            });
+        };
+
+        // Check for SPA engines that should start URL monitoring based on domain match
+        // This happens BEFORE the normal engine matching to catch domain-level SPA detection
+        let spaEngineToMonitor = null;
+        
+        for (let i = 0; i < engines.length; i++) {
+            const engine = engines[i];
+            
+            // Check if this engine has SPA configuration and we're on a matching domain
+            if (engine && engine.spa && engine.spa.domains) {
+                const isOnSpaDomain = engine.spa.domains.some(domain => url.includes(domain));
+                if (isOnSpaDomain && enabledIds.has(engine.id)) {
+                    spaEngineToMonitor = engine;
+                    break; // Use the first matching SPA engine
                 }
             }
-        } catch (e) {
-            if (typeof log === 'function') log(['engine run failed', e], 'error');
         }
-    }
+        
+        // Start URL change detection if we found a SPA engine for this domain
+        if (spaEngineToMonitor && !urlChangeCheckInterval) {
+            log(`Starting URL change detection for SPA domain using engine: ${spaEngineToMonitor.id}`);
+            startUrlChangeDetection(spaEngineToMonitor.spa);
+        }
 
+        // Normal engine loop
+        for (let i = 0; i < engines.length; i++) {
+            const engine = engines[i];
+            
+            if (!engine || typeof engine.match !== 'function' || !engine.match(document, url)) continue;
+
+            const candidates = engine.candidates({ settings, url, document });
+            if (!candidates || !candidates.siteType || !candidates.elements || !candidates.getSearch || !candidates.insert) continue;
+
+            // Enabled instances for this site type
+            const sites = (settings.sites || []).filter(s => s && s.enabled && s.type === candidates.siteType);
+            if (!sites.length) continue;
+
+            if (engine.deferMs && engine.deferMs > 0) {
+                setTimeout(function () { runEngine(candidates, sites, settings); }, engine.deferMs);
+            } else {
+                runEngine(candidates, sites, settings);
+            }
+        }
+    } catch (e) {
+        if (typeof log === 'function') log(['engine run failed', e], 'error');
+    }
+}
+
+(function () {
     runServarrSearchInjection();
 
     runEngines();
+    
+    // Cleanup URL change detection when page unloads
+    window.addEventListener('beforeunload', () => {
+        stopUrlChangeDetection();
+    });
 })();
