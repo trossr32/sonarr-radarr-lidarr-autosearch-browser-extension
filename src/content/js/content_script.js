@@ -250,47 +250,67 @@ function startUrlChangeDetection(spaConfig) {
     activeSpaConfig = spaConfig;
     const checkInterval = (spaConfig && spaConfig.urlCheckIntervalMs) || 500;
     
-    // Check for URL changes
-    urlChangeCheckInterval = setInterval(async () => {
-        const newUrl = window.location.href;
-        if (newUrl !== currentUrl) {
-            log(`URL changed from ${currentUrl} to ${newUrl} - re-running engines`);
-            currentUrl = newUrl;
-            
-            // Check if we're still on a domain that needs SPA detection
-            const stillOnSpaDomain = spaConfig && spaConfig.domains && 
-                spaConfig.domains.some(domain => newUrl.includes(domain));
-            
-            if (!stillOnSpaDomain) {
-                log('Navigated away from SPA domain - stopping URL change detection');
-                stopUrlChangeDetection();
-                return;
-            }
-            
-            // Clear previous injection markers to allow re-injection on new pages
-            document.querySelectorAll('[data-servarr-icon]').forEach(el => {
-                el.remove();
-            });
-            
-            // Remove any existing custom icon wrapper
-            const customWrapper = document.getElementById('servarr-ext_custom-icon-wrapper');
-            if (customWrapper) {
-                customWrapper.remove();
-            }
-            
-            // Clear per-site completion markers on all elements
-            const settings = await getSettings();
-            const sites = (settings.sites || []).filter(s => s && s.enabled);
-            sites.forEach(function (site) {
-                document.querySelectorAll(`[data-servarr-ext-${site.id}-completed]`).forEach(el => {
-                    el.removeAttribute(`data-servarr-ext-${site.id}-completed`);
+    const setupUrlMonitoring = () => {
+        // Check for URL changes
+        urlChangeCheckInterval = setInterval(async () => {
+            const newUrl = window.location.href;
+            if (newUrl !== currentUrl) {
+                log(`URL changed from ${currentUrl} to ${newUrl} - re-running engines`);
+                currentUrl = newUrl;
+                
+                // Check if we're still on a domain that needs SPA detection
+                const stillOnSpaDomain = spaConfig && spaConfig.domains && 
+                    spaConfig.domains.some(domain => newUrl.includes(domain));
+                
+                if (!stillOnSpaDomain) {
+                    log('Navigated away from SPA domain - stopping URL change detection');
+                    stopUrlChangeDetection();
+                    return;
+                }
+                
+                // Clear previous injection markers to allow re-injection on new pages
+                document.querySelectorAll('[data-servarr-icon]').forEach(el => {
+                    el.remove();
                 });
-            });
-            
-            // Re-run engines for the new URL
-            runEngines();
-        }
-    }, checkInterval);
+                
+                // Remove any existing custom icon wrapper
+                const customWrapper = document.getElementById('servarr-ext_custom-icon-wrapper');
+                if (customWrapper) {
+                    customWrapper.remove();
+                }
+                
+                // Clear per-site completion markers on all elements
+                const settings = await getSettings();
+                const sites = (settings.sites || []).filter(s => s && s.enabled);
+                sites.forEach(function (site) {
+                    document.querySelectorAll(`[data-servarr-ext-${site.id}-completed]`).forEach(el => {
+                        el.removeAttribute(`data-servarr-ext-${site.id}-completed`);
+                    });
+                });
+                
+                // Check if there's a defer setting for this SPA domain
+                // Need to find the engine with deferMs for this domain
+                const allEngines = (window.__servarrEngines && window.__servarrEngines.list) ? window.__servarrEngines.list : [];
+                const engineWithDefer = allEngines.find(engine => 
+                    engine && engine.spa && engine.spa.domains && 
+                    engine.spa.domains.some(domain => newUrl.includes(domain)) &&
+                    engine.deferMs && engine.deferMs > 0
+                );
+                
+                // Defer re-running engines if deferMs is set, otherwise run immediately
+                if (engineWithDefer) {
+                    log(`Deferring engine execution by ${engineWithDefer.deferMs}ms to allow page rendering`);
+                    setTimeout(() => {
+                        runEngines();
+                    }, engineWithDefer.deferMs);
+                } else {
+                    runEngines();
+                }
+            }
+        }, checkInterval);
+    };
+
+    setupUrlMonitoring();
 }
 
 /**
@@ -332,12 +352,6 @@ async function runEngines() {
 
         const uniqueEngineIds = Array.from(new Set(allIds));
 
-        // Optional: counts per id (handy for debugging)
-        const countsById = allIds.reduce((acc, id) => {
-            acc[id] = (acc[id] || 0) + 1;
-            return acc;
-        }, {});
-
         // Intersections & diffs vs user settings
         const enabledUniqueIds = uniqueEngineIds.filter(id => enabledIds.has(id));
         const missingFromRegistry = Array.from(enabledIds).filter(id => !uniqueEngineIds.includes(id));
@@ -349,9 +363,8 @@ async function runEngines() {
         log(`Enabled & present: ${enabledUniqueIds.length} → [${enabledUniqueIds.join(', ')}]`);
         if (missingFromRegistry.length) log(`Enabled but no engine registered: [${missingFromRegistry.join(', ')}]`);
         if (presentButDisabled.length) log(`Registered but disabled in settings: [${presentButDisabled.join(', ')}]`);
-        log(['Counts per id:', countsById]);
 
-        // If you want to only run engines that are enabled in settings:
+        // Only run engines that are enabled in settings
         const enginesToRun = allEngines.filter(e => e && enabledIds.has(e.id));
         log(`Will run ${enginesToRun.length} engine instance(s) across ${enabledUniqueIds.length} enabled id(s).`);
         
@@ -382,7 +395,7 @@ async function runEngines() {
                     const link = base + path + encodeURIComponent(term).replace(/%3A/g, ':');
 
                     try {
-                        // same decision you already had: custom floating/anchored vs inline
+                        // custom floating/anchored vs inline
                         const useCustomIcon = !!settingsObj.config.customIconPosition && candidates.elements.length <= 1;
 
                         if (useCustomIcon) {
@@ -400,7 +413,7 @@ async function runEngines() {
         };
 
         // Check for SPA engines that should start URL monitoring based on domain match
-        // This happens BEFORE the normal engine matching to catch domain-level SPA detection
+        // This happens before the normal engine matching to catch domain-level SPA detection
         let spaEngineToMonitor = null;
         
         for (let i = 0; i < engines.length; i++) {
@@ -419,7 +432,12 @@ async function runEngines() {
         // Start URL change detection if we found a SPA engine for this domain
         if (spaEngineToMonitor && !urlChangeCheckInterval) {
             log(`Starting URL change detection for SPA domain using engine: ${spaEngineToMonitor.id}`);
-            startUrlChangeDetection(spaEngineToMonitor.spa);
+
+            if (spaEngineToMonitor.deferMs && spaEngineToMonitor.deferMs > 0) {
+                setTimeout(function () { startUrlChangeDetection(spaEngineToMonitor.spa); }, spaEngineToMonitor.deferMs);
+            } else {
+                startUrlChangeDetection(spaEngineToMonitor.spa);
+            }
         }
 
         // Normal engine loop
