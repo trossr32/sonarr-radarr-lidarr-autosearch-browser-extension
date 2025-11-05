@@ -31,14 +31,14 @@ export async function handleTraktCookieOverlay(page: import('@playwright/test').
 
 	try {
 		// Wait briefly for the overlay to appear
-		const visible = await overlay.isVisible({ timeout: 1500 });
+		const visible = await overlay.isVisible({ timeout: 2000 });
 
 		if (!visible) return;
 
 		await consentBtn.first().click({ timeout: 2000 });
 
 		// Give the app a moment to settle any client-side state
-		await page.waitForTimeout(1000);
+		await page.waitForTimeout(2000);
 
 		await hardReload(page);
 	} catch {

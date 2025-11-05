@@ -239,16 +239,17 @@ let activeSpaConfig = null; // Store the active SPA configuration
 
 /**
  * Starts monitoring URL changes for SPA navigation based on the provided configuration.
- * @param {SpaConfig} spaConfig 
+ * @param {DefaultEngineConfig} engine - The engine object containing spa config and deferMs
+ * @param {SiteSetting[]} sites - The list of enabled site settings for this engine
  */
-function startUrlChangeDetection(spaConfig) {
+function startUrlChangeDetection(engine, sites) {
     // Clear any existing interval
     if (urlChangeCheckInterval) {
         clearInterval(urlChangeCheckInterval);
     }
     
-    activeSpaConfig = spaConfig;
-    const checkInterval = (spaConfig && spaConfig.urlCheckIntervalMs) || 500;
+    activeSpaConfig = engine.spa;
+    const checkInterval = (engine.spa && engine.spa.urlCheckIntervalMs) || 500;
     
     const setupUrlMonitoring = () => {
         // Check for URL changes
@@ -259,8 +260,8 @@ function startUrlChangeDetection(spaConfig) {
                 currentUrl = newUrl;
                 
                 // Check if we're still on a domain that needs SPA detection
-                const stillOnSpaDomain = spaConfig && spaConfig.domains && 
-                    spaConfig.domains.some(domain => newUrl.includes(domain));
+                const stillOnSpaDomain = engine.spa && engine.spa.domains && 
+                    engine.spa.domains.some(domain => newUrl.includes(domain));
                 
                 if (!stillOnSpaDomain) {
                     log('Navigated away from SPA domain - stopping URL change detection');
@@ -280,29 +281,18 @@ function startUrlChangeDetection(spaConfig) {
                 }
                 
                 // Clear per-site completion markers on all elements
-                const settings = await getSettings();
-                const sites = (settings.sites || []).filter(s => s && s.enabled);
                 sites.forEach(function (site) {
                     document.querySelectorAll(`[data-servarr-ext-${site.id}-completed]`).forEach(el => {
                         el.removeAttribute(`data-servarr-ext-${site.id}-completed`);
                     });
                 });
                 
-                // Check if there's a defer setting for this SPA domain
-                // Need to find the engine with deferMs for this domain
-                const allEngines = (window.__servarrEngines && window.__servarrEngines.list) ? window.__servarrEngines.list : [];
-                const engineWithDefer = allEngines.find(engine => 
-                    engine && engine.spa && engine.spa.domains && 
-                    engine.spa.domains.some(domain => newUrl.includes(domain)) &&
-                    engine.deferMs && engine.deferMs > 0
-                );
-                
                 // Defer re-running engines if deferMs is set, otherwise run immediately
-                if (engineWithDefer) {
-                    log(`Deferring engine execution by ${engineWithDefer.deferMs}ms to allow page rendering`);
+                if (engine.deferMs && engine.deferMs > 0) {
+                    log(`Deferring engine execution by ${engine.deferMs}ms to allow page rendering`);
                     setTimeout(() => {
                         runEngines();
-                    }, engineWithDefer.deferMs);
+                    }, engine.deferMs);
                 } else {
                     runEngines();
                 }
@@ -433,10 +423,12 @@ async function runEngines() {
         if (spaEngineToMonitor && !urlChangeCheckInterval) {
             log(`Starting URL change detection for SPA domain using engine: ${spaEngineToMonitor.id}`);
 
+            const sites = (settings.sites || []).filter(s => s && s.enabled);
+
             if (spaEngineToMonitor.deferMs && spaEngineToMonitor.deferMs > 0) {
-                setTimeout(function () { startUrlChangeDetection(spaEngineToMonitor.spa); }, spaEngineToMonitor.deferMs);
+                setTimeout(function () { startUrlChangeDetection(spaEngineToMonitor, sites); }, spaEngineToMonitor.deferMs);
             } else {
-                startUrlChangeDetection(spaEngineToMonitor.spa);
+                startUrlChangeDetection(spaEngineToMonitor, sites);
             }
         }
 
