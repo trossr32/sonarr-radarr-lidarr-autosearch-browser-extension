@@ -136,8 +136,11 @@ jobs:
           # Ensure .bin directory exists and has proper permissions
           if [ -d "node_modules/.bin" ]; then
             find node_modules/.bin -type f -exec chmod +x {} \;
-            find node_modules/.bin -type l -exec chmod +x {} \;
           fi
+
+          # Restore execute bit on Playwright browser binaries which are lost during artifact upload/download
+          chmod +x ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null || true
+          chmod +x ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome-wrapper 2>/dev/null || true
           
           # Reinstall playwright if .bin/playwright is missing
           if [ ! -f "node_modules/.bin/playwright" ]; then
