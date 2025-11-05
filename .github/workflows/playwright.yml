@@ -54,7 +54,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-node-modules
-          path: tests/playwright/node_modules/
+          path: |
+            tests/playwright/node_modules/
+            tests/playwright/package.json
+            tests/playwright/package-lock.json
           retention-days: 1
 
       # Upload the Playwright cache (browsers and dependencies)
@@ -116,7 +119,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: test-node-modules
-          path: tests/playwright/node_modules/
+          path: tests/playwright/
 
       # Download Playwright cache
       - name: Download Playwright cache
@@ -125,22 +128,28 @@ jobs:
           name: playwright-cache
           path: ~/.cache/ms-playwright/
 
-      # Make sure the downloaded files have proper permissions and set up PATH
-      - name: Set permissions and verify setup
+      # Restore node_modules and ensure Playwright is available
+      - name: Restore test environment
         run: |
-          # Set executable permissions
-          find tests/playwright/node_modules/.bin -type f -exec chmod +x {} \; 2>/dev/null || true
-          chmod +x ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null || true
+          cd tests/playwright
+          
+          # Ensure .bin directory exists and has proper permissions
+          if [ -d "node_modules/.bin" ]; then
+            find node_modules/.bin -type f -exec chmod +x {} \;
+            find node_modules/.bin -type l -exec chmod +x {} \;
+          fi
+          
+          # Reinstall playwright if .bin/playwright is missing
+          if [ ! -f "node_modules/.bin/playwright" ]; then
+            echo "Playwright binary not found, reinstalling..."
+            npm install playwright
+          fi
           
           # Verify playwright is available
-          ls -la tests/playwright/node_modules/.bin/ || echo "No .bin directory found"
-          echo "Current PATH: $PATH"
-          
-          # Add node_modules/.bin to PATH for this job
-          echo "$(pwd)/tests/playwright/node_modules/.bin" >> $GITHUB_PATH
+          ./node_modules/.bin/playwright --version || npx playwright --version
 
       - name: Run Playwright test for ${{ matrix.tests.name }}
-        run: npx playwright test ${{ matrix.tests.file }}
+        run: ./node_modules/.bin/playwright test ${{ matrix.tests.file }}
         working-directory: tests/playwright
 
       - uses: actions/upload-artifact@v4
