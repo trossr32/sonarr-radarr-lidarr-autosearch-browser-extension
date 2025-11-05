@@ -313,6 +313,15 @@ async function initialiseBackupForm(settings) {
             await setSettings(next);
 
             $restoreMsg.removeClass().addClass('text-xs text-emerald-400').text('Settings restored successfully.');
+
+            // Refresh all forms
+            initialiseBasicForm(next);
+            initialiseIntegrationsForm(next);
+            initialiseCustomIconForm(next);
+            initialiseContextMenuForm(next);
+            initialiseDebugForm(next);
+            //initialiseBackupForm(next);
+            initialisePermissionsForm(next);
         } catch (e) {
             console.error('Restore failed', e);
             $restoreMsg.removeClass().addClass('text-xs text-rose-400').text('Restore failed: ' + (e && e.message ? e.message : 'Unknown error'));
