@@ -125,11 +125,19 @@ jobs:
           name: playwright-cache
           path: ~/.cache/ms-playwright/
 
-      # Make sure the downloaded files have proper permissions
-      - name: Set permissions
+      # Make sure the downloaded files have proper permissions and set up PATH
+      - name: Set permissions and verify setup
         run: |
-          chmod +x tests/playwright/node_modules/.bin/* || true
-          chmod +x ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome || true
+          # Set executable permissions
+          find tests/playwright/node_modules/.bin -type f -exec chmod +x {} \; 2>/dev/null || true
+          chmod +x ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null || true
+          
+          # Verify playwright is available
+          ls -la tests/playwright/node_modules/.bin/ || echo "No .bin directory found"
+          echo "Current PATH: $PATH"
+          
+          # Add node_modules/.bin to PATH for this job
+          echo "$(pwd)/tests/playwright/node_modules/.bin" >> $GITHUB_PATH
 
       - name: Run Playwright test for ${{ matrix.tests.name }}
         run: npx playwright test ${{ matrix.tests.file }}
