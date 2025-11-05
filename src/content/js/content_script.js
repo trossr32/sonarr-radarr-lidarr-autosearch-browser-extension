@@ -251,7 +251,7 @@ function startUrlChangeDetection(spaConfig) {
     const checkInterval = (spaConfig && spaConfig.urlCheckIntervalMs) || 500;
     
     // Check for URL changes
-    urlChangeCheckInterval = setInterval(() => {
+    urlChangeCheckInterval = setInterval(async () => {
         const newUrl = window.location.href;
         if (newUrl !== currentUrl) {
             log(`URL changed from ${currentUrl} to ${newUrl} - re-running engines`);
@@ -279,6 +279,8 @@ function startUrlChangeDetection(spaConfig) {
             }
             
             // Clear per-site completion markers on all elements
+            const settings = await getSettings();
+            const sites = (settings.sites || []).filter(s => s && s.enabled);
             sites.forEach(function (site) {
                 document.querySelectorAll(`[data-servarr-ext-${site.id}-completed]`).forEach(el => {
                     el.removeAttribute(`data-servarr-ext-${site.id}-completed`);
