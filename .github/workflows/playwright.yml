@@ -138,9 +138,8 @@ jobs:
             find node_modules/.bin -type f -exec chmod +x {} \;
           fi
 
-          # Restore execute bit on Playwright browser binaries which are lost during artifact upload/download
-          chmod +x ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome 2>/dev/null || true
-          chmod +x ~/.cache/ms-playwright/chromium-*/chrome-linux/chrome-wrapper 2>/dev/null || true
+          # Restore execute bits on all Chromium binaries (artifact download strips perms)
+          find ~/.cache/ms-playwright -path '*/chrome-linux/*' -type f -exec chmod +x {} \; 2>/dev/null || true
           
           # Reinstall playwright if .bin/playwright is missing
           if [ ! -f "node_modules/.bin/playwright" ]; then
@@ -160,7 +159,7 @@ jobs:
         with:
           name: playwright-report-${{ matrix.tests.name }}
           path: tests/playwright/playwright-report/
-          retention-days: 30
+          retention-days: 10
 
       # If the test step fails, create an issue using the same method as before, if running on the main or master branch.
       - name: Create issue if test fails
