@@ -1,6 +1,6 @@
 (function(){
     if (!window.__servarrEngines) window.__servarrEngines = { list: [], helpers: {} };
-    
+
     var Def = window.__servarrEngines.helpers.DefaultEngine;
 
     var TV = Def({
@@ -11,10 +11,11 @@
         containerSelector: 'h1',
         insertWhere: 'prepend',
         iconStyle: 'width: 30px; margin: 0 10px 0 0;',
-        getSearch: function(_el,doc){ 
+        deferMs: 2000,
+        getSearch: function(_el,doc){
             var n=doc.querySelector('h1');
-                        
-            return (n && (n.textContent||'').trim())||''; 
+
+            return (n && (n.textContent||'').trim())||'';
         }
     });
 
@@ -26,9 +27,10 @@
         containerSelector: 'h1',
         insertWhere: 'prepend',
         iconStyle: 'width: 30px; margin: 0 10px 0 0;',
-        getSearch: function(_el,doc){ 
-            var n=doc.querySelector('h1'); 
-            return (n && (n.textContent||'').trim())||''; 
+        deferMs: 2000,
+        getSearch: function(_el,doc){
+            var n=doc.querySelector('h1');
+            return (n && (n.textContent||'').trim())||'';
         }
     });
 

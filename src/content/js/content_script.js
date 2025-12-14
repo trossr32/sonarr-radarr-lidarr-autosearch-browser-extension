@@ -326,23 +326,29 @@ async function runServarrSearchInjection() {
                 });
             };
 
+            // Helper to process a single engine
+            const processEngine = function (engine, settingsObj, pageUrl, doc) {
+                const candidates = engine.candidates({ settings: settingsObj, url: pageUrl, document: doc });
+                if (!candidates || !candidates.siteType || !candidates.elements || !candidates.getSearch || !candidates.insert) return;
+
+                const sites = (settingsObj.sites || []).filter(s => s && s.enabled && s.type === candidates.siteType);
+                if (!sites.length) return;
+
+                runEngine(candidates, sites, settingsObj);
+            };
+
             // Normal engine loop
             for (let i = 0; i < engines.length; i++) {
                 const engine = engines[i];
-                
+
                 if (!engine || typeof engine.match !== 'function' || !engine.match(document, url)) continue;
 
-                const candidates = engine.candidates({ settings, url, document });
-                if (!candidates || !candidates.siteType || !candidates.elements || !candidates.getSearch || !candidates.insert) continue;
-
-                // Enabled instances for this site type
-                const sites = (settings.sites || []).filter(s => s && s.enabled && s.type === candidates.siteType);
-                if (!sites.length) continue;
-
+                // For deferred engines, delay the entire candidates computation
+                // so that SPA pages have time to render their DOM elements
                 if (engine.deferMs && engine.deferMs > 0) {
-                    setTimeout(function () { runEngine(candidates, sites, settings); }, engine.deferMs);
+                    setTimeout(processEngine.bind(null, engine, settings, url, document), engine.deferMs);
                 } else {
-                    runEngine(candidates, sites, settings);
+                    processEngine(engine, settings, url, document);
                 }
             }
         } catch (e) {
