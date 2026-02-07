@@ -4,6 +4,7 @@
     var Def = window.__servarrEngines.helpers.DefaultEngine;
 
     function getHref(sel, doc) {
+        // Fall back to just selecting the link if we don't find it with `:has`, for browser support
         var a = doc.querySelector(sel) || doc.querySelector(sel.replace(/:has\([^)]+\)/g, ''));
         return (a && a.href) || '';
     }
