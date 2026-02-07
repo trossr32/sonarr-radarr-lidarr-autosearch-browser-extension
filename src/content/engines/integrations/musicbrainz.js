@@ -3,7 +3,10 @@
     
     var Def = window.__servarrEngines.helpers.DefaultEngine;
 
-    function getHref(sel, doc) { var a = doc.querySelector(sel); return (a && a.href) || ''; }
+    function getHref(sel, doc) {
+        var a = doc.querySelector(sel) || doc.querySelector(sel.replace(/:has\([^)]+\)/g, ''));
+        return (a && a.href) || '';
+    }
 
     var Artist = Def({
         id: 'musicbrainz',
@@ -14,7 +17,7 @@
         insertWhere: 'prepend',
         iconStyle: 'width: 26px; margin: 0 5px -4px 0;',
         getSearch: function (_el, doc) {
-            var href = getHref('.artistheader > h1 > a', doc);
+            var href = getHref('.artistheader > h1 a:has(bdi)', doc);
             return href ? href.replace('https://musicbrainz.org', '').replace('/artist/', 'lidarr:') : '';
         }
     });
@@ -28,7 +31,7 @@
         insertWhere: 'prepend',
         iconStyle: 'width: 26px; margin: 0 5px -4px 0;',
         getSearch: function (_el, doc) {
-            var href = getHref('.rgheader > h1 > a', doc);
+            var href = getHref('.rgheader > h1 a:has(bdi)', doc);
             return href ? href.replace('https://musicbrainz.org', '').replace('/release-group/', 'lidarr:') : '';
         }
     });
@@ -42,7 +45,7 @@
         insertWhere: 'prepend',
         iconStyle: 'width: 26px; margin: 0 5px -4px 0;',
         getSearch: function (_el, doc) {
-            var href = getHref('.releaseheader > h1 > a', doc);
+            var href = getHref('.releaseheader > h1 a:has(bdi)', doc);
             return href ? href.replace('https://musicbrainz.org', '').replace('/release/', 'lidarr:') : '';
         }
     });
