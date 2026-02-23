@@ -50,7 +50,8 @@
     "*://*.thetvdb.com/*",
     "*://*.trakt.tv/*",
     "*://*.pogdesign.co.uk/*",
-    "*://*.tvmaze.com/*"
+    "*://*.tvmaze.com/*",
+    "*://*.wikipedia.org/*"
   ],
   "optional_host_permissions": [
     "<all_urls>"

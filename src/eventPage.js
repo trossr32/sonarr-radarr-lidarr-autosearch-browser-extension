@@ -136,6 +136,7 @@ async function initRun(tabOrId, evt) {
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/primevideo.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/myanimelist.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/rateyourmusic.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/wikipedia.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/content_script.js' });
 
         // release lock

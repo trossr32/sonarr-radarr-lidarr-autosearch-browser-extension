@@ -137,6 +137,7 @@ async function initRun(tabId, evt) {
                 'content/engines/integrations/primevideo.js',
                 'content/engines/integrations/myanimelist.js',
                 'content/engines/integrations/rateyourmusic.js',
+                'content/engines/integrations/wikipedia.js',
                 'content/js/content_script.js'
             ]
         });

@@ -54,6 +54,8 @@
     "*://*.trakt.tv/*",
     "*://*.pogdesign.co.uk/*",
     "*://*.tvmaze.com/*",
+    "*://*.wikipedia.org/*",
+    
     "storage",
     "activeTab",
     "tabs",
