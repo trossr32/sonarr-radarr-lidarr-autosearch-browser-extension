@@ -22,6 +22,18 @@
         return false;
     }
 
+    // Matches categories that indicate the article IS a TV series,
+    // excluding false positives like "Films based on television series".
+    function hasTVCategory(doc) {
+        var cats = doc.querySelectorAll('#mw-normal-catlinks ul li a');
+        var tvPattern = /television series|television show|tv series|animated series|television season/i;
+        for (var i = 0; i < cats.length; i++) {
+            var text = cats[i].textContent;
+            if (tvPattern.test(text) && !/\bfilm|\bbased on\b/i.test(text)) return true;
+        }
+        return false;
+    }
+
     function getImdbId(doc) {
         var links = doc.querySelectorAll('a[href*="imdb.com/title/"]');
         for (var i = 0; i < links.length; i++) {
@@ -41,10 +53,10 @@
         siteType: 'sonarr',
         containerSelector: '#firstHeading',
         insertWhere: 'prepend',
-        iconStyle: 'width: 26px; margin: 0 8px 0 0; display: inline-block; vertical-align: middle;',
+        iconStyle: 'width: 26px; margin: 0 8px 0 0; display: inline-block; vertical-align: middle; position: relative; top: -2px;',
         match: function (document, url) {
             if (!/wikipedia\.org\/wiki\//i.test(url)) return false;
-            return hasCategory(document, /television series|television show|tv series|animated series|television season/i);
+            return hasTVCategory(document);
         },
         getSearch: function (_el, doc) {
             return getSearchTerm(doc);
@@ -57,9 +69,10 @@
         siteType: 'radarr',
         containerSelector: '#firstHeading',
         insertWhere: 'prepend',
-        iconStyle: 'width: 26px; margin: 0 8px 0 0; display: inline-block; vertical-align: middle;',
+        iconStyle: 'width: 26px; margin: 0 8px 0 0; display: inline-block; vertical-align: middle; position: relative; top: -2px;',
         match: function (document, url) {
             if (!/wikipedia\.org\/wiki\//i.test(url)) return false;
+            if (hasTVCategory(document)) return false;
             return hasCategory(document, /\bfilms?\b/i);
         },
         getSearch: function (_el, doc) {
@@ -73,7 +86,7 @@
         siteType: 'lidarr',
         containerSelector: '#firstHeading',
         insertWhere: 'prepend',
-        iconStyle: 'width: 26px; margin: 0 8px 0 0; display: inline-block; vertical-align: middle;',
+        iconStyle: 'width: 26px; margin: 0 8px 0 0; display: inline-block; vertical-align: middle; position: relative; top: -2px;',
         match: function (document, url) {
             if (!/wikipedia\.org\/wiki\//i.test(url)) return false;
             return hasCategory(document, /musical (group|artist|ensemble|act)|singers?\b|bands?\b|musicians?\b|rappers?\b|music group/i);
