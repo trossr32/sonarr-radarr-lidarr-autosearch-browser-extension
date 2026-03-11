@@ -47,6 +47,52 @@
         return getImdbId(doc) || cleanTitle(getTitle(doc));
     }
 
+    // For album articles, find the artist name via infobox then category fallback.
+    function getAlbumArtist(doc) {
+        // Try infobox subheader: "Studio album by Miles Davis", "Compilation album by ..."
+        var subs = doc.querySelectorAll('.infobox .infobox-subheader, .infobox .infobox-below, .infobox .infobox-header.description');
+        for (var i = 0; i < subs.length; i++) {
+            var byMatch = (subs[i].textContent || '').match(/\balbum\s+by\s+(.+)/i);
+            if (byMatch) return byMatch[1].replace(/\[.*?\]/g, '').trim();
+        }
+        // Try infobox "Artist" row (exact match to avoid "Guest artists", etc.)
+        var rows = doc.querySelectorAll('.infobox tr');
+        for (var k = 0; k < rows.length; k++) {
+            var th = rows[k].querySelector('th');
+            if (th && /^\s*artists?\s*$/i.test(th.textContent || '')) {
+                var td = rows[k].querySelector('td');
+                if (td) return (td.textContent || '').replace(/\[.*?\]/g, '').trim();
+            }
+        }
+        // Fallback: "[Artist Name] albums" category (e.g. "Miles Davis albums")
+        // Skip year-only matches like "1959 albums".
+        var cats = doc.querySelectorAll('#mw-normal-catlinks ul li a');
+        for (var j = 0; j < cats.length; j++) {
+            var m = (cats[j].textContent || '').match(/^(.+?)\s+albums?$/i);
+            if (m && !/^\d/.test(m[1].trim())) return m[1].trim();
+        }
+        return null;
+    }
+
+    // Categories that end with "film"/"films" mean the article IS a film.
+    // This avoids false positives like "Film score composers" or "Film music".
+    function hasFilmCategory(doc) {
+        var cats = doc.querySelectorAll('#mw-normal-catlinks ul li a');
+        for (var i = 0; i < cats.length; i++) {
+            if (/\bfilms?$/.test((cats[i].textContent || '').trim())) return true;
+        }
+        return false;
+    }
+
+    function getMusicSearchTerm(doc) {
+        if (hasCategory(doc, /\balbums?\b/i)) {
+            var artist = getAlbumArtist(doc);
+            var title = cleanTitle(getTitle(doc));
+            return artist ? title + ' by ' + artist : title;
+        }
+        return cleanTitle(getTitle(doc));
+    }
+
     var TV = Def({
         id: 'wikipedia',
         key: 'wikipedia-tv',
@@ -73,7 +119,7 @@
         match: function (document, url) {
             if (!/wikipedia\.org\/wiki\//i.test(url)) return false;
             if (hasTVCategory(document)) return false;
-            return hasCategory(document, /\bfilms?\b/i);
+            return hasFilmCategory(document);
         },
         getSearch: function (_el, doc) {
             return getSearchTerm(doc);
@@ -89,10 +135,10 @@
         iconStyle: 'width: 26px; margin: 0 8px 0 0; display: inline-block; vertical-align: middle; position: relative; top: -2px;',
         match: function (document, url) {
             if (!/wikipedia\.org\/wiki\//i.test(url)) return false;
-            return hasCategory(document, /musical (group|artist|ensemble|act)|singers?\b|bands?\b|musicians?\b|rappers?\b|music group/i);
+            return hasCategory(document, /musical (group|artist|ensemble|act)|singers?\b|bands?\b|musicians?\b|rappers?\b|music group|\balbums?\b/i);
         },
         getSearch: function (_el, doc) {
-            return cleanTitle(getTitle(doc));
+            return getMusicSearchTerm(doc);
         }
     });
 
