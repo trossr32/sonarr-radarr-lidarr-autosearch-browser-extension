@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - Fixed test button not requesting permissions for servarr hosts in Firefox.
 - Add SPA support to engines and activate to Trakt. Introduces a URL listener to detect client-side navigation and re-run the engines when the URL changes.
 - Fixed the Metacritic integration broken by their site redesign (the search icon no longer appeared): detect Sonarr vs Radarr from the URL path, target the updated title markup, and re-run until the late-rendered hero title is present so the icon reliably injects.
+- Made search-icon injection reliable on supported sites. They are now declared as manifest content scripts and injected by the browser at page load, instead of relying solely on programmatic injection from the background service worker, which could be delayed or missed under load (occasionally leaving no icon until the page was reloaded). The programmatic path is retained for configured Servarr instances and now clears its lock and retries if an injection is interrupted.
+- Fixed the IPTorrents integration, whose host match never matched any page because the pattern was missing its top-level domain. It now covers IPTorrents across its common domains (.com, .net, .me, .eu, .ru) and the engine matches any IPTorrents TLD.
 
 ## 3.0.1
 

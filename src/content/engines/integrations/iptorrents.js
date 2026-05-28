@@ -6,7 +6,8 @@
     var TV = Def({
         id: 'iptorrents',
         key: 'iptorrents-tv',
-        urlIncludes: ['iptorrents.com/tv'],
+        // IPTorrents runs under several domains/TLDs (.com, .net, .me, .eu, ...)
+        match: function (_doc, url) { return /iptorrents\.[a-z.]+\/tv/i.test(url); },
         siteType: 'sonarr',
         containerSelector: 'b.MovieTitle',
         insertWhere: 'append',
@@ -20,7 +21,7 @@
     var Movies = Def({
         id: 'iptorrents',
         key: 'iptorrents-movies',
-        urlIncludes: ['iptorrents.com/movies'],
+        match: function (_doc, url) { return /iptorrents\.[a-z.]+\/movies/i.test(url); },
         siteType: 'radarr',
         containerSelector: 'b.MovieTitle',
         insertWhere: 'append',

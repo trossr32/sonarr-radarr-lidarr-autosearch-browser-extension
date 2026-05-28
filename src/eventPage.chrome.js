@@ -51,6 +51,29 @@ function isInjectableUrl(url) {
     return url.startsWith('http://') || url.startsWith('https://');
 }
 
+/**
+ * True if the URL is already handled by a declarative content_scripts entry in
+ * the manifest, so the service worker must NOT also inject (it would register
+ * the engines twice and double the injected icons).
+ * @param {string} url
+ * @returns {boolean}
+ */
+function isCoveredByDeclarative(url) {
+    let host;
+    try { host = new URL(url).hostname; } catch (e) { return false; }
+
+    const groups = (chrome.runtime.getManifest().content_scripts || []);
+    for (const g of groups) {
+        for (const pat of (g.matches || [])) {
+            // Patterns look like "*://*.imdb.com/*" -> domain "imdb.com"
+            const m = pat.match(/:\/\/(?:\*\.)?([^/*]+)\//);
+            const domain = m && m[1];
+            if (domain && (host === domain || host.endsWith('.' + domain))) return true;
+        }
+    }
+    return false;
+}
+
 // Returns one of: 'start' | 'injecting' | 'injected'
 async function probeInjection(tabId) {
     try {
@@ -102,6 +125,13 @@ async function initRun(tabId, evt) {
             return;
         }
 
+        // Integration sites are injected via declarative content_scripts; skip the
+        // programmatic path there so engines aren't registered twice.
+        if (isCoveredByDeclarative(tab.url)) {
+            await log(['Skipping programmatic injection; handled by content_scripts', tab.url]);
+            return;
+        }
+
         // probe/lock so we only inject once per page
         const probe = await probeInjection(tabId);
         if (probe !== 'start') {
@@ -109,6 +139,7 @@ async function initRun(tabId, evt) {
             return;
         }
 
+        try {
         await browser.scripting.executeScript({
             target: { tabId },
             files: [
@@ -146,6 +177,19 @@ async function initRun(tabId, evt) {
             target: { tabId },
             func: () => { window.__servarrInjected = true; delete window.__servarrInjecting; }
         });
+        } catch (injectErr) {
+            // Injection failed/interrupted (e.g. the service worker was suspended
+            // mid-flight). Clear the lock so a later event can retry instead of
+            // leaving the page permanently stuck with __servarrInjecting set and
+            // no content script.
+            try {
+                await browser.scripting.executeScript({
+                    target: { tabId },
+                    func: () => { delete window.__servarrInjecting; }
+                });
+            } catch (_) { /* tab may have closed/navigated */ }
+            throw injectErr;
+        }
     } catch (e) {
         await log(e.message, 'error');
     }
