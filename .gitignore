@@ -365,3 +365,4 @@ Extension.pem
 .DS_Store
 .AppleDouble
 .LSOverride
+.claude/settings.local.json

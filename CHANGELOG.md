@@ -2,14 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-## 3.0.2
+## 3.1.0
+
+### Changed
+
+- Updated build and test dependencies (Tailwind CSS, Font Awesome, Jest, Grunt, Playwright).
 
 ### Fixed
 
 - Fixed styling in Firefox add-ons manager options view.
 - Fixed test button not requesting permissions for servarr hosts in Firefox.
 - Add SPA support to engines and activate to Trakt. Introduces a URL listener to detect client-side navigation and re-run the engines when the URL changes.
-- Improve Metacritic engine to better detect Sonarr vs Radarr context and fix flakiness by both adding a delay before running the engine to allow the page to fully load and treating as an SPA.
+- Fixed the Metacritic integration broken by their site redesign (the search icon no longer appeared): detect Sonarr vs Radarr from the URL path and target the updated title markup, retaining the render delay and SPA handling.
 
 ## 3.0.1
 

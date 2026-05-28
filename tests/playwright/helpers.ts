@@ -1,4 +1,36 @@
 import type { Page } from '@playwright/test';
+import { iconDataLocator } from './constants';
+
+/**
+ * Wait for the Servarr icon to be injected, reloading the page if it doesn't
+ * appear. The extension injects its content scripts programmatically from the
+ * MV3 service worker on tab `complete`; under parallel test load that one-shot
+ * injection can be missed for a tab, so the page loads with no content script
+ * at all. A reload re-triggers the inject path and reliably recovers it. Real
+ * users (single page at a time) are not affected by this race.
+ * @param page Playwright Page
+ * @param opts.timeoutMs Per-attempt wait for the icon (default 8000ms)
+ * @param opts.reloads Max reloads to attempt if the icon is missing (default 2)
+ */
+export async function waitForServarrIcon(
+	page: Page,
+	opts: { timeoutMs?: number; reloads?: number } = {}
+): Promise<void> {
+	const timeoutMs = opts.timeoutMs ?? 8000;
+	const reloads = opts.reloads ?? 2;
+
+	for (let attempt = 0; attempt <= reloads; attempt++) {
+		try {
+			await page.waitForSelector(iconDataLocator, { timeout: timeoutMs });
+			return;
+		} catch {
+			if (attempt === reloads) {
+				throw new Error(`Servarr icon was not injected after ${reloads} reload(s)`);
+			}
+			await page.reload({ waitUntil: 'domcontentloaded' });
+		}
+	}
+}
 
 /**
  * Get the expected Sonarr URL for a given add new path query
