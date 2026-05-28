@@ -17,6 +17,10 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   # First job: setup and build extension artifacts
   setup:
@@ -78,22 +82,65 @@ jobs:
       - uses: actions/checkout@v4
       - name: Discover tests
         id: discover
-        run: |
-          # Find all *.spec.ts files and strip out the directory so that later
-          tests=$(find tests/playwright/site.integrations.tests -name '*.spec.ts')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
 
-          # Create JSON format for matrix
-          matrix="{\"tests\":["
-          for test in $tests; do
-            # Extract the test name by manipulating the project path (e.g., remove RestEasier.CoreApi/Tests/ and .csproj)
-            test_name=$(basename "$test" .spec.ts)
-            test_file=$(basename "$test")
-            # Append to matrix
-            matrix="$matrix{\"name\":\"$test_name\",\"file\":\"$test_file\"},"
-          done
-          # Remove the last comma and close the JSON
-          matrix="${matrix::-1}]}"
-          echo "matrix=$matrix" >> $GITHUB_OUTPUT
+            const dir = 'tests/playwright/site.integrations.tests';
+            // *.spec.ts only (this naturally excludes the *.spec.NORUN.ts files).
+            const files = fs.readdirSync(dir).filter(f => f.endsWith('.spec.ts'));
+
+            // Only apply the skip / tracking-issue state machine on the default
+            // branch (scheduled or manual dispatch). On PRs we always run every
+            // test and never touch issues — a PR might be the fix.
+            const isDefaultBranch =
+              context.ref === 'refs/heads/main' || context.ref === 'refs/heads/master';
+
+            const BASE_LABEL = 'failed-tests';      // all auto-filed issues carry this
+            const SKIP_LABEL = 'confirmed-failing';  // marker -> skip the test next run
+            const titleFor = (name) => `Playwright test failed: ${name}`;
+
+            // Map currently-open auto-filed issues by their (trimmed) title.
+            const issuesByTitle = new Map();
+            if (isDefaultBranch) {
+              const openIssues = await github.paginate(github.rest.issues.listForRepo, {
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: BASE_LABEL,
+                per_page: 100,
+              });
+              for (const issue of openIssues) {
+                issuesByTitle.set((issue.title || '').trim(), issue);
+              }
+            }
+
+            const tests = [];
+            for (const file of files) {
+              const name = path.basename(file, '.spec.ts');
+              let issue = ''; // tracking issue number for this test, '' if none
+              if (isDefaultBranch) {
+                const existing = issuesByTitle.get(titleFor(name));
+                if (existing) {
+                  const marked = (existing.labels || [])
+                    .some(l => (typeof l === 'string' ? l : l.name) === SKIP_LABEL);
+                  if (marked) {
+                    // Confirmed failing -> skip: leave it out of the matrix entirely.
+                    core.info(`Skipping "${name}" — issue #${existing.number} is "${SKIP_LABEL}"`);
+                    continue;
+                  }
+                  // Issue exists but not yet confirmed -> run again this time.
+                  issue = String(existing.number);
+                }
+              }
+              tests.push({ name, file, issue });
+            }
+
+            const matrix = { tests };
+            core.setOutput('matrix', JSON.stringify(matrix));
+            core.info(`Discovered matrix: ${JSON.stringify(matrix)}`);
   
   # Third job: run tests in parallel using shared artifacts
   test:
@@ -163,24 +210,84 @@ jobs:
           path: tests/playwright/playwright-report/
           retention-days: 10
 
-      # If the test step fails, create an issue using the same method as before, if running on the main or master branch.
-      - name: Create issue if test fails
+      # On the default branch (scheduled / manual dispatch) manage the per-test
+      # tracking issue when the test FAILS:
+      #   - no issue yet            -> create one (1st failure)
+      #   - issue exists, unmarked  -> add the "confirmed-failing" label + comment
+      #                                so the test is skipped on future runs (2nd failure)
+      # (Tests whose issue is already marked never reach here — they're excluded
+      #  from the matrix by the discover-tests job.)
+      - name: Record failure in tracking issue
         if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: dacbd/create-issue-action@main
+        uses: actions/github-script@v7
         with:
-          token: ${{ github.token }}
-          title: |
-            Playwright test failed: ${{ matrix.tests.name }}
-          assignees: ${{ github.repository_owner }}
-          labels: bug, failed-tests
-          body: |
-            ## Failure Report:
-            
-            > [!IMPORTANT]
-            > Details on failed run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    
-            - **Test File:** `${{ matrix.tests.file }}`
-            - **Author:** trossr32
-            - **Branch:** `${{ github.ref }}`
-            - **Commit:** ${{ github.sha }}
-            - **Workflow:** `${{ github.workflow_ref }}`
+          script: |
+            const name = ${{ toJSON(matrix.tests.name) }};
+            const file = ${{ toJSON(matrix.tests.file) }};
+            const issueNumber = ${{ toJSON(matrix.tests.issue) }};
+            const SKIP_LABEL = 'confirmed-failing';
+            const title = `Playwright test failed: ${name}`;
+            const runUrl =
+              `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            if (issueNumber) {
+              // Second consecutive failure: confirm + mark for skipping.
+              const number = Number(issueNumber);
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: number, labels: [SKIP_LABEL],
+              });
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: number,
+                body: [
+                  `❌ Failed again on [run ${context.runId}](${runUrl}).`,
+                  '',
+                  `Added the \`${SKIP_LABEL}\` label — this test will be **skipped** on future`,
+                  'scheduled runs until this issue is closed.',
+                ].join('\n'),
+              });
+              core.info(`Marked issue #${number} as "${SKIP_LABEL}"`);
+            } else {
+              // First failure: open a new tracking issue.
+              const body = [
+                '## Failure Report:',
+                '',
+                '> [!IMPORTANT]',
+                `> Details on failed run: ${runUrl}`,
+                '',
+                `- **Test File:** \`${file}\``,
+                '- **Author:** trossr32',
+                `- **Branch:** \`${context.ref}\``,
+                `- **Commit:** ${context.sha}`,
+                `- **Workflow:** \`${process.env.GITHUB_WORKFLOW_REF || ''}\``,
+              ].join('\n');
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner, repo: context.repo.repo,
+                title, body,
+                labels: ['bug', 'failed-tests'],
+                assignees: [context.repo.owner],
+              });
+              core.info(`Created issue #${created.data.number}`);
+            }
+
+      # If the test PASSES and it had an open (unmarked) tracking issue, the
+      # integration has recovered: comment and close the issue.
+      - name: Resolve tracking issue on success
+        if: success() && matrix.tests.issue != '' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const number = Number(${{ toJSON(matrix.tests.issue) }});
+            const runUrl =
+              `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: number,
+              body: `✅ Passed again on [run ${context.runId}](${runUrl}) — closing as resolved.`,
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: number, state: 'closed', state_reason: 'completed',
+            });
+            core.info(`Closed issue #${number}`);
