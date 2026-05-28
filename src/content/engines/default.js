@@ -132,9 +132,12 @@
      * @returns {Element|null}
      */
     function createNodeFromHTML(html) {
-        var t = document.createElement('div');
-        t.innerHTML = String(html || '').trim();
-        return t.firstElementChild || null;
+        // Parse via DOMParser rather than assigning innerHTML (or using
+        // createContextualFragment) so the AMO/addons-linter "unsafe assignment"
+        // warning isn't raised. Inputs here are engine-defined wrapper markup,
+        // never page/user content.
+        var doc = new DOMParser().parseFromString(String(html || '').trim(), 'text/html');
+        return doc.body.firstElementChild || null;
     }
 
     window.__servarrEngines.helpers.createNodeFromHTML = createNodeFromHTML;
@@ -256,7 +259,18 @@
                         a.title = (site.name || (typeof title === 'function' ? title(site.type, true) : String(site.type)));
                         a.setAttribute('data-servarr-icon', 'true');
                         a.setAttribute(`data-servarr-ext-${site.id}-completed`, 'true');
-                        a.innerHTML = `<svg style="${styles || iconStyle}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><image href="${iconUrl}" width="48" height="48" /></svg>`;
+                        // Build the SVG via DOM APIs (createElementNS) instead of innerHTML to
+                        // avoid the AMO/addons-linter "unsafe innerHTML" warning.
+                        var SVG_NS = 'http://www.w3.org/2000/svg';
+                        var svg = document.createElementNS(SVG_NS, 'svg');
+                        svg.setAttribute('style', styles || iconStyle);
+                        svg.setAttribute('viewBox', '0 0 48 48');
+                        var svgImage = document.createElementNS(SVG_NS, 'image');
+                        svgImage.setAttribute('href', iconUrl);
+                        svgImage.setAttribute('width', '48');
+                        svgImage.setAttribute('height', '48');
+                        svg.appendChild(svgImage);
+                        a.appendChild(svg);
 
                         var nodeToInsert = a;
 
@@ -269,10 +283,9 @@
                         }
 
                         if (injectStyles) {
-                            var styleNode = createNodeFromHTML(`<style>${injectStyles}</style>`);
-                            if (styleNode) {
-                                document.head.appendChild(styleNode);
-                            }
+                            var styleNode = document.createElement('style');
+                            styleNode.textContent = injectStyles;
+                            document.head.appendChild(styleNode);
                         }
 
                         switch (insertWhere) {

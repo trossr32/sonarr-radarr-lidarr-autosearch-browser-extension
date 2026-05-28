@@ -28,7 +28,7 @@ module.exports = function (grunt) {
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map', dest: 'dist/firefox/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/firefox/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/firefox/content/css', filter: 'isFile' },
-                    { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/firefox', filter: 'isFile' },
+                    { expand: true, flatten: false, cwd: "src", src: ['**/*.js', '!eventPage.chrome.js'], dest: 'dist/firefox', filter: 'isFile' },
 
                     // content
                     { expand: true, flatten: true, src: 'src/*.html', dest: 'dist/firefox', filter: 'isFile' },
@@ -51,7 +51,7 @@ module.exports = function (grunt) {
                     { expand: true, flatten: true, src: 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js.map', dest: 'dist/chromium/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },
-                    { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/chromium', filter: 'isFile' },
+                    { expand: true, flatten: false, cwd: "src", src: ['**/*.js', '!eventPage.js'], dest: 'dist/chromium', filter: 'isFile' },
 
                     // content
                     { expand: true, flatten: true, src: 'src/*.html', dest: 'dist/chromium', filter: 'isFile' },
@@ -66,8 +66,8 @@ module.exports = function (grunt) {
             debug: {
                 files: [
                     // debug
-                    { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/chromium', filter: 'isFile' },
-                    { expand: true, flatten: false, cwd: "src", src: '**/*.js', dest: 'dist/firefox', filter: 'isFile' },
+                    { expand: true, flatten: false, cwd: "src", src: ['**/*.js', '!eventPage.js'], dest: 'dist/chromium', filter: 'isFile' },
+                    { expand: true, flatten: false, cwd: "src", src: ['**/*.js', '!eventPage.chrome.js'], dest: 'dist/firefox', filter: 'isFile' },
                     // Spectrum in debug too
                     { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.js', dest: 'dist/chromium/content/js', filter: 'isFile' },
                     { expand: true, flatten: true, src: 'node_modules/spectrum-colorpicker2/dist/spectrum.min.css', dest: 'dist/chromium/content/css', filter: 'isFile' },

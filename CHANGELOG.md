@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Updated build and test dependencies (Tailwind CSS, Font Awesome, Jest, Grunt, Playwright) and declared web-ext as a dev dependency.
+- Raised the minimum supported Firefox version to 140 (desktop) / 142 (Android) and declared the `data_collection_permissions` manifest key (`none` — no data collected), to meet Firefox add-on store requirements for the built-in data-consent feature.
 - Trakt is now community-supported. Trakt requires a paid subscription that the maintainer does not hold, so the Trakt integration can no longer be verified or maintained directly and now relies on community contributions. Its automated integration tests are skipped.
 
 ### Fixed
