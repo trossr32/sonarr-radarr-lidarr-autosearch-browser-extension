@@ -12,7 +12,7 @@ This extension streamlines searching across user‑hosted *Servarr* applications
 
 - Auto-prefilling Servarr search pages when a user navigates to a URL containing `/add/new/<term>` (or similar).
 - Adding context menu items to search selected text directly in any configured Servarr instance.
-- Injecting small Servarr search icons/links into supported third‑party media sites (IMDb, TMDb, TVDb, Trakt, TVmaze, MusicBrainz, Letterboxd, TV Calendar, Rotten Tomatoes, Metacritic, Simkl, IPTorrents, Last.fm, Allociné, SensCritique, Betaseries, Prime Video, Rate Your Music, MyAnimeList, etc.).
+- Injecting small Servarr search icons/links into supported third‑party media sites (IMDb, TMDb, TVDb, Trakt, TVmaze, MusicBrainz, Letterboxd, TV Calendar, Rotten Tomatoes, Metacritic, Simkl, IPTorrents, Last.fm, Allociné, SensCritique, Betaseries, Prime Video, Rate Your Music, MyAnimeList, Wikipedia, etc.).
 - Providing an options UI where users configure base URLs + API keys (optional) for automatic advanced selector configuration.
 - Backup & restore of user settings via a dedicated Options tab:
   - Exports a JSON file using a schema‑versioned envelope.
@@ -101,7 +101,8 @@ There is **no custom packer**, no dynamic code generation beyond Tailwind’s st
     "*://*.thetvdb.com/*",
     "*://*.trakt.tv/*",
     "*://*.pogdesign.co.uk/*",
-    "*://*.tvmaze.com/*"
+    "*://*.tvmaze.com/*",
+    "*://*.wikipedia.org/*"
 ],
 "optional_host_permissions": [
     "<all_urls>"
@@ -146,6 +147,7 @@ There is **no custom packer**, no dynamic code generation beyond Tailwind’s st
     "*://*.trakt.tv/*",
     "*://*.pogdesign.co.uk/*",
     "*://*.tvmaze.com/*",
+    "*://*.wikipedia.org/*",
     "storage",
     "activeTab",
     "tabs",
@@ -190,6 +192,7 @@ All logic is synchronous or simple async with `fetch` only to user‑supplied Se
 | Telemetry | None. |
 | Tracking / Ads | None. |
 | Backup/restore | Export produces a local JSON download only; import reads a local JSON file chosen by the user. No data is transmitted externally. |
+| Firefox data consent | `browser_specific_settings.gecko.data_collection_permissions` is declared as `required: ["none"]`, formally stating that no data is collected (Firefox built-in data-consent). |
 
 ---
 
