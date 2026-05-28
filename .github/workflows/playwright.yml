@@ -138,8 +138,10 @@ jobs:
             find node_modules/.bin -type f -exec chmod +x {} \;
           fi
 
-          # Restore execute bits on all Chromium binaries (artifact download strips perms)
-          find ~/.cache/ms-playwright -path '*/chrome-linux/*' -type f -exec chmod +x {} \; 2>/dev/null || true
+          # Restore execute bits on all Chromium binaries (artifact download strips perms).
+          # Match chrome-linux64 (Playwright's Chrome-for-Testing builds) as well as the
+          # legacy chrome-linux directory, plus the headless-shell binary.
+          find ~/.cache/ms-playwright -path '*/chrome-linux*/*' -type f -exec chmod +x {} \; 2>/dev/null || true
           
           # Reinstall playwright if .bin/playwright is missing
           if [ ! -f "node_modules/.bin/playwright" ]; then
