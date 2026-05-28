@@ -6,14 +6,15 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-- Updated build and test dependencies (Tailwind CSS, Font Awesome, Jest, Grunt, Playwright).
+- Updated build and test dependencies (Tailwind CSS, Font Awesome, Jest, Grunt, Playwright) and declared web-ext as a dev dependency.
+- Trakt is now community-supported. Trakt requires a paid subscription that the maintainer does not hold, so the Trakt integration can no longer be verified or maintained directly and now relies on community contributions. Its automated integration tests are skipped.
 
 ### Fixed
 
 - Fixed styling in Firefox add-ons manager options view.
 - Fixed test button not requesting permissions for servarr hosts in Firefox.
 - Add SPA support to engines and activate to Trakt. Introduces a URL listener to detect client-side navigation and re-run the engines when the URL changes.
-- Fixed the Metacritic integration broken by their site redesign (the search icon no longer appeared): detect Sonarr vs Radarr from the URL path and target the updated title markup, retaining the render delay and SPA handling.
+- Fixed the Metacritic integration broken by their site redesign (the search icon no longer appeared): detect Sonarr vs Radarr from the URL path, target the updated title markup, and re-run until the late-rendered hero title is present so the icon reliably injects.
 
 ## 3.0.1
 
