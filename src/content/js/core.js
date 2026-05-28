@@ -254,7 +254,8 @@ let sessionId,
                 id: 'trakt',
                 name: 'Trakt',
                 image: 'trakt.png',
-                enabled: true
+                enabled: true,
+                warning: 'Trakt requires a subscription. The developer does not maintain an active account. This integration is entirely community supported.'
             },
             {
                 id: 'tvmaze',

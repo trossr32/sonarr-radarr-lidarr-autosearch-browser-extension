@@ -26,6 +26,12 @@
  */
 
 /**
+ * @typedef {Object} SpaConfig
+ * @property {string[]} [domains] Domain substrings to match for SPA detection (e.g. ["trakt.tv"]). URL change monitoring starts if current URL contains any of these.
+ * @property {number} [urlCheckIntervalMs=500] How often to check for URL changes (in milliseconds).
+ */
+
+/**
  * @typedef {Object} DefaultEngineConfig
  * @property {string} id Unique engine id (e.g. "imdb", "tmdb").
  * @property {ServarrSiteType|string} [siteType] Fixed target type; omit if using {@link DefaultEngineConfig.resolveSiteType}.
@@ -39,6 +45,7 @@
  * @property {string} [wrapLinkWithContainer] Optional HTML string used to wrap the generated <a> link (helps with tricky layouts).
  * @property {string} [iconStyle='width:25px; margin:-8px 10px 0 0;'] Inline CSS applied to the <svg> element that displays the icon.
  * @property {number} [deferMs=0] Optional delay (ms) before running this engine (useful for SPA pages).
+ * @property {SpaConfig} [spa] Optional SPA (Single Page Application) configuration for sites that use client-side routing.
  */
 
 /**
@@ -68,6 +75,7 @@
  * @typedef {Object} EngineInstance
  * @property {string} id Engine id.
  * @property {number} deferMs Optional delay before execution.
+ * @property {Object} [spa] Optional SPA configuration from DefaultEngineConfig.
  * @property {(url: string) => boolean} match Quick URL test to decide whether to run the engine.
  * @property {(ctx: CandidatesContext) => EngineCandidates} candidates Produces the candidate elements and the helpers to extract terms and insert icons.
  */
@@ -152,6 +160,7 @@
         var injectStyles = cfg.injectStyles || null;
         var iconStyle = cfg.iconStyle || 'width:25px; margin:-8px 10px 0 0;';
         var deferMs = cfg.deferMs || 0;
+        var spaConfig = cfg.spa || null; // SPA configuration
 
         // Default matcher (using urlIncludes) — no need to define per engine
         function defaultMatch(document, url) {
@@ -175,6 +184,7 @@
             id: id, // maps to settings.integrations[].id (group id)
             key: key, // optional, for logs only
             deferMs: deferMs,
+            spa: spaConfig, // SPA configuration
 
             /**
              * Quick URL check to decide whether this engine should run.

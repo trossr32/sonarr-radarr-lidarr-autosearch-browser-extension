@@ -82,7 +82,11 @@ There is **no custom packer**, no dynamic code generation beyond Tailwind’s st
     "*://*.allocine.fr/*",
     "*://*.betaseries.com/*",
     "*://*.imdb.com/*",
-    "*://*.iptorrents/*",
+    "*://*.iptorrents.com/*",
+    "*://*.iptorrents.net/*",
+    "*://*.iptorrents.me/*",
+    "*://*.iptorrents.eu/*",
+    "*://*.iptorrents.ru/*",
     "*://*.last.fm/*",
     "*://*.letterboxd.com/*",
     "*://*.metacritic.com/*",
@@ -122,7 +126,11 @@ There is **no custom packer**, no dynamic code generation beyond Tailwind’s st
     "*://*.allocine.fr/*",
     "*://*.betaseries.com/*",
     "*://*.imdb.com/*",
-    "*://*.iptorrents/*",
+    "*://*.iptorrents.com/*",
+    "*://*.iptorrents.net/*",
+    "*://*.iptorrents.me/*",
+    "*://*.iptorrents.eu/*",
+    "*://*.iptorrents.ru/*",
     "*://*.last.fm/*",
     "*://*.letterboxd.com/*",
     "*://*.metacritic.com/*",
@@ -160,8 +168,9 @@ If stores require minimization, `<all_urls>` could be replaced by a dynamic perm
 
 | Component | Role |
 |----------|------|
-| `eventPage.chrome.js` | MV3 service worker shim (message routing, context menu handling, storage change propagation). |
-| `eventPage.js` | Shared background script logic (non‑service worker pieces reused). |
+| Content scripts (`content_script.js` + engine files) | Injected two ways: **declaratively** via the manifest `content_scripts` entry (`run_at: document_idle`) on the listed integration domains, and **programmatically** from the background for user‑configured Servarr instance domains (unknown at install time). The same bundled, local files are used for both; the background path skips domains already covered declaratively to avoid double injection. |
+| `eventPage.chrome.js` | MV3 service worker (message routing, context menu handling, storage change propagation, and programmatic content‑script injection for Servarr domains). |
+| `eventPage.js` | Firefox MV2 background equivalent. |
 | `core.js` | Shared helpers: settings access (storage), API version probing, URL building, small `browser` polyfill for non-WebExtension contexts (used in tests). |
 | `options.js` | Options UI assembly (Tailwind utility classes, accessible tabs, toggle wiring, Spectrum colour picker). |
 | `options_*.js` | Options tab‑specific logic (settings load/save, site/integration list management, backup/restore handling). |

@@ -1,29 +1,29 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-## This is just a guess at what this file should look like based on aommm's existing scripts, 
-## see create-packages_Grunt.ps1 for working Powershell script that this should emulate
+# Mirrors CreatePackage_Grunt.ps1 for non-Windows release builds.
+# web-ext is a devDependency, so `npx` resolves the locally installed binary
+# (run `npm install` / `npm ci` first). No global install or PATH changes required.
 
-echo "###########################"
-echo "# Building firefox package"
-echo "###########################"
-echo
+root="$(pwd)"
+publish="$root/Publish"
 
-if ! command -v web-ext &> /dev/null
-then
-    echo "web-ext command could not be found, installing globally from npm"
-    npm i -g web-ext    
-fi
+# Create Publish folder or clear any existing release packages
+mkdir -p "$publish"
+find "$publish" -type f -delete
 
-mkdir -p Publish
+# build Firefox (xpi) and Chromium (zip) packages from their respective dist folders
+build_package() {
+    local path="$1"
+    local extension="$2"
 
-web-ext build -s dist/firefox -a Publish/ -o --filename "sonarr_radarr_lidarr_autosearch-{version}.xpi"
+    echo "###########################"
+    echo "# Building $path package"
+    echo "###########################"
+    echo
 
-echo "###########################"
-echo "# Building chrome package"
-echo "###########################"
-echo
+    npx web-ext build -s "$root/dist/$path" -a "$publish" -o --filename "sonarr_radarr_lidarr_autosearch-{version}.$extension"
+}
 
-## This would be better as a copy of the xpi and simply renamed to have an extension of .zip, but
-## I don't really know what I'm doing in .sh files ¯\_(ツ)_/¯
-
-web-ext build -s dist/chromium -a Publish/ -o --filename "sonarr_radarr_lidarr_autosearch-{version}.zip"
+build_package firefox xpi
+build_package chromium zip

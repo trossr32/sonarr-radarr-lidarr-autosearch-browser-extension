@@ -5,11 +5,60 @@
     var Def = window.__servarrEngines.helpers.DefaultEngine;
     var pick = window.__servarrEngines.helpers.pickSiteIdFromDocument;
 
+    // Retry-aware IMDb id extractor: if not found, schedule up to 5 retries at 500ms
     function imdbId(doc) {
+        // Try immediate lookup first
         var a = doc.querySelector('a[href^="https://www.imdb.com/title/tt"]');
         var href = (a && a.href) || '';
         var m = href.match(/(tt\d{5,10})/i);
-        return m ? (`imdb:${m[1]}`) : '';
+
+        if (m) {
+            // Reset retry state on success
+            if (!window.__servarrTraktImdbRetry) window.__servarrTraktImdbRetry = { attempts: 0, url: location.href, scheduled: false };
+            
+            window.__servarrTraktImdbRetry.attempts = 0;
+            window.__servarrTraktImdbRetry.url = location.href;
+            window.__servarrTraktImdbRetry.scheduled = false;
+
+            return `imdb:${m[1]}`;
+        }
+
+        // Initialize or refresh retry state per-URL
+        var st = window.__servarrTraktImdbRetry || { attempts: 0, url: location.href, scheduled: false };
+
+        if (st.url !== location.href) {
+            st.attempts = 0;
+            st.url = location.href;
+            st.scheduled = false;
+        }
+
+        // Schedule a re-run if we still have budget
+        if (st.attempts < 5) {
+            st.attempts++;
+
+            if (!st.scheduled) {
+                st.scheduled = true;
+
+                setTimeout(function () {
+                    // Allow another schedule window
+                    var cur = window.__servarrTraktImdbRetry || st;
+                    cur.scheduled = false;
+                    window.__servarrTraktImdbRetry = cur;
+
+                    // Trigger engines to re-evaluate once the DOM likely has imdb link
+                    try {
+                        if (typeof window.runEngines === 'function') {
+                            window.runEngines();
+                        }
+                    } catch (_) { /* ignore */ }
+                }, 500);
+            }
+        }
+
+        // Not found yet; return empty to skip for now
+        window.__servarrTraktImdbRetry = st;
+        
+        return '';
     }
 
     // Shows detail (TV → Sonarr)
@@ -21,6 +70,10 @@
         containerSelector: 'h3',
         insertWhere: 'prepend',
         iconStyle: 'width: 36px; margin-right: 10px;',
+        spa: {
+            domains: ['trakt.tv'],
+            urlCheckIntervalMs: 400
+        },
         resolveSiteType: function (doc) {
             return pick(doc, 'meta[property="og:type"][content^="video"]', 'content', [
                 { siteId: 'sonarr', pattern: /video\.tv_show/i }
@@ -38,6 +91,10 @@
         containerSelector: 'h3',
         insertWhere: 'prepend',
         iconStyle: 'width: 36px; margin-right: 10px;',
+        spa: {
+            domains: ['trakt.tv'],
+            urlCheckIntervalMs: 400
+        },
         resolveSiteType: function (doc) {
             return pick(doc, 'meta[property="og:type"][content^="video"]', 'content', [
                 { siteId: 'radarr', pattern: /video\.movie/i }
@@ -63,6 +120,10 @@
         insertWhere: 'prepend',
         iconStyle: 'width: 20px; margin: 0;',
         siteType: 'sonarr',
+        spa: {
+            domains: ['trakt.tv'],
+            urlCheckIntervalMs: 400
+        },
         getInsertElOverride: function(el) { return el.querySelector('.trakt-card-footer') || el; },
         getSearch: function (_el, doc) {
             const a = _el.querySelector('a');
@@ -95,6 +156,10 @@
         insertWhere: 'prepend',
         iconStyle: 'width: 20px; margin: 0;',
         siteType: 'radarr',
+        spa: {
+            domains: ['trakt.tv'],
+            urlCheckIntervalMs: 500
+        },
         getInsertElOverride: function(el) { return el.querySelector('.trakt-card-footer') || el; },
         getSearch: function (_el, doc) {
             const a = _el.querySelector('a');
