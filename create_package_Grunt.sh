@@ -16,7 +16,7 @@ fi
 
 mkdir -p Publish
 
-web-ext build -s dist/ -a Publish/ -o --filename "sonarr_radarr_lidarr_autosearch-{version}.xpi"
+web-ext build -s dist/firefox -a Publish/ -o --filename "sonarr_radarr_lidarr_autosearch-{version}.xpi"
 
 echo "###########################"
 echo "# Building chrome package"
@@ -26,4 +26,4 @@ echo
 ## This would be better as a copy of the xpi and simply renamed to have an extension of .zip, but
 ## I don't really know what I'm doing in .sh files ¯\_(ツ)_/¯
 
-web-ext build -s dist/ -a Publish/ -o --filename "sonarr_radarr_lidarr_autosearch-{version}.zip"
+web-ext build -s dist/chromium -a Publish/ -o --filename "sonarr_radarr_lidarr_autosearch-{version}.zip"
