@@ -12,8 +12,9 @@
         insertWhere: 'prepend',
         iconStyle: 'width: 20px; margin-right: 5px;',
         getSearch: function(_el,doc){ 
-            var n=doc.querySelector('.album_title'); 
-            return (n && (n.textContent||'').trim())||''; 
+            var qat = doc.querySelector('.album_title'); 
+            var album = (qat && (qat.textContent||'').split("  ")[0].trim())||''; 
+            return album; 
         }
     });
 

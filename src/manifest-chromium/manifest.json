@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Sonarr/Radarr/Lidarr autosearch",
   "description": "Exposes a context menu that enables direct searching for tv shows, movies and other text in Sonarr, Radarr, Lidarr and Readarr.",
-  "version": "3.0.1.0",
+  "version": "3.1.0.0",
   "browser_specific_settings": {
     "gecko": {
       "id": "sonarr-radarr-lidarr-autosearch@robgreen.me",
@@ -25,6 +25,66 @@
   "background": {
     "service_worker": "eventPage.chrome.js"
   },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.allocine.fr/*",
+        "*://*.betaseries.com/*",
+        "*://*.imdb.com/*",
+        "*://*.iptorrents.com/*",
+        "*://*.iptorrents.net/*",
+        "*://*.iptorrents.me/*",
+        "*://*.iptorrents.eu/*",
+        "*://*.iptorrents.ru/*",
+        "*://*.last.fm/*",
+        "*://*.letterboxd.com/*",
+        "*://*.metacritic.com/*",
+        "*://*.musicbrainz.org/*",
+        "*://*.myanimelist.net/*",
+        "*://*.primevideo.com/*",
+        "*://*.rateyourmusic.com/*",
+        "*://*.rottentomatoes.com/*",
+        "*://*.senscritique.com/*",
+        "*://*.simkl.com/*",
+        "*://*.themoviedb.org/*",
+        "*://*.thetvdb.com/*",
+        "*://*.trakt.tv/*",
+        "*://*.pogdesign.co.uk/*",
+        "*://*.tvmaze.com/*",
+        "*://*.wikipedia.org/*"
+      ],
+      "js": [
+        "content/js/jquery.min.js",
+        "content/js/browser-polyfill.min.js",
+        "content/js/icons.js",
+        "content/js/core.js",
+        "content/engines/index.js",
+        "content/engines/default.js",
+        "content/engines/integrations/imdb.js",
+        "content/engines/integrations/tmdb.js",
+        "content/engines/integrations/tvdb.js",
+        "content/engines/integrations/trakt.js",
+        "content/engines/integrations/tvmaze.js",
+        "content/engines/integrations/musicbrainz.js",
+        "content/engines/integrations/letterboxd.js",
+        "content/engines/integrations/tvcalendar.js",
+        "content/engines/integrations/rottentomatoes.js",
+        "content/engines/integrations/metacritic.js",
+        "content/engines/integrations/simkl.js",
+        "content/engines/integrations/iptorrents.js",
+        "content/engines/integrations/lastfm.js",
+        "content/engines/integrations/allocine.js",
+        "content/engines/integrations/senscritique.js",
+        "content/engines/integrations/betaseries.js",
+        "content/engines/integrations/primevideo.js",
+        "content/engines/integrations/myanimelist.js",
+        "content/engines/integrations/rateyourmusic.js",
+        "content/engines/integrations/wikipedia.js",
+        "content/js/content_script.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
   "permissions": [
     "scripting", 
     "storage",
@@ -35,7 +95,11 @@
     "*://*.allocine.fr/*",
     "*://*.betaseries.com/*",
     "*://*.imdb.com/*",
-    "*://*.iptorrents/*",
+    "*://*.iptorrents.com/*",
+    "*://*.iptorrents.net/*",
+    "*://*.iptorrents.me/*",
+    "*://*.iptorrents.eu/*",
+    "*://*.iptorrents.ru/*",
     "*://*.last.fm/*",
     "*://*.letterboxd.com/*",
     "*://*.metacritic.com/*",
@@ -50,7 +114,8 @@
     "*://*.thetvdb.com/*",
     "*://*.trakt.tv/*",
     "*://*.pogdesign.co.uk/*",
-    "*://*.tvmaze.com/*"
+    "*://*.tvmaze.com/*",
+    "*://*.wikipedia.org/*"
   ],
   "optional_host_permissions": [
     "<all_urls>"

@@ -16,6 +16,33 @@ export const test = base.extend<{
         `--load-extension=${pathToExtension}`,
       ],
     });
+    // Suppress site service worker registration on trakt domains to avoid 403 noise and timing variance.
+    await context.addInitScript(() => {
+      try {
+        if (location.hostname.endsWith('trakt.tv')) {
+          const sw = (navigator as any).serviceWorker;
+          if (sw && typeof sw.register === 'function') {
+            const orig = sw.register.bind(sw);
+            sw.register = function(url: any, options: any) {
+              try {
+                const href = new URL(url, location.href).href;
+                if (href.includes('/service-worker.js')) {
+                  return Promise.resolve({
+                    unregister: () => Promise.resolve(true),
+                    update: () => Promise.resolve(),
+                    installing: null,
+                    waiting: null,
+                    active: null,
+                    scope: location.origin + '/',
+                  });
+                }
+              } catch {}
+              return orig(url, options);
+            };
+          }
+        }
+      } catch {}
+    });
     await use(context);
     await context.close();
   },

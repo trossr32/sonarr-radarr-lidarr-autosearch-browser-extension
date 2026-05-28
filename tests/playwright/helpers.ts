@@ -1,4 +1,41 @@
 import type { Page } from '@playwright/test';
+import { iconDataLocator } from './constants';
+
+/**
+ * Wait for the Servarr icon to be injected, reloading the page if it doesn't
+ * appear. The extension injects its content scripts programmatically from the
+ * MV3 service worker on tab `complete`; under parallel test load that one-shot
+ * injection can be missed for a tab, so the page loads with no content script
+ * at all. A reload re-triggers the inject path and reliably recovers it. Real
+ * users (single page at a time) are not affected by this race.
+ * The first wait is generous (matching the suite's assertion budget) so that
+ * sites whose injection is merely slow pass without an unnecessary reload; the
+ * reload is reserved for the genuine "service worker never injected" case.
+ * @param page Playwright Page
+ * @param opts.timeoutMs Per-attempt wait for the icon (default 15000ms)
+ * @param opts.reloads Max reloads to attempt if the icon is missing (default 1)
+ */
+export async function waitForServarrIcon(
+	page: Page,
+	opts: { timeoutMs?: number; reloads?: number } = {}
+): Promise<void> {
+	const timeoutMs = opts.timeoutMs ?? 15000;
+	const reloads = opts.reloads ?? 1;
+
+	for (let attempt = 0; attempt <= reloads; attempt++) {
+		try {
+			// state:'attached' (not the default 'visible') to mirror toHaveCount semantics —
+			// some integrations inject an icon that's present but not "visible" to Playwright.
+			await page.waitForSelector(iconDataLocator, { state: 'attached', timeout: timeoutMs });
+			return;
+		} catch {
+			if (attempt === reloads) {
+				throw new Error(`Servarr icon was not injected after ${reloads} reload(s)`);
+			}
+			await page.reload({ waitUntil: 'domcontentloaded' });
+		}
+	}
+}
 
 /**
  * Get the expected Sonarr URL for a given add new path query
@@ -31,14 +68,14 @@ export async function handleTraktCookieOverlay(page: import('@playwright/test').
 
 	try {
 		// Wait briefly for the overlay to appear
-		const visible = await overlay.isVisible({ timeout: 1500 });
+		const visible = await overlay.isVisible({ timeout: 2000 });
 
 		if (!visible) return;
 
 		await consentBtn.first().click({ timeout: 2000 });
 
 		// Give the app a moment to settle any client-side state
-		await page.waitForTimeout(1000);
+		await page.waitForTimeout(2000);
 
 		await hardReload(page);
 	} catch {

@@ -11,6 +11,9 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './site.integrations.tests',
+  // Allow time for the waitForServarrIcon reload-retry (generous wait + a reload
+  // fallback) when the MV3 service worker is slow to inject under load.
+  timeout: 60000,
   expect: {
     timeout: 15000,
   },

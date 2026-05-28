@@ -254,7 +254,8 @@ let sessionId,
                 id: 'trakt',
                 name: 'Trakt',
                 image: 'trakt.png',
-                enabled: true
+                enabled: true,
+                warning: 'Trakt requires a subscription. The developer does not maintain an active account. This integration is entirely community supported.'
             },
             {
                 id: 'tvmaze',
@@ -349,6 +350,12 @@ let sessionId,
                 image: 'rateyourmusic.jpg',
                 enabled: true,
                 warning: 'This integration was created by a community member and is not maintained by the developer due to the site blocking VPN traffic.'
+            },
+            {
+                id: 'wikipedia',
+                name: 'Wikipedia',
+                image: 'wikipedia.svg',
+                enabled: true
             }
             // {
             //     id: 'nextepisode',

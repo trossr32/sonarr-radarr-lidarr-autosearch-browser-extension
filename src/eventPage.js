@@ -50,6 +50,29 @@ function isInjectableUrl(url) {
     return url.startsWith('http://') || url.startsWith('https://');
 }
 
+/**
+ * True if the URL is already handled by a declarative content_scripts entry in
+ * the manifest, so the background must NOT also inject (it would register the
+ * engines twice and double the injected icons).
+ * @param {string} url
+ * @returns {boolean}
+ */
+function isCoveredByDeclarative(url) {
+    let host;
+    try { host = new URL(url).hostname; } catch (e) { return false; }
+
+    const groups = (browser.runtime.getManifest().content_scripts || []);
+    for (const g of groups) {
+        for (const pat of (g.matches || [])) {
+            // Patterns look like "*://*.imdb.com/*" -> domain "imdb.com"
+            const m = pat.match(/:\/\/(?:\*\.)?([^/*]+)\//);
+            const domain = m && m[1];
+            if (domain && (host === domain || host.endsWith('.' + domain))) return true;
+        }
+    }
+    return false;
+}
+
 // Returns one of: 'start' | 'injecting' | 'injected'
 async function probeInjectionFF(tabId) {
     try {
@@ -103,6 +126,13 @@ async function initRun(tabOrId, evt) {
             return;
         }
 
+        // Integration sites are injected via declarative content_scripts; skip the
+        // programmatic path there so engines aren't registered twice.
+        if (isCoveredByDeclarative(tab.url)) {
+            await log(['Skipping programmatic injection; handled by content_scripts', tab.url]);
+            return;
+        }
+
         // probe/lock so we only inject once per page
         const probe = await probeInjectionFF(tab.id);
         if (probe !== 'start') {
@@ -111,6 +141,7 @@ async function initRun(tabOrId, evt) {
         }
 
         // Explicitly target the tab
+        try {
         await browser.tabs.executeScript(tab.id, { file: 'content/js/jquery.min.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/browser-polyfill.min.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/icons.js' });
@@ -136,12 +167,22 @@ async function initRun(tabOrId, evt) {
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/primevideo.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/myanimelist.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/rateyourmusic.js' });
+        await browser.tabs.executeScript(tab.id, { file: 'content/engines/integrations/wikipedia.js' });
         await browser.tabs.executeScript(tab.id, { file: 'content/js/content_script.js' });
 
         // release lock
         await browser.tabs.executeScript(tab.id, {
             code: `window.__servarrInjected = true; delete window.__servarrInjecting;`
         });
+        } catch (injectErr) {
+            // Injection failed/interrupted: clear the lock so a later event can
+            // retry instead of leaving the page stuck with __servarrInjecting set
+            // and no content script.
+            try {
+                await browser.tabs.executeScript(tab.id, { code: `delete window.__servarrInjecting;` });
+            } catch (_) { /* tab may have closed/navigated */ }
+            throw injectErr;
+        }
    } catch (e) {
         await log(e.message, 'error');
    }

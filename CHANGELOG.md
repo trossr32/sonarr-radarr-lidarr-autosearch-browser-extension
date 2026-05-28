@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.1.0
+
+### Added
+
+- Add Wikipedia integration that injects Sonarr, Radarr and Lidarr icons on Wikipedia articles, classifying each article as a TV series, film or music artist/album from its page categories - ([PR#320](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/pull/320)). Thanks to [bambinofresco](https://github.com/bambinofresco).
+
+### Changed
+
+- Updated build and test dependencies (Tailwind CSS, Font Awesome, Jest, Grunt, Playwright) and declared web-ext as a dev dependency.
+- Trakt is now community-supported. Trakt requires a paid subscription that the maintainer does not hold, so the Trakt integration can no longer be verified or maintained directly and now relies on community contributions. Its automated integration tests are skipped.
+
+### Fixed
+
+- Fixed styling in Firefox add-ons manager options view.
+- Fixed test button not requesting permissions for servarr hosts in Firefox.
+- Add SPA support to engines and activate to Trakt. Introduces a URL listener to detect client-side navigation and re-run the engines when the URL changes.
+- Fixed the Metacritic integration broken by their site redesign (the search icon no longer appeared): detect Sonarr vs Radarr from the URL path, target the updated title markup, and re-run until the late-rendered hero title is present so the icon reliably injects.
+- Made search-icon injection reliable on supported sites. They are now declared as manifest content scripts and injected by the browser at page load, instead of relying solely on programmatic injection from the background service worker, which could be delayed or missed under load (occasionally leaving no icon until the page was reloaded). The programmatic path is retained for configured Servarr instances and now clears its lock and retries if an injection is interrupted.
+- Fixed the IPTorrents integration, whose host match never matched any page because the pattern was missing its top-level domain. It now covers IPTorrents across its common domains (.com, .net, .me, .eu, .ru) and the engine matches any IPTorrents TLD.
+- Fixed the MusicBrainz integration picking up a link injected by a userscript instead of the canonical entry link; it now targets the entry's `bdi` element, with a fallback for browsers without `:has()` support - ([PR#316](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/pull/316)). Thanks to [StormPooper](https://github.com/StormPooper).
+- Fixed RateYourMusic album searches including an encoded newline (`%0A`) by trimming the album title before searching - ([PR#319](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/pull/319)). Thanks to [Xeldarflo](https://github.com/Xeldarflo).
+
 ## 3.0.1
 
 ### Fixed

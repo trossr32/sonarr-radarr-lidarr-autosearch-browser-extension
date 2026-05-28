@@ -86,7 +86,14 @@ Create a file `src/content/engines/integrations/yoursite.js`:
         },
 
         // Icon styles (you can stick to the defaults or tweak per site)
-        iconStyle: 'width: 28px; margin: -4px 10px 0 0;'
+        iconStyle: 'width: 28px; margin: -4px 10px 0 0;',
+
+        // Optional: SPA (Single Page Application) support for sites with client-side routing
+        // Enable this if the site changes URLs without full page reloads (like Trakt, SIMKL, etc.)
+        spa: {
+            domains: ['yoursite.example.com'],  // Domain substrings to monitor for URL changes
+            urlCheckIntervalMs: 500             // How often to check for URL changes (optional, defaults to 500ms)
+        }
     });
 
     window.__servarrEngines.list.push(YourSiteEngine);
@@ -117,6 +124,7 @@ Create a file `src/content/engines/integrations/yoursite.js`:
 | `icon.imgStyles` | `iconStyle` |
 | `deferMs` | `deferMs` (unchanged) |
 | `where` gates | Implement inside `resolveSiteType` (return `null` to skip) or early-exit in `getSearch` |
+| *(new)* | `spa` (SPA/client-side routing support) |
 
 > You can keep the same behaviours: extract IDs (`imdb:tt…`, `tmdb:…`), trim/rewrite titles, or gate on `og:type`, etc.
 
@@ -192,6 +200,76 @@ getSearch: function (_el, document) {
 
 ---
 
+## SPA (Single Page Application) Support
+
+Some modern websites use client-side routing where the URL changes without full page reloads (examples: Trakt.tv, Netflix, many React/Vue apps). The extension needs special handling for these sites since the content script doesn't automatically re-run when the URL changes.
+
+### Enabling SPA Support
+
+Add the `spa` configuration to your engine:
+
+```js
+const YourSpaEngine = Def({
+    id: 'yoursite',
+    urlIncludes: ['yoursite.com/content/'],
+    
+    // Required: SPA configuration
+    spa: {
+        domains: ['yoursite.com'],           // Domains to monitor for URL changes
+        urlCheckIntervalMs: 500              // Optional: check frequency (default: 500ms)
+    },
+    
+    // ... rest of your engine config
+});
+```
+
+### How SPA Detection Works
+
+1. **Domain Matching**: The extension checks if the current URL contains any domain from the `spa.domains` array
+2. **URL Monitoring**: If on a SPA domain, it starts monitoring for URL changes every `urlCheckIntervalMs`
+3. **Automatic Re-injection**: When the URL changes within the SPA domain:
+   - Cleans up existing icons and markers
+   - Re-runs all engines for the new URL
+   - Injects icons if the new URL matches engine criteria
+4. **Smart Cleanup**: Stops monitoring when navigating away from SPA domains entirely
+
+### SPA Configuration Options
+
+| Property | Type | Required | Description |
+|----------|------|----------|-------------|
+| `domains` | `string[]` | Yes | Array of domain substrings to monitor (e.g., `['trakt.tv', 'netflix.com']`) |
+| `urlCheckIntervalMs` | `number` | No | URL change check frequency in milliseconds (default: 500) |
+
+### Examples
+
+**Trakt.tv (real implementation):**
+
+```js
+spa: {
+    domains: ['trakt.tv'],
+    urlCheckIntervalMs: 500
+}
+```
+
+**Multiple domains:**
+
+```js
+spa: {
+    domains: ['netflix.com', 'netflix.ca', 'netflix.co.uk'],
+    urlCheckIntervalMs: 750
+}
+```
+
+### Important Notes
+
+- **Opt-in Feature**: Only engines with `spa` configuration get URL monitoring
+- **Performance**: Lower `urlCheckIntervalMs` = more responsive but higher CPU usage
+- **Domain Specificity**: Use specific domains to avoid false positives (prefer `'app.trakt.tv'` over `'trakt'`)
+- **Multiple Engines**: If multiple engines have SPA config for the same domain, the first enabled one wins
+- **User Settings**: SPA monitoring only works for engines enabled in user settings
+
+---
+
 ## SPA/Slow DOM Pages
 
 If the target DOM is built late (Trakt, SIMKL, Prime Video), add:
@@ -199,6 +277,8 @@ If the target DOM is built late (Trakt, SIMKL, Prime Video), add:
 ```js
 deferMs: 1000 // or 2000/3000 based on observation
 ```
+
+**For SPA sites** that change URLs without page reloads, use the `spa` configuration instead of or in addition to `deferMs`. See the [SPA Support](#spa-single-page-application-support) section above for details.
 
 ---
 
@@ -222,6 +302,11 @@ deferMs: 1000 // or 2000/3000 based on observation
   - `getSearch` returns a **non-empty** term (`"tmdb:12345"`, `"imdb:tt1234567"`, or a clear title).
   - The icon appears only once per target element (the runner prevents double injection).
 - For SPA pages, experiment with `deferMs`.
+- **For SPA sites**:
+  - Check console logs for "Starting URL change detection for SPA domain" when visiting the domain
+  - Verify URL changes are detected with "URL changed from ... to ... - re-running engines" logs
+  - Test navigation within the SPA to ensure icons appear on new pages
+  - Confirm monitoring stops when leaving the SPA domain entirely
 
 ---
 

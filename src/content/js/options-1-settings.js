@@ -1,16 +1,27 @@
 // ---------- Host permission helpers ----------
 function getRt() {
-  // Prefer native chrome.* in Chromium to avoid polyfill arity issues
-  if (typeof chrome !== 'undefined' &&
-      chrome &&
-      chrome.permissions &&
-      typeof chrome.permissions.request === 'function') {
-    return chrome; // callback-style API
-  }
-  if (typeof browser !== 'undefined' && browser) {
-    return browser; // promise-style API (Firefox / polyfill)
-  }
-  return null;
+    // Detect if we're in Firefox by checking for navigator.userAgent or browser.runtime.getBrowserInfo
+    const isFirefox = typeof navigator !== 'undefined' && navigator.userAgent && navigator.userAgent.includes('Firefox');
+    
+    // In Firefox, always prefer the native browser API over the polyfilled chrome object
+    if (isFirefox && typeof browser !== 'undefined' && browser) {
+        return browser; // promise-style API (native Firefox)
+    }
+    
+    // Prefer native chrome.* in Chromium to avoid polyfill arity issues
+    if (typeof chrome !== 'undefined' &&
+        chrome &&
+        chrome.permissions &&
+        typeof chrome.permissions.request === 'function') {
+        return chrome; // callback-style API
+    }
+    
+    // Fallback to browser API (polyfill or other browsers)
+    if (typeof browser !== 'undefined' && browser) {
+        return browser; // promise-style API (Firefox / polyfill)
+    }
+    
+    return null;
 }
 
 /**
@@ -68,7 +79,7 @@ function requestHostPermission(originPattern) {
                 return;
             }
 
-            rt.permissions.request(req).then(x => res(!!x)).catch(() => {        
+            rt.permissions.request(req).then(x => res(!!x)).catch((e) => {        
                 log(['Failed to request host permission', e], 'error');
             
                 res(false);
@@ -381,46 +392,44 @@ var initialiseBasicForm = function (settings) {
                 return;
             }
 
-            await setSettingsPropertiesFromForm();
-            setTestButtonIcon(siteId, 'Progress');
-
-            // Ensure host permission before calling API
-            const $msg = $(`#${siteId}ApiTestMessage`).addClass('hidden');
+            // Get origin and request permission IMMEDIATELY, before any async operations
             const origin = parseOriginFromDomain(($(`#${siteId}Domain`).val() || '').trim());
             
             if (!origin) {
                 setTestButtonIcon(siteId, 'Failed');
-
+                const $msg = $(`#${siteId}ApiTestMessage`);
                 $msg
                     .removeClass('hidden bg-green-600')
                     .addClass('bg-rose-600 text-white')
                     .html('Invalid base URL (must include scheme, e.g. http://host:port/).')
                     .removeClass('hidden');
-                
                 return;
             }
 
-            const hasPerm = await containsHostPermission(origin);
-            
-            if (!hasPerm) {
-                const granted = await requestHostPermission(origin);
+            // Request permission directly - if already granted, this will succeed silently
+            const granted = await requestHostPermission(origin);
 
-                if (granted) {
-                    await updatePermissionChips();
-                } else {
-                    await updatePermissionChip(siteId);
-
-                    setTestButtonIcon(siteId, 'Failed');
-                    
-                    $msg
-                        .removeClass('hidden bg-green-600')
-                        .addClass('bg-rose-600 text-white')
-                        .html('Host permission denied. Cannot contact this instance until permission is granted.')
-                        .removeClass('hidden');
-                    
-                        return;
-                }
+            if (!granted) {
+                setTestButtonIcon(siteId, 'Failed');
+                const $msg = $(`#${siteId}ApiTestMessage`);
+                $msg
+                    .removeClass('hidden bg-green-600')
+                    .addClass('bg-rose-600 text-white')
+                    .html('Host permission denied. Cannot contact this instance until permission is granted.')
+                    .removeClass('hidden');
+                return;
             }
+
+            // Now that permission is granted, proceed with the test
+            await setSettingsPropertiesFromForm();
+            setTestButtonIcon(siteId, 'Progress');
+            
+            // Update permission UI after successful grant
+            await updatePermissionChips();
+
+            const $msg = $(`#${siteId}ApiTestMessage`).addClass('hidden');
+
+            log([`Testing API connection for site ${siteId} at origin ${origin}`], 'info');
 
             let response;
             try {
@@ -555,79 +564,6 @@ var initialiseBasicForm = function (settings) {
                 await updateSiteIconUI(siteId, curSite, true);
                 
                 updateTestButtonState(siteId);
-            }
-        });
-        
-        $root.on('click', 'button[id$="ApiKeyTest"]', async function(){
-            const siteId = $(this).attr('data-site-id');
-            const siteEnabled = $(`#toggle-${siteId}`).prop('checked');
-            
-            if (!siteEnabled) {
-                const $msg = $(`#${siteId}ApiTestMessage`).removeClass('hidden bg-green-600').addClass('bg-rose-600 text-white').html('Enable this site to test the API connection');
-                setTestButtonIcon(siteId, 'Failed');
-                return;
-            }
-
-            await setSettingsPropertiesFromForm();
-            setTestButtonIcon(siteId, 'Progress');
-
-            // Ensure host permission before calling API
-            const $msg = $(`#${siteId}ApiTestMessage`).addClass('hidden');
-            const origin = parseOriginFromDomain(($(`#${siteId}Domain`).val() || '').trim());
-            
-            if (!origin) {
-                setTestButtonIcon(siteId, 'Failed');
-
-                $msg
-                    .removeClass('hidden bg-green-600')
-                    .addClass('bg-rose-600 text-white')
-                    .html('Invalid base URL (must include scheme, e.g. http://host:port/).')
-                    .removeClass('hidden');
-                
-                return;
-            }
-
-            const hasPerm = await containsHostPermission(origin);
-            
-            if (!hasPerm) {
-                const granted = await requestHostPermission(origin);
-                
-                if (granted) {
-                    await updatePermissionChips();
-                } else {
-                    await updatePermissionChip(site.id);
-
-                    setTestButtonIcon(siteId, 'Failed');
-                    
-                    $msg
-                        .removeClass('hidden bg-green-600')
-                        .addClass('bg-rose-600 text-white')
-                        .html('Host permission denied. Cannot contact this instance until permission is granted.')
-                        .removeClass('hidden');
-                    
-                        return;
-                }
-            }
-                        
-            let response;
-            
-            try { 
-                response = await callApi({ siteId, endpoint: 'Version' }); 
-            } catch(e) { 
-                response = { success:false, error:e }; 
-            }
-            
-            if (response && response.success) {
-                setTestButtonIcon(siteId, 'Worked');
-                $msg.removeClass('hidden bg-rose-600').addClass('bg-green-600 text-white').html(`Success! Detected version ${response.data.version}`).removeClass('hidden');
-                updateStatusBadge(siteId, 'ok', response.data.version);
-                const settings = await getSettings();
-                updateAdvancedForm(settings);
-            } else {
-                setTestButtonIcon(siteId, 'Failed');
-                const errText = (response && response.error) ? (response.error.message || String(response.error)) : 'Unknown error';
-                $msg.removeClass('hidden bg-green-600').addClass('bg-rose-600 text-white').html(`Failed: ${errText}. Please check the domain and API key.`).removeClass('hidden');
-                updateStatusBadge(siteId, 'fail');
             }
         });
         
