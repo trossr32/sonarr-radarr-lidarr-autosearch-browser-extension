@@ -1,6 +1,6 @@
 {
     "name": "sonarr-radarr-autosearch-browser-extension",
-    "version": "2.0.0",
+    "version": "3.1.0",
     "devDependencies": {
         "@fortawesome/fontawesome-free": "^7.2.0",
         "@tailwindcss/cli": "^4.3.0",
@@ -18,6 +18,7 @@
         "load-grunt-tasks": "^5.1.0",
         "spectrum-colorpicker2": "^2.0.10",
         "tailwindcss": "^4.3.0",
+        "web-ext": "^10.3.0",
         "webextension-polyfill": "^0.12.0"
     },
     "dependencies": {
