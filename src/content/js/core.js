@@ -350,6 +350,12 @@ let sessionId,
                 image: 'rateyourmusic.jpg',
                 enabled: true,
                 warning: 'This integration was created by a community member and is not maintained by the developer due to the site blocking VPN traffic.'
+            },
+            {
+                id: 'wikipedia',
+                name: 'Wikipedia',
+                image: 'wikipedia.svg',
+                enabled: true
             }
             // {
             //     id: 'nextepisode',

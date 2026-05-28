@@ -59,7 +59,8 @@
         "*://*.thetvdb.com/*",
         "*://*.trakt.tv/*",
         "*://*.pogdesign.co.uk/*",
-        "*://*.tvmaze.com/*"
+        "*://*.tvmaze.com/*",
+        "*://*.wikipedia.org/*"
       ],
       "js": [
         "content/js/jquery.min.js",
@@ -87,6 +88,7 @@
         "content/engines/integrations/primevideo.js",
         "content/engines/integrations/myanimelist.js",
         "content/engines/integrations/rateyourmusic.js",
+        "content/engines/integrations/wikipedia.js",
         "content/js/content_script.js"
       ],
       "run_at": "document_idle"
@@ -116,6 +118,7 @@
     "*://*.trakt.tv/*",
     "*://*.pogdesign.co.uk/*",
     "*://*.tvmaze.com/*",
+    "*://*.wikipedia.org/*",
     "storage",
     "activeTab",
     "tabs",
