@@ -34,4 +34,25 @@
     });
 
     window.__servarrEngines.list.push(Engine);
+
+    // Metacritic is a heavily-hydrated React/ad-laden page: the hero title container
+    // can mount (or remount) after the content script's initial pass, so a single
+    // engine run may snapshot an empty container set and inject nothing — with no
+    // retry. This is timing-dependent and shows up on slower CI runners. Re-run the
+    // engines a few times until the icon is injected. Gated to Metacritic detail
+    // pages because every engine file is injected on every page.
+    if (/metacritic\.com\/(tv|movie)\//i.test(location.href)) {
+        var __mcAttempts = 0;
+        var __mcTimer = setInterval(function () {
+            __mcAttempts++;
+            if (document.querySelector('a[data-servarr-icon="true"]') || __mcAttempts >= 12) {
+                clearInterval(__mcTimer);
+                return;
+            }
+            if (document.querySelector('div[class*="product-hero__title"] h1') &&
+                typeof window.runEngines === 'function') {
+                window.runEngines();
+            }
+        }, 600);
+    }
 })();
