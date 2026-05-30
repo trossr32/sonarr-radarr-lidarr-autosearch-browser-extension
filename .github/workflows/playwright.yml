@@ -26,8 +26,8 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
           
@@ -47,7 +47,7 @@ jobs:
 
       # Upload the built extension
       - name: Upload extension artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: extension-dist
           path: dist/
@@ -55,7 +55,7 @@ jobs:
 
       # Upload node_modules from the test directory (includes Playwright browsers)
       - name: Upload test dependencies
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-node-modules
           path: |
@@ -66,7 +66,7 @@ jobs:
 
       # Upload the Playwright cache (browsers and dependencies)
       - name: Upload Playwright cache
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-cache
           path: ~/.cache/ms-playwright/
@@ -79,10 +79,10 @@ jobs:
     outputs:
       matrix: ${{ steps.discover.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Discover tests
         id: discover
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
@@ -152,25 +152,25 @@ jobs:
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       # Download the pre-built extension
       - name: Download extension artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: extension-dist
           path: dist/
 
       # Download test dependencies
       - name: Download test dependencies
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: test-node-modules
           path: tests/playwright/
 
       # Download Playwright cache
       - name: Download Playwright cache
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: playwright-cache
           path: ~/.cache/ms-playwright/
@@ -203,7 +203,7 @@ jobs:
         run: ./node_modules/.bin/playwright test ${{ matrix.tests.file }}
         working-directory: tests/playwright
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: playwright-report-${{ matrix.tests.name }}
@@ -219,7 +219,7 @@ jobs:
       #  from the matrix by the discover-tests job.)
       - name: Record failure in tracking issue
         if: failure() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const name = ${{ toJSON(matrix.tests.name) }};
@@ -275,7 +275,7 @@ jobs:
       # integration has recovered: comment and close the issue.
       - name: Resolve tracking issue on success
         if: success() && matrix.tests.issue != '' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-        uses: actions/github-script@v7
+        uses: actions/github-script@v9
         with:
           script: |
             const number = Number(${{ toJSON(matrix.tests.issue) }});
