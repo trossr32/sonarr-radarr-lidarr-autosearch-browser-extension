@@ -31,7 +31,7 @@ jobs:
 
     steps:
       - name: Check for outdated npm packages in ${{ matrix.name }}
-        uses: trossr32/outdated-packages-action@bec045471fbe8558e314b4b41b76eaff9ed6b104
+        uses: trossr32/outdated-packages-action@v4
         with:
           use-npm-outdated: true
           npm-project-directory: ${{ matrix.directory }}
