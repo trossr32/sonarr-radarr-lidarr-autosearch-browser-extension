@@ -4,7 +4,7 @@ name: Outdated package checks
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [ master, main ]
+    branches: [ master, main, staging ]
     paths:
       - '.github/workflows/outdated.yml'
       - 'src/**'
