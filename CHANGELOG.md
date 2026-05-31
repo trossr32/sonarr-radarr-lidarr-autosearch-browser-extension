@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.1.1
+
+### Fixed
+
+- Add Lidarr V3 version support to the API connection test.
+
 ## 3.1.0
 
 ### Added

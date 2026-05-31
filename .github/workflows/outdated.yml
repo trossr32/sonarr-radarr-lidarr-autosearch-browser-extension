@@ -4,15 +4,35 @@ name: Outdated package checks
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [ master, main ]
+    branches: [ master, main, staging ]
+    paths:
+      - '.github/workflows/outdated.yml'
+      - 'src/**'
+      - 'tests/**'
+      - 'package.json'
+      - 'tailwind.config.js'
   
   workflow_dispatch:
 
 jobs:
   outdated-packages-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
+
+    name: Check outdated packages (${{ matrix.name }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: project root
+            directory: '.'
+          - name: playwright tests
+            directory: 'tests/playwright'
 
     steps:
-      - uses: trossr32/outdated-packages-action@v1.7.0
+      - name: Check for outdated npm packages in ${{ matrix.name }}
+        uses: trossr32/outdated-packages-action@v4
         with:
           use-npm-outdated: true
+          npm-project-directory: ${{ matrix.directory }}
+          comment-label: '${{ matrix.name }}'

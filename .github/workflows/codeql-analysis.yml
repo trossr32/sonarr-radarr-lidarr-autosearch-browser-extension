@@ -22,7 +22,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
   schedule:
-    - cron: '16 0 * * 5'
+    - cron: '0 5 1,16 * *'
 
 jobs:
   analyze:
@@ -42,7 +42,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
