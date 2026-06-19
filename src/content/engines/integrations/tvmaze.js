@@ -31,5 +31,20 @@
         }
     });
 
-    window.__servarrEngines.list.push(ShowPage, Countdown);
+    var ShowsList = Def({
+        id: 'tvmaze',
+        key: 'tvmaze-shows',
+        match: function (doc, url) {
+            return url.indexOf('tvmaze.com/shows') >= 0 && url.indexOf('tvmaze.com/shows/') === -1;
+        },
+        siteType: 'sonarr',
+        containerSelector: 'span.title h2',
+        insertWhere: 'prepend',
+        iconStyle: 'width: 16px; height: 16px; margin: -2px 6px 0 0; display: inline-block; vertical-align: middle;',
+        getSearch: function (el, doc) {
+            return (el && (el.textContent || '').trim()) || '';
+        }
+    });
+
+    window.__servarrEngines.list.push(ShowPage, Countdown, ShowsList);
 })();
