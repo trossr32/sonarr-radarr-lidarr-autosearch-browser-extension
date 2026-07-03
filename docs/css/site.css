@@ -238,10 +238,12 @@ pre code { background: none; border: 0; padding: 0; color: var(--text); }
     white-space: nowrap;
 }
 .brand:hover { text-decoration: none; }
-.brand img { width: 28px; height: 28px; }
+.brand img { width: 28px; height: 28px; flex-shrink: 0; }
 .brand .tld { color: var(--green); }
 
-/* On narrow screens the wordmark collides with the scrollable nav — icon only */
+/* On narrow screens the wordmark collides with the scrollable nav — icon only,
+   and the brand must not shrink or the icon gets squashed */
+.site-header .brand { flex-shrink: 0; }
 .site-header .brand span { display: none; }
 @media (min-width: 640px) {
     .site-header .brand span { display: inline; }
