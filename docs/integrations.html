@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Integrations — Servarr Auto Search</title>
+    <meta name="description" content="All 20 sites the Servarr Auto Search extension integrates with — IMDb, TMDb, TVDb, Trakt, Letterboxd, MusicBrainz and more — and which Servarr app each one feeds.">
+    <link rel="canonical" href="https://arrsearch.app/integrations.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Servarr Auto Search">
+    <meta property="og:title" content="Integrations — Servarr Auto Search">
+    <meta property="og:description" content="All 20 sites the extension integrates with, and which Servarr app each one feeds.">
+    <meta property="og:url" content="https://arrsearch.app/integrations.html">
+    <meta property="og:image" content="https://arrsearch.app/assets/img/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#060b09">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/icons/icon-128.png">
+    <link rel="apple-touch-icon" href="assets/icons/icon-256.png">
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    <link rel="stylesheet" href="css/site.css">
+    <script src="js/site.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- @shared:header (keep identical across all pages; only aria-current differs) -->
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="index.html">
+                <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                <span>arr search<span class="tld">.app</span></span>
+            </a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="index.html">Home</a>
+                <a href="user-guide.html">User guide</a>
+                <a href="integrations.html" aria-current="page">Integrations</a>
+                <a href="developers.html">Developers</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                </button>
+                <a class="header-cta" href="index.html#install">Install</a>
+            </div>
+        </div>
+    </header>
+    <!-- @shared:header:end -->
+
+    <main id="main">
+        <div class="page-hero">
+            <div class="container">
+                <p class="kicker">On your radar</p>
+                <h1>Site integrations</h1>
+                <p>Every site below gets Servarr search icons injected next to titles. Each integration can be toggled individually on the extension's <strong>Integrations</strong> tab. Want a site added? <a href="developers.html">Integrations are community-built</a>.</p>
+            </div>
+        </div>
+
+        <section class="section">
+            <div class="container">
+                <div class="int-grid">
+                    <div class="int-card" id="imdb">
+                        <header><img src="assets/integrations/imdb.png" alt="" loading="lazy"><h3>IMDb</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>The definitive movie and TV database. Detects whether the page is a series or a film and routes to the right app.</p>
+                    </div>
+                    <div class="int-card" id="tmdb">
+                        <header><img src="assets/integrations/tmdb.svg" alt="" loading="lazy"><h3>TMDb</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>The Movie Database — TV pages search Sonarr, movie pages search Radarr, with exact TMDb IDs where possible.</p>
+                    </div>
+                    <div class="int-card" id="tvdb">
+                        <header><img src="assets/integrations/tvdb.png" alt="" loading="lazy"><h3>TVDb</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>TheTVDB series and movie pages, using the same metadata source many Servarr apps rely on.</p>
+                    </div>
+                    <div class="int-card" id="trakt">
+                        <header><img src="assets/integrations/trakt.png" alt="" loading="lazy"><h3>Trakt</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span><span class="tag warn">Community supported</span></div>
+                        <p>Shows and movies on Trakt. Trakt requires a subscription and the developer does not maintain an active account — this integration is entirely community supported.</p>
+                    </div>
+                    <div class="int-card" id="tvmaze">
+                        <header><img src="assets/integrations/tvmaze.png" alt="" loading="lazy"><h3>TVmaze</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span></div>
+                        <p>Show pages, the countdown page and the shows directory all link straight into your Sonarr search.</p>
+                    </div>
+                    <div class="int-card" id="musicbrainz">
+                        <header><img src="assets/integrations/musicbrainz.svg" alt="" loading="lazy"><h3>MusicBrainz</h3></header>
+                        <div class="tags"><span class="tag lidarr">Lidarr</span></div>
+                        <p>The open music encyclopedia — artists and releases search Lidarr directly.</p>
+                    </div>
+                    <div class="int-card" id="letterboxd">
+                        <header><img src="assets/integrations/letterboxd.svg" alt="" loading="lazy"><h3>Letterboxd</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>From your watchlist to your library — film pages get a Radarr search icon next to the title.</p>
+                    </div>
+                    <div class="int-card" id="tvcalendar">
+                        <header><img src="assets/integrations/tvcalendar.png" alt="" loading="lazy"><h3>TV Calendar</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span></div>
+                        <p>Episode air-date listings with one-click Sonarr searches for each show.</p>
+                    </div>
+                    <div class="int-card" id="rottentomatoes">
+                        <header><img src="assets/integrations/rotten-tomatoes.svg" alt="" loading="lazy"><h3>Rotten Tomatoes</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>Certified fresh? Send it straight from the review page to Sonarr or Radarr.</p>
+                    </div>
+                    <div class="int-card" id="metacritic">
+                        <header><img src="assets/integrations/metacritic.svg" alt="" loading="lazy"><h3>Metacritic</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>TV and movie pages on Metacritic, with single-page-app navigation handled automatically.</p>
+                    </div>
+                    <div class="int-card" id="simkl">
+                        <header><img src="assets/integrations/simkl.png" alt="" loading="lazy"><h3>Simkl</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>TV, anime and movie tracking — searches the right app from show and film pages.</p>
+                    </div>
+                    <div class="int-card" id="iptorrents">
+                        <header><img src="assets/integrations/iptorrents.png" alt="" loading="lazy"><h3>IPTorrents</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span><span class="tag warn">Community supported</span></div>
+                        <p>IPTorrents requires an actively used account and the developer does not maintain one — this integration is entirely community supported.</p>
+                    </div>
+                    <div class="int-card" id="lastfm">
+                        <header><img src="assets/integrations/lastfm.png" alt="" loading="lazy"><h3>last.fm</h3></header>
+                        <div class="tags"><span class="tag lidarr">Lidarr</span></div>
+                        <p>Artist and album pages feed your Lidarr library while you scrobble.</p>
+                    </div>
+                    <div class="int-card" id="allocine">
+                        <header><img src="assets/integrations/allocine.png" alt="" loading="lazy"><h3>Allociné</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>France's biggest movie and TV site — series pages search Sonarr, films search Radarr.</p>
+                    </div>
+                    <div class="int-card" id="senscritique">
+                        <header><img src="assets/integrations/senscritique.png" alt="" loading="lazy"><h3>SensCritique</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>French reviews and rankings for series and films, wired to the matching Servarr app.</p>
+                    </div>
+                    <div class="int-card" id="betaseries">
+                        <header><img src="assets/integrations/betaseries.png" alt="" loading="lazy"><h3>BetaSeries</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span><span class="tag warn">Community created</span></div>
+                        <p>Created by a community member for the French version of the site; not maintained by the developer.</p>
+                    </div>
+                    <div class="int-card" id="primevideo">
+                        <header><img src="assets/integrations/primevideo.png" alt="" loading="lazy"><h3>Prime Video</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span><span class="tag broken">Currently broken</span></div>
+                        <p>Broken as of September 2025 — the page source no longer exposes a reliable identifier or search term. Fix PRs welcome!</p>
+                    </div>
+                    <div class="int-card" id="myanimelist">
+                        <header><img src="assets/integrations/myanimelist.png" alt="" loading="lazy"><h3>MyAnimeList</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span></div>
+                        <p>Anime series and films route to Sonarr or Radarr based on the page's media type.</p>
+                    </div>
+                    <div class="int-card" id="rateyourmusic">
+                        <header><img src="assets/integrations/rateyourmusic.jpg" alt="" loading="lazy"><h3>Rate Your Music</h3></header>
+                        <div class="tags"><span class="tag lidarr">Lidarr</span><span class="tag warn">Community created</span></div>
+                        <p>Created by a community member; not maintained by the developer because the site blocks VPN traffic.</p>
+                    </div>
+                    <div class="int-card" id="wikipedia">
+                        <header><img src="assets/integrations/wikipedia.svg" alt="" loading="lazy"><h3>Wikipedia</h3></header>
+                        <div class="tags"><span class="tag sonarr">Sonarr</span><span class="tag radarr">Radarr</span><span class="tag lidarr">Lidarr</span></div>
+                        <p>Articles about shows, films and albums get a search icon for the matching Servarr app.</p>
+                    </div>
+                </div>
+
+                <div class="note" style="margin-top: 36px;">
+                    <p><strong>Missing your favourite site?</strong> Integrations are declarative and surprisingly small — see the <a href="developers.html">developers page</a> for how to add one, or <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/new?assignees=trossr32&amp;labels=enhancement&amp;projects=&amp;template=feature_request.md&amp;title=%5BFEATURE%5D+It+would+be+good+if..." rel="noopener">request it as a feature</a>.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- @shared:footer (keep identical across all pages) -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a class="brand" href="index.html">
+                        <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                        <span>arr search<span class="tld">.app</span></span>
+                    </a>
+                    <p>Servarr Auto Search — a free, open-source browser extension for Sonarr, Radarr, Lidarr and Readarr. No telemetry, no tracking, MIT licensed.</p>
+                </div>
+                <div>
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="user-guide.html">User guide</a></li>
+                        <li><a href="integrations.html">Integrations</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/CHANGELOG.md" rel="noopener">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension" rel="noopener">GitHub</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues" rel="noopener">Issues</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki" rel="noopener">Wiki</a></li>
+                        <li><a href="developers.html">Contributing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Get it</h4>
+                    <ul>
+                        <li><a href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">Chrome Web Store</a></li>
+                        <li><a href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Firefox Add-ons</a></li>
+                        <li><a href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Edge Add-ons</a></li>
+                        <li><a href="https://ko-fi.com/K3K22CEIT" rel="noopener">Buy the dev a coffee ☕</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>Also answers to <a href="https://servarrsearch.app">servarrsearch.app</a> · Not affiliated with the Servarr projects.</span>
+                <span class="version" data-version>v3.2.0</span>
+            </div>
+        </div>
+    </footer>
+    <!-- @shared:footer:end -->
+</body>
+</html>

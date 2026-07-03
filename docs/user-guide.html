@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>User guide — Servarr Auto Search</title>
+    <meta name="description" content="Complete guide to the Servarr Auto Search browser extension: installation, settings, integrations, custom icons, context menu, troubleshooting, backup and restore.">
+    <link rel="canonical" href="https://arrsearch.app/user-guide.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Servarr Auto Search">
+    <meta property="og:title" content="User guide — Servarr Auto Search">
+    <meta property="og:description" content="Installation, settings, integrations, custom icons, context menu, troubleshooting, backup and restore.">
+    <meta property="og:url" content="https://arrsearch.app/user-guide.html">
+    <meta property="og:image" content="https://arrsearch.app/assets/img/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#060b09">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/icons/icon-128.png">
+    <link rel="apple-touch-icon" href="assets/icons/icon-256.png">
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    <link rel="stylesheet" href="css/site.css">
+    <script src="js/site.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- @shared:header (keep identical across all pages; only aria-current differs) -->
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="index.html">
+                <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                <span>arr search<span class="tld">.app</span></span>
+            </a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="index.html">Home</a>
+                <a href="user-guide.html" aria-current="page">User guide</a>
+                <a href="integrations.html">Integrations</a>
+                <a href="developers.html">Developers</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                </button>
+                <a class="header-cta" href="index.html#install">Install</a>
+            </div>
+        </div>
+    </header>
+    <!-- @shared:header:end -->
+
+    <main id="main">
+        <div class="page-hero">
+            <div class="container">
+                <p class="kicker">Field manual</p>
+                <h1>User guide</h1>
+                <p>Everything the extension can do and every setting it exposes — from first install to backup and restore. Store reviewers: see the <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/REVIEWER_GUIDE.md" rel="noopener">reviewer guide</a> instead.</p>
+            </div>
+        </div>
+
+        <div class="container docs-layout">
+            <details class="toc" open>
+                <summary>On this page</summary>
+                <ol>
+                    <li><a href="#overview">Overview</a></li>
+                    <li><a href="#installation--loading">Installation / loading</a></li>
+                    <li><a href="#quick-start">Quick start</a></li>
+                    <li><a href="#4-tabs--settings-breakdown">Tabs &amp; settings</a></li>
+                    <li><a href="#5-how-automatic-population-works">Automatic population</a></li>
+                    <li><a href="#6-status-badges">Status badges</a></li>
+                    <li><a href="#7-using-the-injected-icon">The injected icon</a></li>
+                    <li><a href="#8-context-menu-workflow">Context menu</a></li>
+                    <li><a href="#9-debugging--troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#10-privacy--data-handling">Privacy</a></li>
+                    <li><a href="#11-backup--migration">Backup / migration</a></li>
+                    <li><a href="#12-frequently-asked-questions-faq">FAQ</a></li>
+                    <li><a href="#15-glossary">Glossary</a></li>
+                </ol>
+            </details>
+
+            <article class="docs-content">
+
+                <h2 id="overview">Overview</h2>
+                <p>The extension detects media titles on supported websites and lets you instantly send them to your Servarr applications (Sonarr, Radarr, Lidarr, Readarr) without copying and pasting. You can optionally inject a floating or anchored action icon on pages, add right-click context menu items, and customise appearance and behaviour.</p>
+                <p>All configuration is stored locally via the browser extension storage API. No telemetry, analytics, or remote configuration is performed.</p>
+
+                <h2 id="installation--loading">Installation / loading</h2>
+                <h3 id="all-browsers">All browsers</h3>
+                <p>Install from the official store for your browser:</p>
+                <ul>
+                    <li><a href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">Chrome Web Store</a> (Chrome, Brave and other Chromium browsers)</li>
+                    <li><a href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Firefox Add-ons</a></li>
+                    <li><a href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Microsoft Edge Add-ons</a></li>
+                </ul>
+                <h3 id="from-released-source---chromium-chrome--edge--brave">From released source — Chromium (Chrome / Edge / Brave)</h3>
+                <ol>
+                    <li>Download or build the release ZIP for Chromium (MV3).</li>
+                    <li>Go to <code>chrome://extensions</code> (or <code>edge://extensions</code>).</li>
+                    <li>Enable <strong>Developer mode</strong>.</li>
+                    <li>Click <strong>Load unpacked</strong> and select the build folder (or drag in the unzipped build directory).</li>
+                    <li>Verify that the extension icon appears in the toolbar.</li>
+                </ol>
+                <h3 id="from-released-source---firefox">From released source — Firefox</h3>
+                <ol>
+                    <li>Download the <code>.xpi</code> build for Firefox (MV2), or load a temporary add-on via <code>about:debugging#/runtime/this-firefox</code>.</li>
+                    <li>Click <strong>Load Temporary Add-on…</strong> and select any file in the Firefox build folder (e.g. <code>manifest.json</code>).</li>
+                    <li>The add-on remains until the browser is closed (temporary mode) or permanently if installed from the store.</li>
+                </ol>
+
+                <h2 id="quick-start">Quick start</h2>
+                <ol>
+                    <li>Open the extension's options page (click the extension icon → <strong>settings</strong>, or right-click the toolbar icon → <strong>Options</strong> / <strong>Manage Extension</strong>).</li>
+                    <li>On the <strong>Settings</strong> tab, add at least one Servarr instance (Sonarr / Radarr / Lidarr / Readarr). Provide:
+                        <ul>
+                            <li>Base URL (including protocol) — e.g. <code>http://localhost:8989</code></li>
+                            <li>API key (from the target application's UI) — optional, but required for auto population.</li>
+                        </ul>
+                    </li>
+                    <li>Toggle the instance ON so the extension will use it.</li>
+                    <li>(Optional) Show <strong>Advanced settings</strong> and enable <em>Auto populate from API</em> to automatically determine version and selectors.</li>
+                    <li>Visit a supported media site (e.g. IMDb, TMDb, Trakt). You should see inline action buttons or the injected icon (if enabled) allowing you to send items to Servarr.</li>
+                </ol>
+                <p>If nothing appears, check the <strong>Debug</strong> tab and the <a href="#9-debugging--troubleshooting">troubleshooting section</a> below.</p>
+                <div class="note"><p><strong>Note:</strong> advanced options live <em>inside the Settings tab</em>. Use the <strong>Show advanced</strong> button to reveal the advanced section under each site card (beneath the icon palette).</p></div>
+
+                <h2 id="4-tabs--settings-breakdown">Tabs &amp; settings breakdown</h2>
+
+                <h3 id="41-settings-basic">Settings (basic)</h3>
+                <p>Core instance configuration.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field / control</th><th>Purpose</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td>Instance enable toggle</td><td>Activates this Servarr integration.</td><td>You can enable multiple simultaneous instances (e.g. Sonarr + Radarr).</td></tr>
+                            <tr><td>Base URL</td><td>Root address of the application.</td><td>Must match your deployment (http/https, port).</td></tr>
+                            <tr><td>API key</td><td>Enables authenticated API calls.</td><td>Required for auto population &amp; some actions. Stored only locally.</td></tr>
+                            <tr><td>Display name</td><td>The label shown in icons and menus.</td><td>Click the name in the site card header to rename.</td></tr>
+                            <tr><td>Add instance button</td><td>Create a new Sonarr/Radarr/Lidarr/Readarr entry.</td><td>Button at the top-right of the Settings tab.</td></tr>
+                            <tr><td>Remove (trash icon)</td><td>Delete an instance.</td><td>Permanently removes the site from your settings.</td></tr>
+                            <tr><td>Grant permissions button</td><td>Opens a prompt to allow the extension to access the specified Servarr domain.</td><td>Required for detection on Servarr pages for auto-searching.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>If <em>Auto populate from API</em> (advanced) is ON and an API key is set, advanced selector fields are fetched and filled automatically; otherwise defaults are used.</p>
+
+                <h3 id="42-advanced-inside-settings">Advanced (inside Settings)</h3>
+                <p>Advanced options are shown <strong>within the Settings tab</strong>. Toggle the <strong>Show advanced</strong> button to reveal or hide the advanced section for each site (it appears under the icon palette). Controls automatic selector and version detection.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Setting</th><th>Description</th><th>When to disable</th></tr></thead>
+                        <tbody>
+                            <tr><td>Icon palette (foreground / background)</td><td>Customise the Servarr icon colours per site.</td><td>Changes save immediately; <strong>Reset colours</strong> restores defaults.</td></tr>
+                            <tr><td>Auto populate from API</td><td>Calls version / capability endpoints to infer correct selectors or paths.</td><td>If your server blocks the request or populates incorrect values.</td></tr>
+                            <tr><td>Manual overrides (fields below)</td><td>(Visible when auto population is OFF) Provide explicit path / version selectors.</td><td>Use when custom reverse proxies or non-standard ports cause detection to fail.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>The extension only performs version probing passively (non-blocking). If calls fail, defaults remain; basic functionality usually still works.</p>
+
+                <h3 id="43-integrations">Integrations</h3>
+                <p>Enable / disable icons and actions on specific third-party media websites — see the full <a href="integrations.html">integrations gallery</a> for the current list and status of every site.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Control</th><th>Behaviour</th></tr></thead>
+                        <tbody>
+                            <tr><td>Per-site toggle</td><td>Show or hide search / add actions for that site.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>If a site toggle is enabled but no icons appear, the site layout may have changed (see <a href="#9-debugging--troubleshooting">troubleshooting</a>).</p>
+
+                <h3 id="44-custom-icons">Custom icons</h3>
+                <p>Controls the injected page action icon's appearance and placement.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Toggle / field</th><th>Meaning</th><th>Values</th></tr></thead>
+                        <tbody>
+                            <tr><td>Use custom icon</td><td>Master enable for the injected floating/anchored icon.</td><td>On / off</td></tr>
+                            <tr><td>Icon type</td><td>Anchored (relative to page edge) vs floating (free overlay).</td><td>Anchored / floating</td></tr>
+                            <tr><td>Window side</td><td>Horizontal anchoring side.</td><td>Left / right</td></tr>
+                            <tr><td>Window position</td><td>Vertical anchoring edge.</td><td>Top / bottom</td></tr>
+                            <tr><td>Side offset unit</td><td>Unit for the horizontal offset distance.</td><td>px / %</td></tr>
+                            <tr><td>Position offset unit</td><td>Unit for the vertical offset distance.</td><td>px / %</td></tr>
+                            <tr><td>Offset numeric inputs</td><td>Distance values for side / position.</td><td>Number + chosen unit</td></tr>
+                            <tr><td>Colour picker</td><td>Icon background colour.</td><td>Any valid colour</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>Behavioural logic:</p>
+                <ul>
+                    <li>Disabling <em>Use custom icon</em> disables all subordinate toggles.</li>
+                    <li>Changing icon type (anchored vs floating) dynamically enables/disables certain offset unit controls to prevent invalid combos.</li>
+                    <li>Offsets are saved as <code>[value][unit]</code> (e.g. <code>32px</code> / <code>15%</code>).</li>
+                </ul>
+                <div class="note"><p><strong>Tip:</strong> use percentages for responsive layouts, pixels for precise alignment.</p></div>
+
+                <h3 id="45-context-menu">Context menu</h3>
+                <p>Adds right-click search / add entries. When enabled, selecting text (a title) on a page and right-clicking presents Servarr actions.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Feature</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td>Enable context menu</td><td>Registers context entries for active instances.</td></tr>
+                            <tr><td>Dynamic instances</td><td>Each enabled Servarr app appears with a distinct action.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 id="46-debug">Debug</h3>
+                <p>Diagnostics &amp; logging.</p>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Control</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td>Turn on console logging</td><td>Writes verbose logs (detection, API attempts) to the browser devtools console.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>Only enable while troubleshooting; logging adds minor overhead.</p>
+
+                <h3 id="47-permissions">Permissions</h3>
+                <p>Shows all permissions currently granted to the extension. You may need to re-grant permissions if you change your Servarr instance URLs.</p>
+                <p>Some permissions are mandatory. Any non-mandatory permissions can be revoked, but certain features may stop working.</p>
+
+                <h3 id="48-support">Support</h3>
+                <p>This tab contains helpful external links only — there are no settings to toggle here and nothing in this section changes the extension's behaviour.</p>
+
+                <h2 id="5-how-automatic-population-works">How automatic population works</h2>
+                <p>When <em>Auto populate from API</em> is ON and an API key is supplied, the extension will:</p>
+                <ol>
+                    <li>Issue a lightweight version/capabilities request to each enabled instance.</li>
+                    <li>Derive required internal identifiers or selectors (e.g. API version differences) and store them.</li>
+                    <li>Update advanced fields silently; manual edits are locked while active.</li>
+                </ol>
+                <p><strong>Failure handling:</strong> if the request fails (network / 401 / timeout) the extension falls back to defaults and continues operating. A badge (if displayed) may reflect a failure colour.</p>
+                <p>Disable auto population if:</p>
+                <ul>
+                    <li>You use a reverse proxy rewriting paths unpredictably.</li>
+                    <li>Access requires VPN / network conditions that intermittently block API calls.</li>
+                    <li>You maintain custom forked Servarr builds with non-standard responses.</li>
+                </ul>
+
+                <h2 id="6-status-badges">Status badges</h2>
+                <p>Where shown, badges use colours to indicate:</p>
+                <ul>
+                    <li><strong>Green:</strong> API reachable and responsive.</li>
+                    <li><strong>Yellow/amber:</strong> partial or slow response (heuristic fall-back).</li>
+                    <li><strong>Red:</strong> failed probe (using defaults).</li>
+                </ul>
+                <p>Badges are passive and never block interaction.</p>
+
+                <h2 id="7-using-the-injected-icon">Using the injected icon</h2>
+                <ol>
+                    <li>Enable <em>Use custom icon</em> in the Custom icons tab.</li>
+                    <li>Choose <strong>Anchored</strong> for a fixed distance from the window edges; <strong>Floating</strong> for freer overlay behaviour (still positioned relative to window edges with offsets).</li>
+                    <li>Adjust left/right, top/bottom and the numeric offsets until placement suits your layout.</li>
+                    <li>Open a supported site page and verify the icon appears; click it to access quick actions.</li>
+                </ol>
+                <p>If it overlaps site UI, reduce offsets or switch side/position.</p>
+
+                <h2 id="8-context-menu-workflow">Context menu workflow</h2>
+                <ul>
+                    <li>Highlight a movie/show/album/book title in the page body.</li>
+                    <li>Right-click and choose the relevant Servarr instance action.</li>
+                    <li>The extension opens the appropriate add/search route.</li>
+                </ul>
+                <p>If no menu items appear, ensure the context menu feature is enabled and the instance is active.</p>
+
+                <h2 id="9-debugging--troubleshooting">Debugging &amp; troubleshooting</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Symptom</th><th>Checks / fixes</th></tr></thead>
+                        <tbody>
+                            <tr><td>No icons on a supported site</td><td>Confirm the site toggle is enabled; open the console (F12) with debug logging ON; check for selector errors.</td></tr>
+                            <tr><td>API calls failing</td><td>Verify base URL &amp; API key; test the same endpoint in the browser; watch for CORS or reverse proxy blocks.</td></tr>
+                            <tr><td>Icon misplaced</td><td>Switch px ↔ % units; reduce offsets; verify <em>Use custom icon</em> is still enabled.</td></tr>
+                            <tr><td>Context menu missing</td><td>Re-toggle the context menu feature; reload the page.</td></tr>
+                            <tr><td>Settings not saving</td><td>Ensure no private / ephemeral browsing session is clearing storage; look for errors in the console.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p><strong>Reset approach:</strong> use <strong>Reset settings</strong> on the Backup &amp; restore tab of the options page to restore defaults (see <a href="#11-backup--migration">backup / migration</a>).</p>
+
+                <h2 id="10-privacy--data-handling">Privacy &amp; data handling</h2>
+                <ul>
+                    <li>All settings are stored locally using <code>browser.storage</code>.</li>
+                    <li>API keys never leave your machine except when calling your own Servarr endpoints.</li>
+                    <li>No telemetry, analytics, or third-party tracking.</li>
+                    <li>Optional donation links open external payment pages (manual user action).</li>
+                </ul>
+                <p>See the full <a href="privacy.html">privacy policy</a>.</p>
+
+                <h2 id="11-backup--migration">Backup / migration</h2>
+                <p>Settings can be backed up, restored and reset from the <strong>Backup &amp; restore</strong> tab on the extension's options page.</p>
+
+                <h3 id="backup">Backup</h3>
+                <p>Click <strong>Download backup</strong> to export your current settings to a JSON file named <code>servarr-autosearch-settings-&lt;timestamp&gt;.json</code>. The file wraps your settings in a schema-versioned envelope (export date, extension version and schema version) so it can be validated when restored later.</p>
+                <div class="note warn"><p><strong>⚠️</strong> The backup file contains the API keys of any configured Servarr instances — store it securely.</p></div>
+
+                <h3 id="restore">Restore</h3>
+                <ol>
+                    <li>Choose a previously saved backup file with the file picker.</li>
+                    <li>(Optional) Click <strong>Preview changes</strong> to see exactly what will be added, removed or changed before applying anything. The preview updates if you toggle the merge/replace mode.</li>
+                    <li>Choose the mode: by default the backup is <strong>merged</strong> into your current settings; tick <em>Replace existing settings instead of merging</em> to overwrite everything with the file's contents instead.</li>
+                    <li>Click <strong>Restore</strong> and confirm. Settings apply immediately and all options tabs refresh — no reload required.</li>
+                </ol>
+                <p>Notes:</p>
+                <ul>
+                    <li>Both current (envelope) backups and legacy plain-JSON settings exports are accepted; legacy files import with a warning.</li>
+                    <li>Files are validated before import (settings structure must be intact); invalid files are rejected with the reason shown.</li>
+                    <li>A backup created by a newer version of the extension warns before importing; one from an older version is normalised on import.</li>
+                </ul>
+
+                <h3 id="reset">Reset</h3>
+                <p><strong>Reset settings</strong> restores every setting to its default value (with a confirmation prompt). This cannot be undone, so take a backup first.</p>
+
+                <h3 id="migrating-to-another-browser-or-profile">Migrating to another browser or profile</h3>
+                <p>Download a backup in the source browser, then restore it from the options page in the target browser. This works across Chromium browsers and Firefox.</p>
+
+                <h2 id="12-frequently-asked-questions-faq">Frequently asked questions</h2>
+                <div class="faq">
+                    <details>
+                        <summary>Do I need an API key?</summary>
+                        <p>Only for automatic population and some enriched operations. Basic link insertion may function without it.</p>
+                    </details>
+                    <details>
+                        <summary>Why do some pages show no actions?</summary>
+                        <p>The site layout or class names may have changed; <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues" rel="noopener">open an issue</a> with the URL and expected media type.</p>
+                    </details>
+                    <details>
+                        <summary>Does the extension send data anywhere else?</summary>
+                        <p>No. Only direct calls to your configured Servarr endpoints occur. See the <a href="privacy.html">privacy policy</a>.</p>
+                    </details>
+                    <details>
+                        <summary>Will enabling debug slow browsing?</summary>
+                        <p>Minimal impact; disable when finished troubleshooting.</p>
+                    </details>
+                </div>
+
+                <h2 id="13-contributing--support">Contributing &amp; support</h2>
+                <ul>
+                    <li>Report bugs / request features via <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues" rel="noopener">GitHub Issues</a> — include console logs (enable debug first) and steps to reproduce.</li>
+                    <li>Pull requests welcome — see the <a href="developers.html">developers page</a>.</li>
+                    <li>For version history, additions, fixes and migration notes, see the <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/CHANGELOG.md" rel="noopener">changelog</a>.</li>
+                </ul>
+
+                <h2 id="15-glossary">Glossary</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Term</th><th>Definition</th></tr></thead>
+                        <tbody>
+                            <tr><td>Servarr</td><td>Collective reference to Sonarr, Radarr, Lidarr, Readarr (and similar).</td></tr>
+                            <tr><td>Anchored icon</td><td>Icon positioned relative to page/window edges with fixed offsets.</td></tr>
+                            <tr><td>Floating icon</td><td>Alternative layout style; still edge-based but with different enable/disable logic for offset controls.</td></tr>
+                            <tr><td>Probe</td><td>A lightweight API request used to determine availability or version info.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>Happy searching! 📡</p>
+
+            </article>
+        </div>
+    </main>
+
+    <!-- @shared:footer (keep identical across all pages) -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a class="brand" href="index.html">
+                        <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                        <span>arr search<span class="tld">.app</span></span>
+                    </a>
+                    <p>Servarr Auto Search — a free, open-source browser extension for Sonarr, Radarr, Lidarr and Readarr. No telemetry, no tracking, MIT licensed.</p>
+                </div>
+                <div>
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="user-guide.html">User guide</a></li>
+                        <li><a href="integrations.html">Integrations</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/CHANGELOG.md" rel="noopener">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension" rel="noopener">GitHub</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues" rel="noopener">Issues</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki" rel="noopener">Wiki</a></li>
+                        <li><a href="developers.html">Contributing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Get it</h4>
+                    <ul>
+                        <li><a href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">Chrome Web Store</a></li>
+                        <li><a href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Firefox Add-ons</a></li>
+                        <li><a href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Edge Add-ons</a></li>
+                        <li><a href="https://ko-fi.com/K3K22CEIT" rel="noopener">Buy the dev a coffee ☕</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>Also answers to <a href="https://servarrsearch.app">servarrsearch.app</a> · Not affiliated with the Servarr projects.</span>
+                <span class="version" data-version>v3.2.0</span>
+            </div>
+        </div>
+    </footer>
+    <!-- @shared:footer:end -->
+</body>
+</html>
