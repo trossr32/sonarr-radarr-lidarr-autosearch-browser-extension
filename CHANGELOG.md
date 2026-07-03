@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.2.0
+
+### Added
+
+- Add TVMaze integration support for the /shows directory listing pages, injecting a Sonarr search icon on each show card - ([PR#343](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/pull/343)). Thanks to [vBm](https://github.com/vBm).
+
+### Fixed
+
+- Fixed the TVMaze countdown page injecting the first show's name into every search icon; each icon now searches for its own show's name - ([PR#342](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/pull/342)). Thanks to [vBm](https://github.com/vBm).
+- Tightened the TVMaze /shows directory URL matcher so the trailing-slash variant is also matched and unrelated URLs containing the substring are not.
+
 ## 3.1.1
 
 ### Fixed

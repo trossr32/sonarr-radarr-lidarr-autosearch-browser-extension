@@ -32,8 +32,10 @@
     var ShowsList = Def({
         id: 'tvmaze',
         key: 'tvmaze-shows',
-        match: function (doc, url) {
-            return url.indexOf('tvmaze.com/shows') >= 0 && url.indexOf('tvmaze.com/shows/') === -1;
+        match: function (_doc, url) {
+            // Directory root only (with optional trailing slash / query / hash);
+            // excludes show detail pages like tvmaze.com/shows/158/fringe.
+            return /tvmaze\.com\/shows\/?($|[?#])/i.test(url);
         },
         siteType: 'sonarr',
         containerSelector: 'span.title h2',
