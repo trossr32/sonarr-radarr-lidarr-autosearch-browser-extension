@@ -145,6 +145,8 @@ Review Checklist For Subagent Output
 Decisions Log
 - 2026-03-22: Established orchestrator-first workflow; default behavior is subagent delegation instead of direct implementation.
 - 2026-03-22: Added this ORCHESTRATOR.md as persistent context anchor for compaction resilience.
+- 2026-07-03: Documented the standard release process for contributor PRs into staging (version bump locations, changelog format, contributor credits) in CLAUDE.md "Release process".
+- 2026-07-03: TVMaze /shows directory engine (PR#343) matcher tightened to a regex (`/tvmaze\.com\/shows\/?($|[?#])/i`) covering the trailing-slash variant while still excluding show detail pages.
 
 Open Risks Queue
 - Monitor SPA engines for recurrent regressions on Trakt/Metacritic.

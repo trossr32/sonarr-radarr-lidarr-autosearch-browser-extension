@@ -53,18 +53,41 @@ Grunt copies `src/` into each `dist/` target, excluding the other browser's even
 **Core modules:**
 - `src/content/js/core.js` — default settings schema, `getSettings`/`setSettings` over `browser.storage.sync` (key: `sonarrRadarrLidarrAutosearchSettings`), Servarr API probing that autopopulates search paths/selectors by instance version, shared `log()`. Settings migration is additive-on-read: missing properties are defaulted at read time, never via a migration framework. Also contains a `browser` shim so content code can run in non-extension contexts (Playwright).
 - `src/content/js/content_script.js` — `runServarrSearchInjection` (prefill search on Servarr pages, with wait/retry for the input element) and `runEngines` (icon injection on integration sites), plus SPA URL-change polling for client-routed sites.
-- `src/content/engines/default.js` — the `DefaultEngine(config)` factory: declarative per-site config (`urlIncludes`, `containerSelector`, `getSearch`, optional `resolveSiteType`, `deferMs`, `spa`) producing candidate discovery + icon insertion. Engines register by pushing onto `window.__servarrEngines.list` (reset by `engines/index.js` on each injection to prevent duplicates).
+- `src/content/engines/default.js` — the `DefaultEngine(config)` factory: declarative per-site config (`urlIncludes`, `containerSelector`, `getSearch`, optional `resolveSiteType`, `deferMs`, `spa`) producing candidate discovery + icon insertion. Engines register by pushing onto `window.__servarrEngines.list` (reset by `engines/index.js` on each injection to prevent duplicates). Custom `match` functions receive `(document, url)`.
 - `src/content/js/options-*.js` — one file per options tab (settings, integrations, custom icons, context menu, debug, backup/restore, permissions).
 
 **Engine contract:** an engine's `id` must match a `settings.integrations[].id` entry (defaults in `core.js`) or it never runs. Injected elements carry dedupe markers (`data-servarr-icon`, `data-servarr-ext-{siteId}-completed`) so reinjection on SPA navigation is safe — follow this pattern in new engines.
 
 **Adding a new site integration** touches all of: a new `src/content/engines/integrations/<site>.js`, both manifests (`content_scripts.js` list, `matches`, `host_permissions`), the `integrations` array in `core.js`, an icon in `src/content/assets/images/integrations/`, and ideally a Playwright spec in `tests/playwright/site.integrations.tests/`.
 
+## Release process (contributor PRs merged into staging)
+
+After contributor PRs are merged into `staging`, the standard release prep is done on `staging` before merging to `master`. Update **all** of the following:
+
+**Version** (semver `X.Y.Z`; manifests use a 4-part `X.Y.Z.0`):
+- `package.json` — `"version": "X.Y.Z"`
+- `package-lock.json` — root `"version"` in both the top-level object and the `packages[""]` entry
+- `src/manifest-chromium/manifest.json` — `"version": "X.Y.Z.0"`
+- `src/manifest-firefox/manifest.json` — `"version": "X.Y.Z.0"`
+- `src/options.html` — footer `<i>Version X.Y.Z</i>`
+- `src/popup.html` — `<span ...>Version X.Y.Z</span>`
+- `README.md` — the two Edge add-ons badges (`message=vX.Y.Z.0`); the Chrome/Firefox badges auto-read from the stores. Do not touch the Edge *users* badge (`message=<count>`).
+- `dist/` is gitignored — never edit it for a version bump.
+
+**Changelog** (`CHANGELOG.md` only):
+- Add a `## X.Y.Z` section at the top with `### Added` / `### Changed` / `### Fixed` subsections as needed.
+- One bullet per merged PR, ending with `- ([PR#N](<full PR URL>)). Thanks to [username](https://github.com/username).` for contributor PRs.
+
+**Contributors** (for first-time contributors):
+- `README.md` "Thanks" section — append an avatar anchor following the existing `<a href='https://github.com/<user>' ...><picture><img src="https://avatars.githubusercontent.com/<user>?s=64&v=4" ...></picture></a>` pattern.
+- Contributor credit also goes in the CHANGELOG bullet (see above).
+
+The wiki (`wiki/`) holds no version, changelog, or contributor content.
+
 ## Conventions and cautions
 
 - Prefer minimal, targeted changes; integrations regress from third-party DOM changes and fixes should stay site-specific. SPA sites (Trakt, Metacritic) are the most timing-fragile.
 - Don't tune the global search-input wait/retry settings to fix one site.
-- Never edit `dist/` — it is generated output (though it is committed).
-- Version appears in `package.json` (e.g. `3.1.1`), both manifests (`3.1.1.0`), README badges, and `CHANGELOG.md`; keep them in sync on release changes.
+- Never edit `dist/` — it is generated output.
 - External PRs target the `staging` branch, not `master`.
 - jshint (config in `.jshintrc`) runs over `src/content/**/*.js` as part of `grunt debug`/`grunt release`.

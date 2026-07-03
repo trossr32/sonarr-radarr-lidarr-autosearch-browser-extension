@@ -11,9 +11,8 @@
         containerSelector: 'h1.show-for-medium',
         insertWhere: 'prepend',
         iconStyle: 'width: 32px; margin: -8px 10px 0 0;',
-        getSearch: function (_el, doc) {
-            var n = doc.querySelector('h1.show-for-medium');
-            return (n && (n.textContent || '').trim()) || '';
+        getSearch: function (el, doc) {
+            return (el && (el.textContent || '').trim()) || '';
         }
     });
 
@@ -25,11 +24,27 @@
         containerSelector: 'div.show-name',
         insertWhere: 'prepend',
         iconStyle: 'width: 24px; margin: -8px 10px 0 0;',
-        getSearch: function (_el, doc) {
-            var n = doc.querySelector('div.show-name');
-            return (n && (n.textContent || '').trim()) || '';
+        getSearch: function (el, doc) {
+            return (el && (el.textContent || '').trim()) || '';
         }
     });
 
-    window.__servarrEngines.list.push(ShowPage, Countdown);
+    var ShowsList = Def({
+        id: 'tvmaze',
+        key: 'tvmaze-shows',
+        match: function (_doc, url) {
+            // Directory root only (with optional trailing slash / query / hash);
+            // excludes show detail pages like tvmaze.com/shows/158/fringe.
+            return /tvmaze\.com\/shows\/?($|[?#])/i.test(url);
+        },
+        siteType: 'sonarr',
+        containerSelector: 'span.title h2',
+        insertWhere: 'prepend',
+        iconStyle: 'width: 16px; height: 16px; margin: -2px 6px 0 0; display: inline-block; vertical-align: middle;',
+        getSearch: function (el, doc) {
+            return (el && (el.textContent || '').trim()) || '';
+        }
+    });
+
+    window.__servarrEngines.list.push(ShowPage, Countdown, ShowsList);
 })();
