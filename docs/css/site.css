@@ -241,6 +241,12 @@ pre code { background: none; border: 0; padding: 0; color: var(--text); }
 .brand img { width: 28px; height: 28px; }
 .brand .tld { color: var(--green); }
 
+/* On narrow screens the wordmark collides with the scrollable nav — icon only */
+.site-header .brand span { display: none; }
+@media (min-width: 640px) {
+    .site-header .brand span { display: inline; }
+}
+
 .site-nav {
     display: flex;
     align-items: center;

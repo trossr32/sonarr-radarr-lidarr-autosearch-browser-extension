@@ -6,9 +6,9 @@
 
 [![Playwright tests](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/actions/workflows/playwright.yml/badge.svg)](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/actions/workflows/playwright.yml)
 
-📚 Visit the [Wiki](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki) for installation, settings, and integration guides.
+🌐 Visit **[arrsearch.app](https://arrsearch.app)** — the extension's website — for the full [user guide](https://arrsearch.app/user-guide.html), the [integrations gallery](https://arrsearch.app/integrations.html) and store links.
 
-👉 New: A comprehensive end-user configuration manual is now available: see the [User Guide](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki/User-Guide).
+📚 The [Wiki](https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki) hosts contributor documentation: adding a site integration, testing, and contributing.
 
 ## Overview
 
