@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Developers — Servarr Auto Search</title>
+    <meta name="description" content="Contribute to the Servarr Auto Search browser extension: add a site integration, run the test suites, and open a pull request against the staging branch.">
+    <link rel="canonical" href="https://arrsearch.app/developers.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Servarr Auto Search">
+    <meta property="og:title" content="Developers — Servarr Auto Search">
+    <meta property="og:description" content="Add a site integration, run the test suites, and open a pull request against the staging branch.">
+    <meta property="og:url" content="https://arrsearch.app/developers.html">
+    <meta property="og:image" content="https://arrsearch.app/assets/img/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#060b09">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/icons/icon-128.png">
+    <link rel="apple-touch-icon" href="assets/icons/icon-256.png">
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    <link rel="stylesheet" href="css/site.css">
+    <script src="js/site.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- @shared:header (keep identical across all pages; only aria-current differs) -->
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="index.html">
+                <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                <span>arr search<span class="tld">.app</span></span>
+            </a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="index.html">Home</a>
+                <a href="user-guide.html">User guide</a>
+                <a href="integrations.html">Integrations</a>
+                <a href="developers.html" aria-current="page">Developers</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                </button>
+                <a class="header-cta" href="index.html#install">Install</a>
+            </div>
+        </div>
+    </header>
+    <!-- @shared:header:end -->
+
+    <main id="main">
+        <div class="page-hero">
+            <div class="container">
+                <p class="kicker">Join the crew</p>
+                <h1>Developers &amp; contributors</h1>
+                <p>Every integration on this site was someone scratching their own itch. The codebase is plain JavaScript — no bundler, no transpiler — and a new site integration is mostly a declarative config object.</p>
+            </div>
+        </div>
+
+        <div class="container docs-layout" style="grid-template-columns: 1fr;">
+            <article class="docs-content">
+
+                <h2 id="how-to-contribute">How to contribute</h2>
+                <ol>
+                    <li>Fork the <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension" rel="noopener">repo</a> and create a feature branch.</li>
+                    <li>Make your changes. For site integrations, follow the <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki/Site-integrations" rel="noopener">adding a site integration</a> guide on the wiki.</li>
+                    <li>Run the tests (Playwright / Jest) and verify your changes manually.</li>
+                    <li>Commit, push to your fork, and open a pull request.</li>
+                </ol>
+                <div class="note"><p><strong>Important:</strong> target the <strong><code>staging</code></strong> branch with your pull request, not <code>master</code>. Version bumps, changelog entries and packaging are handled on staging before each release.</p></div>
+
+                <h2 id="adding-an-integration">Adding a site integration</h2>
+                <p>Integrations are built on a declarative <code>DefaultEngine(config)</code> pattern: you describe which URLs the engine applies to, where in the page the icon should be inserted, and how to extract the search term. A minimal engine is a few dozen lines. A new integration touches:</p>
+                <ul>
+                    <li>A new engine file in <code>src/content/engines/integrations/</code></li>
+                    <li>Both browser manifests (content script list, matches, host permissions)</li>
+                    <li>The integrations list in <code>src/content/js/core.js</code></li>
+                    <li>A site logo in <code>src/content/assets/images/integrations/</code></li>
+                    <li>Ideally, a Playwright spec in <code>tests/playwright/site.integrations.tests/</code></li>
+                </ul>
+                <p>The full walkthrough — engine anatomy, SPA support, dynamic routing, layout tips and the PR checklist — lives on the wiki, which is the canonical contributor reference:</p>
+                <p><a class="btn btn-ghost" href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki/Site-integrations" rel="noopener">Read the integration guide on the wiki →</a></p>
+
+                <h2 id="testing">Testing</h2>
+                <p>Playwright integration tests run against the real third-party sites with the built extension loaded:</p>
+                <pre><code>npm i
+grunt playwright
+cd tests/playwright
+npm i
+npx playwright install --with-deps chromium
+npx playwright test</code></pre>
+                <p>Jest unit tests are minimal but quick:</p>
+                <pre><code>npm i
+npm run test</code></pre>
+                <p>For manual debugging, enable <strong>Debug</strong> mode in the extension settings and watch the console for <code>[ServarrExt …]</code> logs. Details on the <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki/Testing-integrations" rel="noopener">testing wiki page</a>.</p>
+
+                <h2 id="issues">Issues &amp; feature requests</h2>
+                <ul>
+                    <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/new?assignees=trossr32&amp;labels=bug&amp;projects=&amp;template=bug_report.md&amp;title=" rel="noopener">Report a bug</a> — include the URL, browser, and console logs with debug enabled.</li>
+                    <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/new?assignees=trossr32&amp;labels=enhancement&amp;projects=&amp;template=feature_request.md&amp;title=%5BFEATURE%5D+It+would+be+good+if..." rel="noopener">Suggest a feature</a> — new site integrations especially welcome.</li>
+                </ul>
+
+                <h2 id="thanks">Thanks</h2>
+                <p>Big thanks to everyone who has contributed integrations, bug fixes and ideas — you're the <a href="index.html">signal boosters on the home page</a>. Your work helps the whole community enjoy smoother Servarr searches.</p>
+
+            </article>
+        </div>
+    </main>
+
+    <!-- @shared:footer (keep identical across all pages) -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a class="brand" href="index.html">
+                        <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                        <span>arr search<span class="tld">.app</span></span>
+                    </a>
+                    <p>Servarr Auto Search — a free, open-source browser extension for Sonarr, Radarr, Lidarr and Readarr. No telemetry, no tracking, MIT licensed.</p>
+                </div>
+                <div>
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="user-guide.html">User guide</a></li>
+                        <li><a href="integrations.html">Integrations</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/CHANGELOG.md" rel="noopener">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension" rel="noopener">GitHub</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues" rel="noopener">Issues</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki" rel="noopener">Wiki</a></li>
+                        <li><a href="developers.html">Contributing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Get it</h4>
+                    <ul>
+                        <li><a href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">Chrome Web Store</a></li>
+                        <li><a href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Firefox Add-ons</a></li>
+                        <li><a href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Edge Add-ons</a></li>
+                        <li><a href="https://ko-fi.com/K3K22CEIT" rel="noopener">Buy the dev a coffee ☕</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>Also answers to <a href="https://servarrsearch.app">servarrsearch.app</a> · Not affiliated with the Servarr projects.</span>
+                <span class="version" data-version>v3.2.0</span>
+            </div>
+        </div>
+    </footer>
+    <!-- @shared:footer:end -->
+</body>
+</html>

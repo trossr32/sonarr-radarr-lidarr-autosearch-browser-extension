@@ -72,6 +72,7 @@ After contributor PRs are merged into `staging`, the standard release prep is do
 - `src/options.html` — footer `<i>Version X.Y.Z</i>`
 - `src/popup.html` — `<span ...>Version X.Y.Z</span>`
 - `README.md` — the two Edge add-ons badges (`message=vX.Y.Z.0`); the Chrome/Firefox badges auto-read from the stores. Do not touch the Edge *users* badge (`message=<count>`).
+- `docs/*.html` (website) — the footer `<span class="version" data-version>vX.Y.Z</span>` on all 5 pages, plus the two static Edge shields in `docs/index.html` (`version-vX.Y.Z` badge; leave the Edge users badge alone). The JS release fetch overrides these live, but the fallback must not drift.
 - `dist/` is gitignored — never edit it for a version bump.
 
 **Changelog** (`CHANGELOG.md` only):
@@ -83,6 +84,10 @@ After contributor PRs are merged into `staging`, the standard release prep is do
 - Contributor credit also goes in the CHANGELOG bullet (see above).
 
 The wiki holds no version, changelog, or contributor content. `wiki/` is a gitignored local checkout of the GitHub wiki repo (`https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension.wiki.git`) — it has its own git history; commit and push wiki edits there directly (wikis have no PR flow). If `wiki/` is missing, clone that URL into it.
+
+## Website (docs/)
+
+`docs/` is the arrsearch.app website, served by GitHub Pages from `master:/docs` (custom domain in `docs/CNAME`; `servarrsearch.app` redirects to it at DNS level). Hand-written static HTML/CSS/vanilla JS — no build step. Shared header/footer markup is duplicated across pages between `<!-- @shared:header -->`/`<!-- @shared:footer -->` sentinel comments; keep the blocks identical (only `aria-current="page"` differs per page). All internal URLs are relative (never `/…`-rooted) except `404.html`, which must stay root-relative because Pages serves it at arbitrary paths. Content ownership: the site is canonical for user docs (`user-guide.html`, `integrations.html`, `privacy.html`); the wiki is canonical for contributor docs (`developers.html` only carries summaries + links). The changelog is never mirrored — the site links to `CHANGELOG.md` on GitHub. On release: bump the footer version fallback (see above); touch `integrations.html` only if integrations were added/removed/status-changed and `user-guide.html` only if the options UI changed. Preview locally with `npx http-server docs -p 8123` (or the `site` entry in `.claude/launch.json`).
 
 ## Conventions and cautions
 

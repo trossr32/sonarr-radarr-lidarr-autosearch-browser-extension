@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Servarr Auto Search — Sonarr, Radarr, Lidarr &amp; Readarr browser extension</title>
+    <meta name="description" content="A free, open-source browser extension that sends any show, film, album or book straight to your Sonarr, Radarr, Lidarr or Readarr instance — from IMDb, TMDb, Trakt and 17 more sites, the context menu, or a URL.">
+    <link rel="canonical" href="https://arrsearch.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Servarr Auto Search">
+    <meta property="og:title" content="Servarr Auto Search — point your *arrs at anything">
+    <meta property="og:description" content="Free, open-source browser extension for Sonarr, Radarr, Lidarr and Readarr. One-click search from IMDb, TMDb, Trakt and 17 more sites.">
+    <meta property="og:url" content="https://arrsearch.app/">
+    <meta property="og:image" content="https://arrsearch.app/assets/img/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#060b09">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/icons/icon-128.png">
+    <link rel="apple-touch-icon" href="assets/icons/icon-256.png">
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    <link rel="stylesheet" href="css/site.css">
+    <script src="js/site.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- @shared:header (keep identical across all pages; only aria-current differs) -->
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="index.html" aria-current="page">
+                <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                <span>arr search<span class="tld">.app</span></span>
+            </a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="index.html" aria-current="page">Home</a>
+                <a href="user-guide.html">User guide</a>
+                <a href="integrations.html">Integrations</a>
+                <a href="developers.html">Developers</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                </button>
+                <a class="header-cta" href="index.html#install">Install</a>
+            </div>
+        </div>
+    </header>
+    <!-- @shared:header:end -->
+
+    <main id="main">
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="container">
+                <div>
+                    <p class="kicker">Sonarr · Radarr · Lidarr · Readarr</p>
+                    <h1>Every show, film and album — <span class="glow">one click</span> from anywhere on the web.</h1>
+                    <p class="hero-sub">Servarr Auto Search is a free, open-source browser extension that spots media on the sites you already browse and beams it straight into your *arr apps. No copying, no pasting, no tab juggling.</p>
+                    <p class="hero-tagline">$ arr search — <strong>point your *arrs at anything</strong></p>
+                    <div class="store-buttons">
+                        <a class="btn btn-primary" href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M12 8h9.2M8.5 14 3.9 6M15.4 14l-4.6 8"/></svg>
+                            Add to Chrome
+                        </a>
+                        <a class="btn btn-ghost" href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Add to Firefox</a>
+                        <a class="btn btn-ghost" href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Add to Edge</a>
+                    </div>
+                    <p class="hero-meta">Free &amp; open source (MIT) · No telemetry, ever · Works with Chrome, Edge, Brave &amp; Firefox</p>
+                </div>
+                <div class="radar-wrap" aria-hidden="true">
+                    <div class="radar">
+                        <div class="radar-beam"></div>
+                        <div class="radar-core"></div>
+                        <div class="blip" style="--a: 25deg;  --d: 33; --delay: 0.55s"><img src="assets/integrations/imdb.png" alt=""></div>
+                        <div class="blip" style="--a: 70deg;  --d: 17; --delay: 1.55s"><img src="assets/integrations/trakt.png" alt=""></div>
+                        <div class="blip" style="--a: 110deg; --d: 40; --delay: 2.45s"><img src="assets/integrations/tmdb.svg" alt=""></div>
+                        <div class="blip" style="--a: 150deg; --d: 24; --delay: 3.35s"><img src="assets/integrations/letterboxd.svg" alt=""></div>
+                        <div class="blip" style="--a: 195deg; --d: 36; --delay: 4.35s"><img src="assets/integrations/tvdb.png" alt=""></div>
+                        <div class="blip" style="--a: 240deg; --d: 20; --delay: 5.35s"><img src="assets/integrations/musicbrainz.svg" alt=""></div>
+                        <div class="blip" style="--a: 285deg; --d: 41; --delay: 6.35s"><img src="assets/integrations/rotten-tomatoes.svg" alt=""></div>
+                        <div class="blip" style="--a: 330deg; --d: 25; --delay: 7.35s"><img src="assets/integrations/lastfm.png" alt=""></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The URL trick -->
+        <section class="section section-alt">
+            <div class="container">
+                <p class="kicker">The URL trick</p>
+                <h2>Type a title onto the end of your search URL. Done.</h2>
+                <p class="section-lead">Append anything to your Servarr <code>/add/new</code> page and the extension fills the search box and fires the search for you — perfect for bookmarklets, launchers and muscle memory.</p>
+                <div class="terminal reveal" role="img" aria-label="Example: opening http://sonarr:8989/add/new/severance automatically searches Sonarr for severance">
+                    <div class="terminal-bar"><i></i><i></i><i></i><span>sonarr — add new series</span></div>
+                    <div class="terminal-body">
+                        <div><span class="dim">$ open </span><span class="type-line">http://sonarr:8989<span class="path">/add/new/severance</span></span><span class="cursor"></span></div>
+                        <div><span class="dim">→ search field populated · search triggered · showing results for</span> "severance"</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="section">
+            <div class="container">
+                <p class="kicker">Three ways in</p>
+                <h2>Search your *arrs without leaving the page.</h2>
+                <div class="grid-3">
+                    <div class="card reveal">
+                        <div class="card-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        </div>
+                        <h3>Site search icons</h3>
+                        <p>On IMDb, TMDb, Trakt, Letterboxd, MusicBrainz and 15 more sites, the extension injects a Servarr icon next to the title. One click opens the right app with the right search — often by exact ID.</p>
+                    </div>
+                    <div class="card reveal">
+                        <div class="card-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h12"/></svg>
+                        </div>
+                        <h3>Right-click search</h3>
+                        <p>Highlight any title anywhere on the web, right-click, and send it to Sonarr, Radarr, Lidarr or Readarr from the context menu. A new tab lands on the results.</p>
+                    </div>
+                    <div class="card reveal">
+                        <div class="card-icon">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 16 4-4-4-4M6 8l-4 4 4 4M14.5 4l-5 16"/></svg>
+                        </div>
+                        <h3>URL auto-search</h3>
+                        <p>Open <code>…/add/new/fringe</code> on your instance and the search runs itself. Provide an API key and the extension even auto-detects your Servarr version and selectors.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live demo -->
+        <!-- <section class="section section-alt">
+            <div class="container">
+                <p class="kicker">In the wild</p>
+                <h2>Watch it work.</h2>
+                <p class="section-lead">Pick your icon colours on the options page — cyan for Sonarr, pink for Radarr — then browse to TVDb or TMDb and your search icons are already waiting next to the title.</p>
+                <figure class="shot demo-shot reveal">
+                    <video controls autoplay muted loop playsinline preload="metadata" poster="assets/img/demo-poster.jpg" width="1280" height="720" aria-label="Demo: choosing cyan and pink icon colours in the extension options, then the matching Sonarr search icon appearing on TVDb and Radarr icon on TMDb">
+                        <source src="assets/img/demo.mp4" type="video/mp4">
+                        Your browser doesn't support embedded video — <a href="assets/img/demo.mp4">download the demo</a> instead.
+                    </video>
+                    <figcaption>Recorded with the real extension, unedited: colour the Sonarr and Radarr icons, then find them injected on TVDb and TMDb — one click from your library.</figcaption>
+                </figure>
+            </div>
+        </section> -->
+
+        <!-- Integrations -->
+        <section class="section section-alt">
+            <div class="container">
+                <p class="kicker">On your radar</p>
+                <h2>20 sites, wired straight to your library.</h2>
+                <p class="section-lead">Each integration can be toggled individually in the options page. Spotted a site we should support? <a href="developers.html">Integrations are community-built</a> — add yours.</p>
+                <div class="logo-wall">
+                    <a class="logo-chip" href="integrations.html#imdb"><img src="assets/integrations/imdb.png" alt="" loading="lazy">IMDb</a>
+                    <a class="logo-chip" href="integrations.html#tmdb"><img src="assets/integrations/tmdb.svg" alt="" loading="lazy">TMDb</a>
+                    <a class="logo-chip" href="integrations.html#tvdb"><img src="assets/integrations/tvdb.png" alt="" loading="lazy">TVDb</a>
+                    <a class="logo-chip" href="integrations.html#trakt"><img src="assets/integrations/trakt.png" alt="" loading="lazy">Trakt</a>
+                    <a class="logo-chip" href="integrations.html#tvmaze"><img src="assets/integrations/tvmaze.png" alt="" loading="lazy">TVmaze</a>
+                    <a class="logo-chip" href="integrations.html#musicbrainz"><img src="assets/integrations/musicbrainz.svg" alt="" loading="lazy">MusicBrainz</a>
+                    <a class="logo-chip" href="integrations.html#letterboxd"><img src="assets/integrations/letterboxd.svg" alt="" loading="lazy">Letterboxd</a>
+                    <a class="logo-chip" href="integrations.html#tvcalendar"><img src="assets/integrations/tvcalendar.png" alt="" loading="lazy">TV Calendar</a>
+                    <a class="logo-chip" href="integrations.html#rottentomatoes"><img src="assets/integrations/rotten-tomatoes.svg" alt="" loading="lazy">Rotten Tomatoes</a>
+                    <a class="logo-chip" href="integrations.html#metacritic"><img src="assets/integrations/metacritic.svg" alt="" loading="lazy">Metacritic</a>
+                    <a class="logo-chip" href="integrations.html#simkl"><img src="assets/integrations/simkl.png" alt="" loading="lazy">Simkl</a>
+                    <a class="logo-chip" href="integrations.html#iptorrents"><img src="assets/integrations/iptorrents.png" alt="" loading="lazy">IPTorrents</a>
+                    <a class="logo-chip" href="integrations.html#lastfm"><img src="assets/integrations/lastfm.png" alt="" loading="lazy">last.fm</a>
+                    <a class="logo-chip" href="integrations.html#allocine"><img src="assets/integrations/allocine.png" alt="" loading="lazy">Allociné</a>
+                    <a class="logo-chip" href="integrations.html#senscritique"><img src="assets/integrations/senscritique.png" alt="" loading="lazy">SensCritique</a>
+                    <a class="logo-chip" href="integrations.html#betaseries"><img src="assets/integrations/betaseries.png" alt="" loading="lazy">BetaSeries</a>
+                    <a class="logo-chip" href="integrations.html#primevideo"><img src="assets/integrations/primevideo.png" alt="" loading="lazy">Prime Video</a>
+                    <a class="logo-chip" href="integrations.html#myanimelist"><img src="assets/integrations/myanimelist.png" alt="" loading="lazy">MyAnimeList</a>
+                    <a class="logo-chip" href="integrations.html#rateyourmusic"><img src="assets/integrations/rateyourmusic.jpg" alt="" loading="lazy">Rate Your Music</a>
+                    <a class="logo-chip" href="integrations.html#wikipedia"><img src="assets/integrations/wikipedia.svg" alt="" loading="lazy">Wikipedia</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Supported apps -->
+        <section class="section">
+            <div class="container">
+                <p class="kicker">Your fleet</p>
+                <h2>Speaks fluent *arr.</h2>
+                <p class="section-lead">Add as many instances as you run — every enabled instance gets its own icons and context-menu entries.</p>
+                <div class="apps-grid">
+                    <div class="app-card app-sonarr reveal">
+                        <h3>Sonarr</h3>
+                        <span class="app-kind">TV series</span>
+                        <p>Send shows from IMDb, TVDb, TVmaze, Trakt and more straight to your series search.</p>
+                    </div>
+                    <div class="app-card app-radarr reveal">
+                        <h3>Radarr</h3>
+                        <span class="app-kind">Films</span>
+                        <p>Letterboxd, TMDb, Rotten Tomatoes — one click from review to your movie library.</p>
+                    </div>
+                    <div class="app-card app-lidarr reveal">
+                        <h3>Lidarr</h3>
+                        <span class="app-kind">Music</span>
+                        <p>MusicBrainz, last.fm and Rate Your Music feed your album collection directly.</p>
+                    </div>
+                    <div class="app-card app-readarr reveal">
+                        <h3>Readarr</h3>
+                        <span class="app-kind">Books &amp; audiobooks</span>
+                        <p>Ebook and audiobook instances are both supported — enable them in settings.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="section section-alt">
+            <div class="container">
+                <p class="kicker">Signal strength</p>
+                <h2>Live from the stores.</h2>
+                <div class="stats-row">
+                    <div class="stat-group reveal">
+                        <h3>Chrome Web Store</h3>
+                        <div class="badges">
+                            <img src="https://img.shields.io/chrome-web-store/v/jmmjjcddjldjdjgckdiokhfokccdnekc?label=version&style=flat-square&color=00e585&labelColor=1b2b23" alt="Chrome Web Store version" height="20" loading="lazy">
+                            <img src="https://img.shields.io/chrome-web-store/users/jmmjjcddjldjdjgckdiokhfokccdnekc?label=users&style=flat-square&color=00e585&labelColor=1b2b23" alt="Chrome Web Store users" height="20" loading="lazy">
+                            <img src="https://img.shields.io/chrome-web-store/stars/jmmjjcddjldjdjgckdiokhfokccdnekc?label=rating&style=flat-square&color=00e585&labelColor=1b2b23" alt="Chrome Web Store rating" height="20" loading="lazy">
+                        </div>
+                        <a class="store-link" href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">Open in Chrome Web Store →</a>
+                    </div>
+                    <div class="stat-group reveal">
+                        <h3>Firefox Add-ons</h3>
+                        <div class="badges">
+                            <img src="https://img.shields.io/amo/v/sonarr-radarr-lidarr-search?label=version&style=flat-square&color=00e585&labelColor=1b2b23" alt="Firefox Add-ons version" height="20" loading="lazy">
+                            <img src="https://img.shields.io/amo/users/sonarr-radarr-lidarr-search?label=users&style=flat-square&color=00e585&labelColor=1b2b23" alt="Firefox Add-ons users" height="20" loading="lazy">
+                            <img src="https://img.shields.io/amo/stars/sonarr-radarr-lidarr-search?label=rating&style=flat-square&color=00e585&labelColor=1b2b23" alt="Firefox Add-ons rating" height="20" loading="lazy">
+                        </div>
+                        <a class="store-link" href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Open in Firefox Add-ons →</a>
+                    </div>
+                    <div class="stat-group reveal">
+                        <h3>Edge Add-ons</h3>
+                        <div class="badges">
+                            <img src="https://img.shields.io/badge/version-v3.2.0-00e585?style=flat-square&labelColor=1b2b23" alt="Edge Add-ons version" height="20" loading="lazy">
+                            <img src="https://img.shields.io/badge/users-707-00e585?style=flat-square&labelColor=1b2b23" alt="Edge Add-ons users" height="20" loading="lazy">
+                        </div>
+                        <a class="store-link" href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Open in Edge Add-ons →</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contributors -->
+        <section class="section">
+            <div class="container">
+                <p class="kicker">Signal boosters</p>
+                <h2>Built in the open, by the community.</h2>
+                <p class="section-lead">Integrations, fixes and ideas from *arr users everywhere. Thank you — <a href="developers.html">and there's room for you too</a>.</p>
+                <div class="avatars">
+                    <a href="https://github.com/banterboy" rel="noopener"><img src="https://avatars.githubusercontent.com/banterboy?s=128&v=4" alt="banterboy" title="banterboy" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/aommm" rel="noopener"><img src="https://avatars.githubusercontent.com/aommm?s=128&v=4" alt="aommm" title="aommm" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/ledge74" rel="noopener"><img src="https://avatars.githubusercontent.com/ledge74?s=128&v=4" alt="ledge74" title="ledge74" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/almottier" rel="noopener"><img src="https://avatars.githubusercontent.com/almottier?s=128&v=4" alt="almottier" title="almottier" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/dannyvink" rel="noopener"><img src="https://avatars.githubusercontent.com/dannyvink?s=128&v=4" alt="dannyvink" title="dannyvink" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/Pompiedom" rel="noopener"><img src="https://avatars.githubusercontent.com/Pompiedom?s=128&v=4" alt="Pompiedom" title="Pompiedom" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/carsso" rel="noopener"><img src="https://avatars.githubusercontent.com/carsso?s=128&v=4" alt="carsso" title="carsso" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/3vanlock" rel="noopener"><img src="https://avatars.githubusercontent.com/3vanlock?s=128&v=4" alt="3vanlock" title="3vanlock" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/cyberden" rel="noopener"><img src="https://avatars.githubusercontent.com/cyberden?s=128&v=4" alt="cyberden" title="cyberden" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/MozPri" rel="noopener"><img src="https://avatars.githubusercontent.com/MozPri?s=128&v=4" alt="MozPri" title="MozPri" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/dynamiccookies" rel="noopener"><img src="https://avatars.githubusercontent.com/dynamiccookies?s=128&v=4" alt="dynamiccookies" title="dynamiccookies" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/theotherp" rel="noopener"><img src="https://avatars.githubusercontent.com/theotherp?s=128&v=4" alt="theotherp" title="theotherp" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/0xdevalias" rel="noopener"><img src="https://avatars.githubusercontent.com/0xdevalias?s=128&v=4" alt="0xdevalias" title="0xdevalias" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/StormPooper" rel="noopener"><img src="https://avatars.githubusercontent.com/StormPooper?s=128&v=4" alt="StormPooper" title="StormPooper" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/Xeldarflo" rel="noopener"><img src="https://avatars.githubusercontent.com/Xeldarflo?s=128&v=4" alt="Xeldarflo" title="Xeldarflo" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/bambinofresco" rel="noopener"><img src="https://avatars.githubusercontent.com/bambinofresco?s=128&v=4" alt="bambinofresco" title="bambinofresco" loading="lazy" referrerpolicy="no-referrer"></a>
+                    <a href="https://github.com/vBm" rel="noopener"><img src="https://avatars.githubusercontent.com/vBm?s=128&v=4" alt="vBm" title="vBm" loading="lazy" referrerpolicy="no-referrer"></a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-band" id="install">
+            <div class="container">
+                <p class="kicker">Ready when you are</p>
+                <h2>Stop copying titles. Start pinging them.</h2>
+                <div class="store-buttons">
+                    <a class="btn btn-primary" href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">Add to Chrome</a>
+                    <a class="btn btn-ghost" href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Add to Firefox</a>
+                    <a class="btn btn-ghost" href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Add to Edge</a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- @shared:footer (keep identical across all pages) -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a class="brand" href="index.html">
+                        <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                        <span>arr search<span class="tld">.app</span></span>
+                    </a>
+                    <p>Servarr Auto Search — a free, open-source browser extension for Sonarr, Radarr, Lidarr and Readarr. No telemetry, no tracking, MIT licensed.</p>
+                </div>
+                <div>
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="user-guide.html">User guide</a></li>
+                        <li><a href="integrations.html">Integrations</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/CHANGELOG.md" rel="noopener">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension" rel="noopener">GitHub</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues" rel="noopener">Issues</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki" rel="noopener">Wiki</a></li>
+                        <li><a href="developers.html">Contributing</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Get it</h4>
+                    <ul>
+                        <li><a href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">Chrome Web Store</a></li>
+                        <li><a href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Firefox Add-ons</a></li>
+                        <li><a href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Edge Add-ons</a></li>
+                        <li><a href="https://ko-fi.com/K3K22CEIT" rel="noopener">Buy the dev a coffee ☕</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>Also answers to <a href="https://servarrsearch.app">servarrsearch.app</a> · Not affiliated with the Servarr projects.</span>
+                <span class="version" data-version>v3.2.0</span>
+            </div>
+        </div>
+    </footer>
+    <!-- @shared:footer:end -->
+
+    <!-- Mobile sticky install bar (index only) -->
+    <div class="install-bar">
+        <a href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">Add to Chrome</a>
+        <a class="alt" href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Firefox</a>
+        <a class="alt" href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Edge</a>
+    </div>
+</body>
+</html>

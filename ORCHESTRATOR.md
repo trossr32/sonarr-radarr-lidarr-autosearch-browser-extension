@@ -147,6 +147,7 @@ Decisions Log
 - 2026-03-22: Added this ORCHESTRATOR.md as persistent context anchor for compaction resilience.
 - 2026-07-03: Documented the standard release process for contributor PRs into staging (version bump locations, changelog format, contributor credits) in CLAUDE.md "Release process".
 - 2026-07-03: TVMaze /shows directory engine (PR#343) matcher tightened to a regex (`/tvmaze\.com\/shows\/?($|[?#])/i`) covering the trailing-slash variant while still excluding show detail pages.
+- 2026-07-03: Built the arrsearch.app website in `docs/` (static HTML/CSS/JS, no build step) to replace the Jekyll-rendered README on GitHub Pages; `_config.yml` deleted. Pages source must be switched to `master:/docs`. Site is canonical for user docs; wiki remains canonical for contributor docs. See CLAUDE.md "Website (docs/)".
 
 Open Risks Queue
 - Monitor SPA engines for recurrent regressions on Trakt/Metacritic.
