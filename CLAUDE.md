@@ -82,7 +82,7 @@ After contributor PRs are merged into `staging`, the standard release prep is do
 - `README.md` "Thanks" section — append an avatar anchor following the existing `<a href='https://github.com/<user>' ...><picture><img src="https://avatars.githubusercontent.com/<user>?s=64&v=4" ...></picture></a>` pattern.
 - Contributor credit also goes in the CHANGELOG bullet (see above).
 
-The wiki (`wiki/`) holds no version, changelog, or contributor content.
+The wiki holds no version, changelog, or contributor content. `wiki/` is a gitignored local checkout of the GitHub wiki repo (`https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension.wiki.git`) — it has its own git history; commit and push wiki edits there directly (wikis have no PR flow). If `wiki/` is missing, clone that URL into it.
 
 ## Conventions and cautions
 
