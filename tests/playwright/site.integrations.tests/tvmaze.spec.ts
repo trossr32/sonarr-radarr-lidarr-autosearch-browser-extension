@@ -20,3 +20,12 @@ test('tvmaze countdown has sonarr icons', async ({ page }) => {
 
   await expect(page.locator(iconDataLocator)).not.toHaveCount(0);
 });
+
+test('tvmaze shows directory has sonarr icons', async ({ page }) => {
+  await page.goto('https://www.tvmaze.com/shows', { waitUntil: 'commit' });
+
+  // Wait for the extension to inject (reloads if the MV3 service worker missed it)
+  await waitForServarrIcon(page);
+
+  await expect(page.locator(iconDataLocator)).not.toHaveCount(0);
+});
