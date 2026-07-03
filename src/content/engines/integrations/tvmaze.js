@@ -11,9 +11,8 @@
         containerSelector: 'h1.show-for-medium',
         insertWhere: 'prepend',
         iconStyle: 'width: 32px; margin: -8px 10px 0 0;',
-        getSearch: function (_el, doc) {
-            var n = doc.querySelector('h1.show-for-medium');
-            return (n && (n.textContent || '').trim()) || '';
+        getSearch: function (el, doc) {
+            return (el && (el.textContent || '').trim()) || '';
         }
     });
 
@@ -25,9 +24,8 @@
         containerSelector: 'div.show-name',
         insertWhere: 'prepend',
         iconStyle: 'width: 24px; margin: -8px 10px 0 0;',
-        getSearch: function (_el, doc) {
-            var n = doc.querySelector('div.show-name');
-            return (n && (n.textContent || '').trim()) || '';
+        getSearch: function (el, doc) {
+            return (el && (el.textContent || '').trim()) || '';
         }
     });
 
