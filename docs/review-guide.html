@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Reviewer guide — Servarr Auto Search</title>
+    <meta name="description" content="Guide for Chrome Web Store, Mozilla Add-ons and Microsoft Edge Add-ons reviewers: build reproduction, permissions justification, data handling, and functional test steps for the Servarr Auto Search extension.">
+    <link rel="canonical" href="https://arrsearch.app/review-guide.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Servarr Auto Search">
+    <meta property="og:title" content="Reviewer guide — Servarr Auto Search">
+    <meta property="og:description" content="Build reproduction, permissions justification, data handling, and functional test steps for store reviewers.">
+    <meta property="og:url" content="https://arrsearch.app/review-guide.html">
+    <meta property="og:image" content="https://arrsearch.app/assets/img/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="color-scheme" content="dark light">
+    <meta name="theme-color" content="#060b09">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/icons/favicon-16.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="assets/icons/favicon-48.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="assets/icons/icon-128.png">
+    <link rel="apple-touch-icon" href="assets/icons/icon-256.png">
+    <script>try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+    <link rel="stylesheet" href="css/site.css">
+    <script src="js/site.js" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- @shared:header (keep identical across all pages; only aria-current differs) -->
+    <header class="site-header">
+        <div class="container">
+            <a class="brand" href="index.html">
+                <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                <span>arr search<span class="tld">.app</span></span>
+            </a>
+            <nav class="site-nav" aria-label="Main">
+                <a href="index.html">Home</a>
+                <a href="user-guide.html">User guide</a>
+                <a href="integrations.html">Integrations</a>
+                <a href="developers.html">Developers</a>
+            </nav>
+            <div class="header-actions">
+                <button class="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+                    <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                </button>
+                <a class="header-cta" href="user-guide.html#installation--loading">Install</a>
+            </div>
+        </div>
+    </header>
+    <!-- @shared:header:end -->
+
+    <main id="main">
+        <div class="page-hero">
+            <div class="container">
+                <p class="kicker">For store reviewers</p>
+                <h1>Extension reviewer guide</h1>
+                <p>For Chrome Web Store, Mozilla Add-ons (AMO) and Microsoft Edge Add-ons reviewers: how to inspect, build, validate and test the Sonarr/Radarr/Lidarr/Readarr Auto Search extension. The canonical version of this document lives in the repository.</p>
+                <p style="margin-top: 18px;"><a class="btn btn-ghost" href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/REVIEWER_GUIDE.md" rel="noopener">Read the reviewer guide on GitHub →</a></p>
+            </div>
+        </div>
+
+        <div class="container docs-layout">
+            <details class="toc" open>
+                <summary>On this page</summary>
+                <ol>
+                    <li><a href="#1-summary">Summary</a></li>
+                    <li><a href="#2-repository-layout-source-vs-built-artifacts">Repository layout</a></li>
+                    <li><a href="#3-build--verification-steps">Build &amp; verification</a></li>
+                    <li><a href="#4-permissions--justification">Permissions</a></li>
+                    <li><a href="#5-background--runtime-architecture">Runtime architecture</a></li>
+                    <li><a href="#6-data-handling--privacy">Data handling &amp; privacy</a></li>
+                    <li><a href="#7-third-party-libraries">Third-party libraries</a></li>
+                    <li><a href="#8-how-to-functionally-test">Functional testing</a></li>
+                    <li><a href="#9-security-review-checklist">Security checklist</a></li>
+                    <li><a href="#10-testing-automated">Automated testing</a></li>
+                    <li><a href="#11-notable-implementation-details">Implementation details</a></li>
+                    <li><a href="#12-how-to-trace-code-paths">Tracing code paths</a></li>
+                    <li><a href="#13-known-limitations--edge-cases">Known limitations</a></li>
+                    <li><a href="#14-reviewer-quick-script-audit-pointers">Script audit pointers</a></li>
+                    <li><a href="#15-contact">Contact</a></li>
+                </ol>
+            </details>
+
+            <article class="docs-content">
+
+                <h2 id="1-summary">Summary</h2>
+                <p>This extension streamlines searching across user-hosted <em>Servarr</em> applications (Sonarr, Radarr, Lidarr, Readarr) by:</p>
+                <ul>
+                    <li>Auto-prefilling Servarr search pages when a user navigates to a URL containing <code>/add/new/&lt;term&gt;</code> (or similar).</li>
+                    <li>Adding context menu items to search selected text directly in any configured Servarr instance.</li>
+                    <li>Injecting small Servarr search icons/links into supported third-party media sites (IMDb, TMDb, TVDb, Trakt, TVmaze, MusicBrainz, Letterboxd, TV Calendar, Rotten Tomatoes, Metacritic, Simkl, IPTorrents, Last.fm, Allociné, SensCritique, Betaseries, Prime Video, Rate Your Music, MyAnimeList, Wikipedia — see the <a href="integrations.html">integrations gallery</a>).</li>
+                    <li>Providing an options UI where users configure base URLs + API keys (optional) for automatic advanced selector configuration.</li>
+                    <li>Backup &amp; restore of user settings via a dedicated options tab: exports a JSON file using a schema-versioned envelope; imports either the new envelope or legacy plain JSON with validation; supports merge or replace modes and a preview-changes diff.</li>
+                </ul>
+                <p>The extension does <strong>not</strong> collect analytics, ship remote code, or exfiltrate user data. All API calls target only the user's own Servarr instances explicitly configured in settings. See the latest release changes in the <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/CHANGELOG.md" rel="noopener">changelog</a>.</p>
+
+                <h2 id="2-repository-layout-source-vs-built-artifacts">Repository layout (source vs built artifacts)</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>src/</code></td><td>Authoritative source (HTML, JS, Tailwind/Sass inputs, manifests).</td></tr>
+                            <tr><td><code>src/manifest-chromium/manifest.json</code></td><td>Chromium MV3 manifest.</td></tr>
+                            <tr><td><code>src/manifest-firefox/manifest.json</code></td><td>Firefox MV2 manifest (kept until MV3 is fully supported on Firefox for parity).</td></tr>
+                            <tr><td><code>src/content/js/</code></td><td>Core runtime scripts (logic, content script, shared helpers, popup &amp; options).</td></tr>
+                            <tr><td><code>src/content/css/</code></td><td>Tailwind entry (<code>tailwind.css</code>).</td></tr>
+                            <tr><td><code>dist/chromium/</code></td><td>Build output for Chromium (produced by <code>grunt release</code>).</td></tr>
+                            <tr><td><code>dist/firefox/</code></td><td>Build output for Firefox.</td></tr>
+                            <tr><td><code>tests/playwright/</code></td><td>Playwright integration tests (site integration smoke tests).</td></tr>
+                            <tr><td><code>tests/unit-tests/</code></td><td>Jest unit tests (minimal).</td></tr>
+                            <tr><td><code>Gruntfile.js</code></td><td>Build pipeline definition.</td></tr>
+                            <tr><td><code>tailwind.config.js</code></td><td>Tailwind configuration (purge/content globs + safelist).</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>All minified/processed assets in <code>dist/</code> are reproducible by following the build steps below.</p>
+
+                <h2 id="3-build--verification-steps">Build &amp; verification steps</h2>
+                <p>Perform a clean build from source (commands are cross-platform):</p>
+                <pre><code>npm ci
+grunt release</code></pre>
+                <p>This produces:</p>
+                <ul>
+                    <li><code>dist/chromium</code> (MV3 build using <code>eventPage.chrome.js</code> as service worker + background script bundle pieces).</li>
+                    <li><code>dist/firefox</code> (MV2 build with <code>background.scripts</code>).</li>
+                </ul>
+                <h3 id="mapping-built-code-to-source">Mapping built code to source</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Built file (example)</th><th>Source origin</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>dist/**/popup.html</code></td><td><code>src/popup.html</code> (unchanged except path rewriting if any).</td></tr>
+                            <tr><td><code>dist/**/options.html</code></td><td><code>src/options.html</code>.</td></tr>
+                            <tr><td><code>dist/**/content/js/*.js</code></td><td>Direct copies from <code>src/content/js/</code> (no obfuscation).</td></tr>
+                            <tr><td><code>dist/**/content/css/tailwind.css</code></td><td>Generated by Tailwind from utility classes declared across <code>src/**/*.html</code> &amp; <code>src/**/*.js</code> + safelist.</td></tr>
+                            <tr><td>Icon images</td><td>Copied 1:1 from <code>src/content/assets/images/</code>.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>There is <strong>no custom packer</strong>, no dynamic code generation beyond Tailwind's static CSS expansion.</p>
+
+                <h2 id="4-permissions--justification">Permissions &amp; justification</h2>
+                <p><code>manifest-chromium/manifest.json</code>:</p>
+                <pre><code>"permissions": ["scripting", "storage", "activeTab", "contextMenus"],
+"host_permissions": [
+    "*://*.allocine.fr/*", "*://*.betaseries.com/*", "*://*.imdb.com/*",
+    "*://*.iptorrents.com/*", "*://*.iptorrents.net/*", "*://*.iptorrents.me/*",
+    "*://*.iptorrents.eu/*", "*://*.iptorrents.ru/*", "*://*.last.fm/*",
+    "*://*.letterboxd.com/*", "*://*.metacritic.com/*", "*://*.musicbrainz.org/*",
+    "*://*.myanimelist.net/*", "*://*.primevideo.com/*", "*://*.rateyourmusic.com/*",
+    "*://*.rottentomatoes.com/*", "*://*.senscritique.com/*", "*://*.simkl.com/*",
+    "*://*.themoviedb.org/*", "*://*.thetvdb.com/*", "*://*.trakt.tv/*",
+    "*://*.pogdesign.co.uk/*", "*://*.tvmaze.com/*", "*://*.wikipedia.org/*"
+],
+"optional_host_permissions": ["&lt;all_urls&gt;"]</code></pre>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Permission</th><th>Rationale</th></tr></thead>
+                        <tbody>
+                            <tr><td><code>scripting</code></td><td>Injection of content script on listed domains (MV3 requirement).</td></tr>
+                            <tr><td><code>storage</code></td><td>Persist user configuration (base URLs, API keys, toggles).</td></tr>
+                            <tr><td><code>activeTab</code></td><td>Allow immediate context-menu-initiated search to open the correct tab / access the tab URL when needed.</td></tr>
+                            <tr><td><code>contextMenus</code></td><td>Add right-click Servarr search items.</td></tr>
+                            <tr><td>Host list</td><td>Integration discovery. The site list is explicit for transparency.</td></tr>
+                            <tr><td><code>&lt;all_urls&gt;</code> (optional)</td><td>User-specified Servarr domains, unknown at install time (e.g. <code>http://nas.local:8989</code>). Users grant permission to their Servarr instances on a per-domain basis.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3 id="firefox-mv2">Firefox (MV2)</h3>
+                <p><code>manifest-firefox/manifest.json</code> lists the same host patterns plus <code>storage</code>, <code>activeTab</code>, <code>tabs</code> and <code>contextMenus</code> under <code>permissions</code> (MV2 does not separate <code>host_permissions</code>), with <code>&lt;all_urls&gt;</code> under <code>optional_permissions</code>. The same justifications apply.</p>
+
+                <h2 id="5-background--runtime-architecture">Background &amp; runtime architecture</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Component</th><th>Role</th></tr></thead>
+                        <tbody>
+                            <tr><td>Content scripts (<code>content_script.js</code> + engine files)</td><td>Injected two ways: <strong>declaratively</strong> via the manifest <code>content_scripts</code> entry (<code>run_at: document_idle</code>) on the listed integration domains, and <strong>programmatically</strong> from the background for user-configured Servarr instance domains (unknown at install time). The same bundled, local files are used for both; the background path skips domains already covered declaratively to avoid double injection.</td></tr>
+                            <tr><td><code>eventPage.chrome.js</code></td><td>MV3 service worker (message routing, context menu handling, storage change propagation, and programmatic content-script injection for Servarr domains).</td></tr>
+                            <tr><td><code>eventPage.js</code></td><td>Firefox MV2 background equivalent.</td></tr>
+                            <tr><td><code>core.js</code></td><td>Shared helpers: settings access (storage), API version probing, URL building, small <code>browser</code> polyfill for non-WebExtension contexts (used in tests).</td></tr>
+                            <tr><td><code>options.js</code> / <code>options_*.js</code></td><td>Options UI assembly and tab-specific logic (settings load/save, site/integration list management, backup/restore handling).</td></tr>
+                            <tr><td><code>popup.js</code></td><td>Popup enable/disable toggle + quick settings link.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>All logic is synchronous or simple async, with <code>fetch</code> only to user-supplied Servarr endpoints (API base derived from settings). No external analytics endpoints.</p>
+
+                <h2 id="6-data-handling--privacy">Data handling &amp; privacy</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Aspect</th><th>Details</th></tr></thead>
+                        <tbody>
+                            <tr><td>Storage scope</td><td><code>browser.storage.sync</code> / <code>local</code> (standard WebExtension) for configuration only.</td></tr>
+                            <tr><td>Personal data</td><td>None collected or transmitted externally.</td></tr>
+                            <tr><td>Network calls</td><td>Only to user Servarr instances (optional) when an API key is present — to detect version for auto configuration.</td></tr>
+                            <tr><td>Telemetry / tracking / ads</td><td>None.</td></tr>
+                            <tr><td>Backup/restore</td><td>Export produces a local JSON download only; import reads a local JSON file chosen by the user. No data is transmitted externally.</td></tr>
+                            <tr><td>Firefox data consent</td><td><code>browser_specific_settings.gecko.data_collection_permissions</code> is declared as <code>required: ["none"]</code>, formally stating that no data is collected (Firefox built-in data consent).</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 id="7-third-party-libraries">Third-party libraries</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Library</th><th>Source</th><th>Use</th></tr></thead>
+                        <tbody>
+                            <tr><td>jQuery</td><td><code>node_modules/jquery</code></td><td>Simple DOM selection &amp; legacy code compatibility.</td></tr>
+                            <tr><td>Font Awesome 7</td><td><code>@fortawesome/fontawesome-free</code></td><td>Icons in popup/options UIs.</td></tr>
+                            <tr><td>Tailwind CSS 4 + Forms plugin</td><td><code>tailwindcss</code>, <code>@tailwindcss/forms</code></td><td>Utility-first styling, accessible form defaults. Built into a single CSS file.</td></tr>
+                            <tr><td>Spectrum colour picker</td><td><code>spectrum-colorpicker2</code></td><td>Colour picker.</td></tr>
+                            <tr><td>webextension-polyfill</td><td><code>webextension-polyfill</code></td><td>Unified <code>browser.*</code> API shim across Chrome/Firefox.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>All libraries are installed via <code>npm ci</code> and bundled transparently (no CDN runtime fetches). Unminified sources remain in <code>node_modules/</code>.</p>
+
+                <h2 id="8-how-to-functionally-test">How to functionally test</h2>
+                <h3 id="81-load-the-extension-chromium">8.1 Load the extension (Chromium)</h3>
+                <ol>
+                    <li>Build: <code>npm ci &amp;&amp; grunt release</code>.</li>
+                    <li>Open <code>chrome://extensions</code> → enable Developer Mode.</li>
+                    <li>Click "Load unpacked" → select <code>dist/chromium</code>.</li>
+                    <li>Open the popup: verify the enable/disable button toggles state (stored in extension storage).</li>
+                </ol>
+                <h3 id="82-load-the-extension-firefox">8.2 Load the extension (Firefox)</h3>
+                <p>Option A (temporary install): build, visit <code>about:debugging#/runtime/this-firefox</code>, "Load Temporary Add-on" → pick any file inside <code>dist/firefox</code> (e.g. <code>manifest.json</code>).</p>
+                <p>Option B (web-ext run):</p>
+                <pre><code>npm ci
+grunt release
+npm run firefox</code></pre>
+                <h3 id="83-configure--test-core-features">8.3 Configure &amp; test core features</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Feature</th><th>Steps</th></tr></thead>
+                        <tbody>
+                            <tr><td>Auto-search injection</td><td>Navigate to a configured Sonarr/Radarr URL, append <code>/add/new/&lt;term&gt;</code> → search field prefilled &amp; results loaded.</td></tr>
+                            <tr><td>Context menu search</td><td>Select text on any page → right-click → choose a Servarr target → new tab opens to the correct add/new path.</td></tr>
+                            <tr><td>Integration icons</td><td>Visit (e.g.) <code>https://www.imdb.com/title/tt0944947/</code> → Servarr icon(s) should inject near the title region (depends on site layout).</td></tr>
+                            <tr><td>Enable/disable toggle</td><td>Popup → toggle → integration icons &amp; auto-search cease when disabled.</td></tr>
+                            <tr><td>Advanced auto-detect</td><td>In options: set base URL + API key for (e.g.) Sonarr → advanced selectors auto-populate; test by removing the key and toggling detection off/on.</td></tr>
+                            <tr><td>Custom icon (if enabled)</td><td>In options, navigate to the custom icon tab; enable &amp; adjust position/colour; verify the preview updates.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h3 id="84-storage-inspection">8.4 Storage inspection</h3>
+                <p>In DevTools (background page or service worker):</p>
+                <pre><code>await browser.storage.sync.get();</code></pre>
+                <p>Review the structure (only configuration JSON under a single key).</p>
+                <h3 id="85-backup--restore">8.5 Backup &amp; restore</h3>
+                <p>Options → "Backup &amp; restore" tab.</p>
+                <ul>
+                    <li><strong>Backup:</strong> "Download backup" produces a pretty-printed JSON file using an envelope format — <code>type</code> (<code>"servarr-autosearch-settings"</code>), <code>schemaVersion</code> (<code>1</code>), <code>exportedAt</code>, <code>appVersion</code>, and a <code>data</code> payload with internal fields (prefixed <code>_</code>/<code>__</code>) stripped.</li>
+                    <li><strong>Restore:</strong> choose a saved JSON file (envelope or legacy plain JSON — legacy accepted with an informational note). Optional replace mode overwrites fully; the default is a deep merge (arrays replaced; objects merged). "Preview changes" shows a diff of added/removed/changed paths before applying. Files are minimally validated (<code>config</code> object, <code>sites[]</code>, <code>integrations[]</code>); a newer <code>schemaVersion</code> warns before import, older schemas are normalised.</li>
+                    <li><strong>Reset:</strong> "Reset settings" → confirmation prompt → resets to built-in defaults.</li>
+                    <li>No network transmission occurs during backup or restore; files are handled locally in the browser context.</li>
+                </ul>
+
+                <h2 id="9-security-review-checklist">Security review checklist</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Check</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            <tr><td>Remote script injection</td><td>None (all scripts packaged locally).</td></tr>
+                            <tr><td><code>eval</code> / dynamic function</td><td>Not used.</td></tr>
+                            <tr><td>Dangerous DOM APIs</td><td>Only standard element creation &amp; attribute manipulation; no unsanitised HTML injection from external sources.</td></tr>
+                            <tr><td>External network endpoints</td><td>Only user-configured Servarr base URLs when an API key is present (GET/POST for version test).</td></tr>
+                            <tr><td>Permission minimisation</td><td>Core set only; <code>&lt;all_urls&gt;</code> justified for unknown self-hosted domains &amp; a consistent injection model.</td></tr>
+                            <tr><td>CSP</td><td>Uses default WebExtension CSP; no inline JS reliance beyond standard HTML event-free patterns.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 id="10-testing-automated">Testing (automated)</h2>
+                <p><strong>Playwright (site integrations)</strong> — not required for functional store acceptance but provided for transparency:</p>
+                <pre><code>npm ci
+grunt release
+cd tests/playwright
+npm i
+npx playwright install --with-deps chromium
+npx playwright test</code></pre>
+                <p>These load integration target pages and assert icon injection or URL logic (requires network access to public sites; may be flaky if site layouts change).</p>
+                <p><strong>Jest (unit tests)</strong> — currently minimal; used as a development safeguard:</p>
+                <pre><code>npm ci
+npm test</code></pre>
+
+                <h2 id="11-notable-implementation-details">Notable implementation details</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Concern</th><th>Handling</th></tr></thead>
+                        <tbody>
+                            <tr><td>Accessible tabs</td><td>ARIA roles &amp; keyboard navigation (ArrowLeft/Right, Home/End).</td></tr>
+                            <tr><td>Toggle controls</td><td>Replaces the legacy Bootstrap toggle plugin with small custom button logic + <code>aria-pressed</code>.</td></tr>
+                            <tr><td>Range inputs</td><td>Native <code>&lt;input type="range"&gt;</code> styled via the Tailwind forms plugin (no third-party slider).</td></tr>
+                            <tr><td>Status badges (options)</td><td>Show passive health of Servarr API endpoints; timeouts gracefully degrade to "Unknown/Fail".</td></tr>
+                            <tr><td>Browser polyfill</td><td><code>webextension-polyfill</code> for consistent Promise-based APIs.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 id="12-how-to-trace-code-paths">How to trace code paths</h2>
+                <p>Typical icon injection path on an integration page:</p>
+                <ol>
+                    <li>Content script runs (<code>sonarr_radarr_lidarr_autosearch.js</code>).</li>
+                    <li>Loads settings via helpers in <code>core.js</code>.</li>
+                    <li>Detects page type via site-specific selectors.</li>
+                    <li>Builds search URLs and injects an <code>&lt;a&gt;</code> or <code>&lt;img&gt;</code> element with a click handler.</li>
+                    <li>If disabled (<code>settings.config.enabled === false</code>) it returns early.</li>
+                </ol>
+                <p>Auto-search path:</p>
+                <ol>
+                    <li>User navigates to an add/new URL carrying trailing search text.</li>
+                    <li>Content script checks the path &amp; extracts the trailing segment.</li>
+                    <li>Waits for the search input (configurable selectors) up to a timeout.</li>
+                    <li>Sets the value and dispatches an input event.</li>
+                </ol>
+
+                <h2 id="13-known-limitations--edge-cases">Known limitations / edge cases</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Area</th><th>Note</th></tr></thead>
+                        <tbody>
+                            <tr><td>Layout changes on external sites</td><td>May break icon injection; handled by future config updates, not runtime heuristics.</td></tr>
+                            <tr><td>Firefox MV3 migration</td><td>Pending full parity; the MV2 manifest is currently retained for Android support (see <a href="https://extensionworkshop.com/documentation/develop/developing-extensions-for-firefox-for-android/#mv3-compatibility" rel="noopener">Firefox for Android MV3 compatibility</a>).</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2 id="14-reviewer-quick-script-audit-pointers">Reviewer quick script audit pointers</h2>
+                <p>Search for any suspicious patterns:</p>
+                <ul>
+                    <li><code>eval(</code> → not present.</li>
+                    <li><code>new Function(</code> → not present.</li>
+                    <li><code>fetch(</code> / <code>XMLHttpRequest</code> → confined to Servarr API probing in <code>core.js</code> (search for <code>callApi</code>).</li>
+                    <li>Event listeners for the context menu: background script only (<code>eventPage.*</code>).</li>
+                    <li>Storage key: <code>sonarrRadarrLidarrAutosearchSettings</code> (searchable).</li>
+                </ul>
+
+                <h2 id="15-contact">Contact</h2>
+                <p>If clarification is required during review, please <a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues/new?assignees=trossr32&amp;labels=question&amp;projects=&amp;title=" rel="noopener">raise an issue</a> in the repository or include reviewer notes in the store submission feedback.</p>
+                <p><strong>Summary assertion:</strong> all shipped code is deterministic &amp; build-reproducible with <code>npm ci &amp;&amp; grunt release</code>, free of remote executable payloads, limited to user-directed network activity, and structured for least complexity in review (no bundler obfuscation).</p>
+                <p>Thank you for reviewing this extension. 📡</p>
+
+            </article>
+        </div>
+    </main>
+
+    <!-- @shared:footer (keep identical across all pages) -->
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <a class="brand" href="index.html">
+                        <img src="assets/icons/favicon-48.png" alt="" width="28" height="28">
+                        <span>arr search<span class="tld">.app</span></span>
+                    </a>
+                    <p>Servarr Auto Search — a free, open-source browser extension for Sonarr, Radarr, Lidarr and Readarr. No telemetry, no tracking, MIT licensed.</p>
+                </div>
+                <div>
+                    <h4>Product</h4>
+                    <ul>
+                        <li><a href="user-guide.html">User guide</a></li>
+                        <li><a href="integrations.html">Integrations</a></li>
+                        <li><a href="privacy.html">Privacy</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/blob/master/CHANGELOG.md" rel="noopener">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Project</h4>
+                    <ul>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension" rel="noopener">GitHub</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/issues" rel="noopener">Issues</a></li>
+                        <li><a href="https://github.com/trossr32/sonarr-radarr-lidarr-autosearch-browser-extension/wiki" rel="noopener">Wiki</a></li>
+                        <li><a href="developers.html">Contributing</a></li>
+                        <li><a href="review-guide.html">Reviewer guide</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Get it</h4>
+                    <ul>
+                        <li><a href="https://chrome.google.com/webstore/detail/sonarrradarrlidarr-autose/jmmjjcddjldjdjgckdiokhfokccdnekc" rel="noopener">Chrome Web Store</a></li>
+                        <li><a href="https://addons.mozilla.org/en-GB/firefox/addon/sonarr-radarr-lidarr-search/" rel="noopener">Firefox Add-ons</a></li>
+                        <li><a href="https://microsoftedge.microsoft.com/addons/detail/sonarrradarrlidarr-auto/aclgfcjonnhgdkinhmmafdbkpegfcnal" rel="noopener">Edge Add-ons</a></li>
+                        <li><a href="https://ko-fi.com/K3K22CEIT" rel="noopener">Buy the dev a coffee ☕</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>Also answers to <a href="https://servarrsearch.app">servarrsearch.app</a> · Not affiliated with the Servarr projects.</span>
+                <span class="version" data-version>v3.2.0</span>
+            </div>
+        </div>
+    </footer>
+    <!-- @shared:footer:end -->
+</body>
+</html>
