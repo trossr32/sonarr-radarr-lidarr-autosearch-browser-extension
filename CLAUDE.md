@@ -72,7 +72,7 @@ After contributor PRs are merged into `staging`, the standard release prep is do
 - `src/options.html` — footer `<i>Version X.Y.Z</i>`
 - `src/popup.html` — `<span ...>Version X.Y.Z</span>`
 - `README.md` — the two Edge add-ons badges (`message=vX.Y.Z.0`); the Chrome/Firefox badges auto-read from the stores. Do not touch the Edge *users* badge (`message=<count>`).
-- `docs/*.html` (website) — the footer `<span class="version" data-version>vX.Y.Z</span>` on all 5 pages, plus the two static Edge shields in `docs/index.html` (`version-vX.Y.Z` badge; leave the Edge users badge alone). The JS release fetch overrides these live, but the fallback must not drift.
+- `docs/*.html` (website) — the footer `<span class="version" data-version>vX.Y.Z</span>` on all 6 pages (every page except 404.html), plus the two static Edge shields in `docs/index.html` (`version-vX.Y.Z` badge; leave the Edge users badge alone). The JS release fetch overrides these live, but the fallback must not drift.
 - `dist/` is gitignored — never edit it for a version bump.
 
 **Changelog** (`CHANGELOG.md` only):
