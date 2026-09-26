@@ -73,6 +73,17 @@ var title = (s, removeUnderscore) => {
 };
 
 /**
+ * Strips dots from search terms so Servarr's SPA router does not treat
+ * them as file extensions (which causes 404 responses).
+ * @param {string} term
+ * @returns {string}
+ */
+var sanitizeSearchTerm = function(term) {
+    return (term || '').replace(/\./g, '');
+};
+
+
+/**
  * Add/update the floating/anchored custom icon row and inject one clickable icon
  * for the given site instance.
  * Uses siteIconConfig to pick the correct image and siteId to keep classes/IDs unique.
@@ -382,7 +393,8 @@ async function runEngines() {
 
                     const base = (site.domain || '').replace(/\/$/, '');
                     const path = (site.searchPath || '');
-                    const link = base + path + encodeURIComponent(term).replace(/%3A/g, ':');
+                    const sanitized = sanitizeSearchTerm(term);
+                    const link = base + path + encodeURIComponent(sanitized).replace(/%3A/g, ':');
 
                     try {
                         // custom floating/anchored vs inline

@@ -310,8 +310,9 @@ async function onClickHandler(info, tab) {
 
     for (const site of settings.sites || []) {
         if (info.menuItemId === `${site.id}Menu`) {
+            const term = (info.selectionText || '').replace(/\./g, '');
             await browser.tabs.create({
-                url: site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
+                url: site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(term).replace(/%3A/g, ':')
             });
         }
     }

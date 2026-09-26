@@ -38,3 +38,31 @@ describe('servarr_search_url', () => {
         expect(processServarrUrl(searchUrl, siteSearchPath)).toBe(expectedResult);
     })
   })
+
+/**
+ * Sanitize a search term for use in a Servarr URL path segment.
+ * Mirrors the implementation in content_script.js.
+ * @param {string} term
+ * @returns {string}
+ */
+let sanitizeSearchTerm = function(term) {
+    return (term || '').replace(/\./g, '');
+};
+
+describe('sanitizeSearchTerm', () => {
+    test.each`
+      input                    | expected
+      ${'S.W.A.T. Exiles'}    | ${'SWAT Exiles'}
+      ${'S.W.A.T.'}           | ${'SWAT'}
+      ${'Dr. House'}           | ${'Dr House'}
+      ${'Mr. Robot'}           | ${'Mr Robot'}
+      ${'Fringe'}              | ${'Fringe'}
+      ${'Y: The Last Man'}     | ${'Y: The Last Man'}
+      ${'S.H.I.E.L.D.'}       | ${'SHIELD'}
+      ${'imdb:tt1234567'}      | ${'imdb:tt1234567'}
+      ${'tmdb:12345'}          | ${'tmdb:12345'}
+      ${''}                    | ${''}
+    `(`sanitizes '$input' → '$expected'`, ({ input, expected }) => {
+        expect(sanitizeSearchTerm(input)).toBe(expected);
+    });
+});
