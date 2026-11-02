@@ -380,9 +380,7 @@ async function runEngines() {
                     const perSiteAttr = `data-servarr-ext-${site.id}-completed`;
                     if (el.getAttribute && el.getAttribute(perSiteAttr)) return;
 
-                    const base = (site.domain || '').replace(/\/$/, '');
-                    const path = (site.searchPath || '');
-                    const link = base + path + encodeURIComponent(term).replace(/%3A/g, ':');
+                    const link = buildServarrSearchUrl(site.domain, site.searchPath, encodeURIComponent(term).replace(/%3A/g, ':'));
 
                     try {
                         // custom floating/anchored vs inline

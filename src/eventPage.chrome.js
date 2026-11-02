@@ -311,7 +311,7 @@ async function onClickHandler(info, tab) {
     for (const site of settings.sites || []) {
         if (info.menuItemId === `${site.id}Menu`) {
             await browser.tabs.create({
-                url: site.domain.replace(/\/$/, '') + site.searchPath + encodeURIComponent(info.selectionText).replace(/\./g, ' ')
+                url: buildServarrSearchUrl(site.domain, site.searchPath, encodeURIComponent(info.selectionText).replace(/\./g, ' '))
             });
         }
     }
