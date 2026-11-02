@@ -1,12 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-
-// core.js is a plain browser script (no exports), so pull the real helper out of the source
-// rather than duplicating it here.
-const src = fs.readFileSync(path.join(__dirname, '../../src/content/js/core.js'), 'utf8');
-const match = src.match(/let buildServarrSearchUrl = [\s\S]*?\n};\n/);
-if (!match) throw new Error('buildServarrSearchUrl not found in core.js');
-const buildServarrSearchUrl = new Function(`${match[0]}; return buildServarrSearchUrl;`)();
+const { buildServarrSearchUrl } = require('../../src/content/js/core.js');
 
 describe('buildServarrSearchUrl', () => {
     test.each`
