@@ -756,6 +756,29 @@ async function resetSettings() {
 }
 
 /**
+ * Build the URL that opens a Servarr "add new" search for a term.
+ *
+ * Sonarr v5 (and Radarr's matching UI) no longer routes `/add/new/<term>` (it shows "Page not found") and only
+ * accepts the term as a query string: `/add/new?term=<term>`. The query string form also works on v3/v4, so it is
+ * used whenever the configured search path is the `/add/new` page. Other paths (Lidarr/Readarr `/add/search/`,
+ * legacy v2 `/addseries/`, or user-customised paths) keep the original "append term to path" behaviour.
+ * @param {string} domain - Servarr base url, e.g. http://host:8989/
+ * @param {string} searchPath - the site's configured searchPath
+ * @param {string} term - already URI-encoded search term
+ * @returns {string} url
+ */
+let buildServarrSearchUrl = (domain, searchPath, term) => {
+    const base = (domain || '').replace(/\/$/, '');
+    const path = searchPath || '';
+
+    if (/^\/add\/new\/?$/.test(path)) {
+        return base + '/add/new?term=' + term;
+    }
+
+    return base + path + term;
+};
+
+/**
  * Get search path / selector configuration for a given site and version
  * @param {string} siteId 
  * @param {string} version 
