@@ -480,12 +480,13 @@ let sessionId,
             id: 'sonarr',
             configs: [
                 {
-                    versionMatch: /^2/,
+                    versionMatch: /^2(?:\.|$)/,
                     searchPath: '/addseries/',
                     searchInputSelector: '.add-series-search .x-series-search'
                 },
                 {
-                    versionMatch: /^[3|4|5|6]/,
+                    // v3 and newer (3-9, 10+). Kept as the last entry so it is also the fallback for future versions.
+                    versionMatch: /^(?:[3-9]|[1-9]\d+)(?:\.|$)/,
                     searchPath: '/add/new/',
                     searchInputSelector: 'input[name="seriesLookup"]'
                 }
@@ -495,12 +496,13 @@ let sessionId,
             id: 'radarr',
             configs: [
                 {
-                    versionMatch: /^[0|2]/,
+                    versionMatch: /^[02](?:\.|$)/,
                     searchPath: '/addmovies/',
                     searchInputSelector: '.add-movies-search .x-movies-search'
                 },
                 {
-                    versionMatch: /^[3|4|5|6]/,
+                    // v3 and newer (3-9, 10+). Kept as the last entry so it is also the fallback for future versions.
+                    versionMatch: /^(?:[3-9]|[1-9]\d+)(?:\.|$)/,
                     searchPath: '/add/new/',
                     searchInputSelector: 'input[name="movieLookup"]'
                 }
@@ -510,7 +512,7 @@ let sessionId,
             id: 'lidarr',
             configs: [
                 {
-                    versionMatch: /^[0|1|2|3]/,
+                    versionMatch: /^[0-3](?:\.|$)/,
                     searchPath: '/add/search/',
                     searchInputSelector: 'input[name="searchBox"]'
                 }
@@ -520,7 +522,7 @@ let sessionId,
             id: 'readarr_ebook',
             configs: [
                 {
-                    versionMatch: /^[0|1]/,
+                    versionMatch: /^[01](?:\.|$)/,
                     searchPath: '/add/search/',
                     searchInputSelector: 'input[name="searchBox"]'
                 }
@@ -530,7 +532,7 @@ let sessionId,
             id: 'readarr_audiobook',
             configs: [
                 {
-                    versionMatch: /^[0|1]/,
+                    versionMatch: /^[01](?:\.|$)/,
                     searchPath: '/add/search/',
                     searchInputSelector: 'input[name="searchBox"]'
                 }
@@ -756,16 +758,45 @@ async function resetSettings() {
 }
 
 /**
- * Get search path / selector configuration for a given site and version
- * @param {string} siteId 
- * @param {string} version 
- * @returns {VersionConfigItem}
+ * Build the URL that opens a Servarr "add new" search for a term.
+ *
+ * Sonarr v5 (and Radarr's matching UI) no longer routes `/add/new/<term>` (it shows "Page not found") and only
+ * accepts the term as a query string: `/add/new?term=<term>`. The query string form also works on v3/v4, so it is
+ * used whenever the configured search path is the `/add/new` page. Other paths (Lidarr/Readarr `/add/search/`,
+ * legacy v2 `/addseries/`, or user-customised paths) keep the original "append term to path" behaviour.
+ * @param {string} domain - Servarr base url, e.g. http://host:8989/
+ * @param {string} searchPath - the site's configured searchPath
+ * @param {string} term - already URI-encoded search term
+ * @returns {string} url
  */
-let getVersionConfig = (siteType, version) =>
-    versionConfig
-        .find(v => v.id === siteType)
-        .configs
-            .find(c => c.versionMatch.test(version));
+let buildServarrSearchUrl = (domain, searchPath, term) => {
+    const base = (domain || '').replace(/\/$/, '');
+    const path = searchPath || '';
+
+    if (/^\/add\/new\/?$/.test(path)) {
+        return base + '/add/new?term=' + term;
+    }
+
+    return base + path + term;
+};
+
+/**
+ * Get search path / selector configuration for a given site and version.
+ * If the version isn't matched by any entry (e.g. an app version released after this list was written) the newest
+ * known config for that site type (the last entry) is used, rather than returning undefined.
+ * @param {string} siteType
+ * @param {string} version 
+ * @returns {VersionConfigItem|undefined} undefined only if the site type is unknown
+ */
+let getVersionConfig = (siteType, version) => {
+    const configs = (versionConfig.find(v => v.id === siteType) || {}).configs;
+
+    if (!configs || !configs.length) {
+        return undefined;
+    }
+
+    return configs.find(c => c.versionMatch.test(String(version || ''))) || configs[configs.length - 1];
+};
 
 /**
  * Build a URL to call an API
@@ -845,14 +876,16 @@ async function callApi(request) {
 
                     let config = getVersionConfig(site.type, data.version);
 
-                    for (let i = 0; i < settings.sites.length; i++) {
-                        if (settings.sites[i].id === site.id) {
-                            settings.sites[i].searchPath = config.searchPath;
-                            settings.sites[i].searchInputSelector = config.searchInputSelector;
+                    if (config) {
+                        for (let i = 0; i < settings.sites.length; i++) {
+                            if (settings.sites[i].id === site.id) {
+                                settings.sites[i].searchPath = config.searchPath;
+                                settings.sites[i].searchInputSelector = config.searchInputSelector;
+                            }
                         }
-                    }
 
-                    await setSettings(settings);
+                        await setSettings(settings);
+                    }
 
                     return apiResponse;
 
@@ -885,4 +918,9 @@ async function callApi(request) {
     response = await performCall(url);
 
     return response;
+}
+
+// Allow unit tests (Jest/Node) to import the pure helpers. `module` is undefined in the extension, so this is a no-op there.
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { buildServarrSearchUrl, getVersionConfig };
 }
