@@ -1,0 +1,23 @@
+const fs = require('fs');
+const path = require('path');
+
+// core.js is a plain browser script (no exports), so pull the real helper out of the source
+// rather than duplicating it here.
+const src = fs.readFileSync(path.join(__dirname, '../../src/content/js/core.js'), 'utf8');
+const match = src.match(/let buildServarrSearchUrl = [\s\S]*?\n};\n/);
+if (!match) throw new Error('buildServarrSearchUrl not found in core.js');
+const buildServarrSearchUrl = new Function(`${match[0]}; return buildServarrSearchUrl;`)();
+
+describe('buildServarrSearchUrl', () => {
+    test.each`
+      domain                        | searchPath        | term             | expected
+      ${'http://host:8989'}         | ${'/add/new/'}    | ${'fringe'}      | ${'http://host:8989/add/new?term=fringe'}
+      ${'http://host:8989/'}        | ${'/add/new/'}    | ${'fringe'}      | ${'http://host:8989/add/new?term=fringe'}
+      ${'https://host:7878/'}       | ${'/add/new'}     | ${'the%20matrix'}| ${'https://host:7878/add/new?term=the%20matrix'}
+      ${'http://host/sonarr'}       | ${'/add/new/'}    | ${'S.W.A.T.'}    | ${'http://host/sonarr/add/new?term=S.W.A.T.'}
+      ${'http://host:8686/'}        | ${'/add/search/'} | ${'abba'}        | ${'http://host:8686/add/search/abba'}
+      ${'http://host:8989/'}        | ${'/addseries/'}  | ${'fringe'}      | ${'http://host:8989/addseries/fringe'}
+    `('$domain + $searchPath + $term -> $expected', ({ domain, searchPath, term, expected }) => {
+        expect(buildServarrSearchUrl(domain, searchPath, term)).toBe(expected);
+    });
+});
