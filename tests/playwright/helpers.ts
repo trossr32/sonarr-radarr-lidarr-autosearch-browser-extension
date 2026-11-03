@@ -42,14 +42,14 @@ export async function waitForServarrIcon(
  * @param query 
  * @returns expected Sonarr URL
  */
-export const getExpectedSonarrUrl = (query: string): string => `http://my.sonarr-url.domain:8989/add/new/${query}`;
+export const getExpectedSonarrUrl = (query: string): string => `http://my.sonarr-url.domain:8989/add/new?term=${query}`;
 
 /**
  * Get the expected Radarr URL for a given add new path query
  * @param query
  * @returns expected Radarr URL
  */
-export const getExpectedRadarrUrl = (query: string): string => `http://my.radarr-url.domain:7878/add/new/${query}`;
+export const getExpectedRadarrUrl = (query: string): string => `http://my.radarr-url.domain:7878/add/new?term=${query}`;
 
 /**
  * Get the expected Lidarr URL for a given search query

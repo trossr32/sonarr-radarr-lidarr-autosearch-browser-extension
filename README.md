@@ -14,7 +14,7 @@
 
 This is an extension for Chromium browsers and Firefox that:
 
-1. Populates the search field on a servarr instance with any text added to the end of the search URL and then triggers the input event on the search field to fire off a search request. For instance, the standard search page url for Sonarr would be http://my.sonarr.domain:7357/add/new. This extension takes a URL like http://my.sonarr.domain:7357/add/new/fringe and automatically triggers the page to show results for fringe.
+1. Opens a Servarr search using a term supplied in the URL. Sonarr and Radarr use the native query-string search, for example http://my.sonarr.domain:7357/add/new?term=fringe. Legacy and custom search paths continue to use the configured path and input-field injection.
 
 2. When right-clicking selected text on any page this extension exposes a context menu with entries for Sonarr, Radarr, Lidarr and Readarr that allow a direct search for the selected text in a new tab.
 

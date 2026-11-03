@@ -193,6 +193,10 @@ async function runServarrSearchInjection() {
 
                 log(['servarr site match found: ', site]);
 
+                // Servarr handles query-string searches natively. Do not overwrite
+                // them using the legacy path-based input injection below.
+                if (new URL(window.location.href).searchParams.has('term')) return;
+
                 // Must be on the site’s search path
                 if (window.location.href.indexOf(site.searchPath) === -1) return;
 
@@ -380,9 +384,7 @@ async function runEngines() {
                     const perSiteAttr = `data-servarr-ext-${site.id}-completed`;
                     if (el.getAttribute && el.getAttribute(perSiteAttr)) return;
 
-                    const base = (site.domain || '').replace(/\/$/, '');
-                    const path = (site.searchPath || '');
-                    const link = base + path + encodeURIComponent(term).replace(/%3A/g, ':');
+                    const link = buildServarrSearchUrl(site.domain, site.searchPath, encodeURIComponent(term).replace(/%3A/g, ':'));
 
                     try {
                         // custom floating/anchored vs inline
