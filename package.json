@@ -26,6 +26,7 @@
     },
     "scripts": {
         "test": "jest",
+        "test:servarr-url": "node tests/servarr-url-regression.cjs",
         "debug": "grunt debug",
         "playwright": "grunt playwright",
         "release": "grunt release",
