@@ -1,38 +1,70 @@
 name: Outdated package checks
 
-# Run workflow on pull request to the main branch
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches: [ master, main, staging ]
+    branches: [master, main, staging]
     paths:
       - '.github/workflows/outdated.yml'
       - 'src/**'
       - 'tests/**'
       - 'package.json'
+      - 'package-lock.json'
       - 'tailwind.config.js'
-  
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   outdated-packages-check:
-    runs-on: ubuntu-slim
-
+    runs-on: ubuntu-24.04
     name: Check outdated packages (${{ matrix.name }})
-
     strategy:
       fail-fast: false
       matrix:
         include:
           - name: project root
             directory: '.'
+            artifact: project-root
           - name: playwright tests
-            directory: 'tests/playwright'
-
+            directory: tests/playwright
+            artifact: playwright-tests
     steps:
-      - name: Check for outdated npm packages in ${{ matrix.name }}
-        uses: trossr32/outdated-packages-action@v4
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
-          use-npm-outdated: true
-          npm-project-directory: ${{ matrix.directory }}
-          comment-label: '${{ matrix.name }}'
+          node-version: lts/*
+      - run: npm ci
+        working-directory: ${{ matrix.directory }}
+      # npm outdated returns 1 for outdated dependencies. Report those as
+      # maintenance information; registry/command errors must still fail.
+      # Summaries and artifacts work on fork PRs without comment write access.
+      - name: Report outdated packages
+        working-directory: ${{ matrix.directory }}
+        env:
+          REPORT_SCOPE: ${{ matrix.name }}
+        run: |
+          node <<'JS'
+          const { spawnSync } = require('node:child_process');
+          const fs = require('node:fs');
+          const result = spawnSync('npm', ['outdated', '--json'], { encoding: 'utf8' });
+          if (result.error) throw result.error;
+          const report = JSON.parse(result.stdout || '{}');
+          if (result.status === null || result.status > 1 || report.error) {
+            console.error(result.stderr, report.error || 'npm outdated failed');
+            process.exit(1);
+          }
+          fs.writeFileSync('npm-outdated.json', JSON.stringify(report, null, 2));
+          const rows = Object.entries(report).flatMap(([name, value]) =>
+            (Array.isArray(value) ? value : [value]).map(v =>
+              `| ${name} | ${v.current || '-'} | ${v.wanted || '-'} | ${v.latest || '-'} |`));
+          const summary = `### Outdated npm packages: ${process.env.REPORT_SCOPE}\n\n` +
+            (rows.length ? '| Package | Current | Wanted | Latest |\n| --- | --- | --- | --- |\n' + rows.join('\n') : 'No outdated packages found.') + '\n';
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary);
+          JS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: outdated-packages-${{ matrix.artifact }}
+          path: ${{ matrix.directory }}/npm-outdated.json
+          retention-days: 5

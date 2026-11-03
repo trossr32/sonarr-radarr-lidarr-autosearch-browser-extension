@@ -3,6 +3,29 @@ import { test, expect } from '../fixtures';
 import { getExpectedRadarrUrl, getExpectedSonarrUrl, waitForServarrIcon } from '../helpers';
 
 const imdbUrl = (imdbId: string): string => `https://www.imdb.com/title/${imdbId}/`;
+// Exercise the real content scripts without depending on IMDb bot protection,
+// consent screens or changes to the selected live titles' metadata.
+test.beforeEach(async ({ page }) => {
+  const types: Record<string, string> = {
+    tt1119644: 'video.tv_show',
+    tt0468569: 'video.movie',
+    tt1080585: 'other',
+  };
+  await page.route('https://www.imdb.com/title/**', async route => {
+    const url = new URL(route.request().url());
+    const id = url.pathname.split('/')[2];
+    const type = types[id];
+    if (!type) return route.abort();
+    await route.fulfill({
+      contentType: 'text/html',
+      body: `<!doctype html><html><head>
+        <link rel="canonical" href="${imdbUrl(id)}">
+        <meta property="og:type" content="${type}">
+        </head><body><h1>IMDb integration fixture</h1></body></html>`,
+    });
+  });
+});
+
 const servarrQueryId = (imdbId: string): string => `imdb:${imdbId}`;
 
 test('imdb tv has sonarr icon', async ({ page }) => {
